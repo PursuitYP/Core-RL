@@ -35,13 +35,13 @@ Scale-Invariant Continuing Control 已有 main pilot：
 
 `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
 
-完整 fixed-condition extended sweep 已提交为 CPU task `core-rl-scale-invariant-extended-33723554`，namespace 是 `ailab-safethm`。截至 2026-07-09 17:02 HKT，该任务记录为 Running。它已经创建目录 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`，但该目录目前没有标准 artifacts，因此还不是 evidence。
+完整 fixed-condition extended sweep 已提交为 CPU task `core-rl-scale-invariant-extended-33723554`，namespace 是 `ailab-safethm`。截至 2026-07-09 17:19 HKT，该任务记录为 Running。它已经创建目录 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`，但该目录目前没有标准 artifacts，因此还不是 evidence。
 
 最近一轮 reviewer-style critique 后新增了三个 second-round extended sweeps：
 
-- Reward-centered beta/gamma/no-reset switch：smoke result 是 `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke`；rerun CPU task 是 `core-rl-reward-sensitivity-extended-rerun-28457861`，截至 2026-07-09 17:02 HKT 记录为 Running；rerun 目录 `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended` 已存在，但还没有标准 artifacts。
-- Output-controlled true-online fairness audit：smoke result 是 `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`；rerun CPU task 是 `core-rl-output-fairness-extended-rerun-29576456`，截至 2026-07-09 17:02 HKT 记录为 Running；rerun 目录 `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended` 已存在，但还没有标准 artifacts。
-- Dyna model-aging drift sweep：smoke result 是 `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke`；rerun CPU task 是 `core-rl-dyna-drift-extended-rerun-30016335`，截至 2026-07-09 17:02 HKT 记录为 Running；rerun 目录 `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended` 已存在，但还没有标准 artifacts。
+- Reward-centered beta/gamma/no-reset switch：smoke result 是 `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke`；rerun CPU task 是 `core-rl-reward-sensitivity-extended-rerun-28457861`，截至 2026-07-09 17:19 HKT 记录为 Running；rerun 目录 `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended` 已存在，但还没有标准 artifacts。
+- Output-controlled true-online fairness audit：smoke result 是 `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`；rerun CPU task 是 `core-rl-output-fairness-extended-rerun-29576456`，截至 2026-07-09 17:24 HKT 记录为 Running；最新日志推进到 condition `938/1500`，说明该 job 在正常推进；rerun 目录 `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended` 已存在，但还没有标准 artifacts。
+- Dyna model-aging drift sweep：smoke result 是 `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke`；rerun CPU task 是 `core-rl-dyna-drift-extended-rerun-30016335`，截至 2026-07-09 17:19 HKT 记录为 Running；rerun 目录 `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended` 已存在，但还没有标准 artifacts。
 
 这三个 sweep 的第一次提交立即失败，原因是命令使用了宿主机专用 Python 路径 `/data/yupeng/conda_envs/core-rl/bin/python`，该路径在 rjob 容器内不存在。失败 job IDs `21581151`、`20998802`、`18940577` 只作为 audit 记录，不能混入当前 evidence。它们已经改用容器内 `python` 重新提交；以上 rerun tasks 才是当前有效任务。
 
