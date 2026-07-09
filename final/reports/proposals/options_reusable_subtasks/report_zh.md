@@ -1,10 +1,10 @@
 # Doorway Options for Reusable Subtasks
 
-状态：quarantined negative-result study。本报告是一个独立 proposal，研究 doorway options 在 Four Rooms 中是否真的表现为 reusable subtasks。当前证据不支持 transfer claim；它说明在提出任何正向 reusable options 结论前，必须先通过 fixed-goal sanity checks，并显式验证 SMDP accounting。
+状态：独立的 bounded negative-result study。本报告是一个独立 proposal，研究 doorway options 在 Four Rooms 中是否真的表现为 reusable subtasks。当前证据不支持 transfer claim；它说明在提出任何正向 reusable options 结论前，必须先通过 fixed-goal validation checks，并显式验证 SMDP accounting。
 
 ## 摘要
 
-Options 常被用来说明 temporally extended actions 可以改善 exploration、planning 和 transfer。本研究在一个有意保持小型的 Four Rooms navigation task 中，用 hand-coded doorway options 测试这个想法。核心方法规则是真实 environment-step accounting：option 可能把多个 primitive moves 压缩成一个 high-level decision，但它仍然消耗同样的 interaction steps。在当前 changing-goal pilot 中，如果按 reward per real environment step 衡量，primitive control 略优于 short 和 long doorway-option controllers。Options 会被选择，也有时能到达局部 doorway target，但它们的 commitment cost 没有换来更好的 goal recovery 或 final reward。因此当前结果应作为 quarantined negative pilot，而不是 reusable-subtask transfer 的证据。
+Options 常被用来说明 temporally extended actions 可以改善 exploration、planning 和 transfer。本研究在一个有意保持小型的 Four Rooms navigation task 中，用 hand-coded doorway options 测试这个想法。核心方法规则是真实 environment-step accounting：option 可能把多个 primitive moves 压缩成一个 high-level decision，但它仍然消耗同样的 interaction steps。在当前 changing-goal pilot 中，如果按 reward per real environment step 衡量，primitive control 略优于 short 和 long doorway-option controllers。Options 会被选择，也有时能到达局部 doorway target，但它们的 commitment cost 没有换来更好的 goal recovery 或 final reward。因此当前结果是 bounded negative pilot，而不是 reusable-subtask transfer 的证据。
 
 ## Proposal Template Answers / 提案模板回答
 
@@ -16,7 +16,7 @@ Implemented comparison：primitive control 与两个 option-augmented SMDP contr
 
 Observation or metric：主指标是 reward per real environment step。诊断指标包括 option usage rate、option duration、option success、steps since goal switch，以及 goal changes 后的 recovery。
 
-Compute need and fallback：实验是 CPU-scale，并可用 Reproduction 章节中的命令复现。Fallback 是在 fixed-goal sanity case 和 SMDP backup audit 通过前，将本研究保持为 quarantined negative accounting result。
+Compute need and fallback：实验是 CPU-scale，并可用 Reproduction 章节中的命令复现。Fallback 是在 fixed-goal validation case 和 SMDP backup audit 通过前，将本研究保持为 bounded negative accounting result。
 
 ## Research Motivation/Question/Method / 研究动机、问题与方法
 
@@ -69,13 +69,13 @@ Option diagnostics 说明负结果不只是因为 options 不可用。在 tail s
 
 有几个机制可以解释当前 pilot。第一，commitment cost 可能占主导：option 会花多个真实 steps 跟随一个可能与当前 goal 不一致的 subpolicy。第二，changing-goal regime 可能让先前合理的 doorway 在局部变 stale。第三，更大的 top-level action set 可能拖慢 value learning，特别是 option values 没有足够快学到时。第四，long options 可能在 decision-step plots 中看起来更好，因为它们减少 high-level choices，但 environment-step accounting 会暴露真实 interaction cost。
 
-决定性限制是缺少 fixed-goal sanity case。Changing-goal transfer experiment 很难解释；除非相同 option definitions 先在 stationary setting 中有效，而在该 setting 里 doorway travel 本应有用。因此当前正确解释是 quarantined negative pilot：当前 setup 不支持 reusable-subtask transfer，而且 implementation/evaluation pipeline 仍需要一个更简单的 sanity win。
+决定性限制是缺少 fixed-goal validation case。Changing-goal transfer experiment 很难解释；除非相同 option definitions 先在 stationary setting 中有效，而在该 setting 里 doorway travel 本应有用。因此当前正确解释是 bounded negative pilot：当前 setup 不支持 reusable-subtask transfer，而且 implementation/evaluation pipeline 仍需要一个更简单的 validation win。
 
-Fixed-goal sanity gate 应要求：固定 start-goal distribution；使用同一组 short 和 long doorway options；报告 reward per real environment step、steps to goal、option duration、option termination locations；并显式审计 SMDP backup 是否使用 duration 和 accumulated reward。如果 options 在该 setting 中都不能 match 或 beat primitive control，本研究就应继续作为 negative accounting result，而不是 transfer study。
+Fixed-goal validation gate 应要求：固定 start-goal distribution；使用同一组 short 和 long doorway options；报告 reward per real environment step、steps to goal、option duration、option termination locations；并显式审计 SMDP backup 是否使用 duration 和 accumulated reward。如果 options 在该 setting 中都不能 match 或 beat primitive control，本研究就应继续作为 negative accounting result，而不是 transfer study。
 
 ## 局限与有效性威胁
 
-当前 pilot 缺少 fixed-goal sanity case，因此无法区分失败来自 transfer 难度，还是 option implementation 本身普遍无用。
+当前 pilot 缺少 fixed-goal validation case，因此无法区分失败来自 transfer 难度，还是 option implementation 本身普遍无用。
 
 Options 是 hand-coded，因此本研究测试的是 option utility 和 accounting，不是 option discovery。
 
@@ -92,7 +92,7 @@ Goal-change schedule 可能比 stationary navigation task 更惩罚 commitment�
 | Reviewer angle | Critique | Current treatment | Remaining risk |
 |---|---|---|---|
 | Research question | 题目容易变成“options 分数更高”，而不是 focused RL question。 | 报告明确为 real-step SMDP accounting 下 reusable subtasks 的窄问题。 | 正向版本仍需要更干净的 sanity experiment。 |
-| Temporal abstraction | Doorway options 很 plausible，但 plausibility 不是 utility。 | 证据等级写成 quarantined negative。 | Transfer language 前需要 fixed-goal sanity win。 |
+| Temporal abstraction | Doorway options 很 plausible，但 plausibility 不是 utility。 | 证据等级写成 bounded negative。 | Transfer language 前需要 fixed-goal validation win。 |
 | Accounting | Decision-step metrics 会虚假偏向 options。 | Reward per real environment step 是主指标。 | 正向 claim 前需要 backup details 和 edge-case audit。 |
 | Transfer | 没有 stationary success 时 changing-goal results 太早。 | Transfer 在 fixed-goal sanity 前被显式阻断。 | Sanity 后可能仍需重设 goal schedule。 |
 | Interpretation | Negative pilot 可能被过度解释为“options 不工作”。 | 结论限制在当前 tested setup。 | 一般结论需要更多 environments 和 option definitions。 |
@@ -108,7 +108,7 @@ Goal-change schedule 可能比 stationary navigation task 更惩罚 commitment�
 
 ## Conclusion / 结论
 
-独立结论是保守的：在已测试的 changing-goal Four Rooms pilot 中，hand-coded doorway options 没有在 reward per real environment step 上优于 primitive control。当前 transfer claim 不受支持，应保持 quarantined。下一步不应扩大比较范围，而应先做 fixed-goal sanity experiment，并显式完成 SMDP accounting audit。只有相同 options 在干净 stationary 条件下确实有帮助后，才应重新打开 changing-goal transfer claim。
+独立结论是保守的：在已测试的 changing-goal Four Rooms pilot 中，hand-coded doorway options 没有在 reward per real environment step 上优于 primitive control。当前 transfer claim 不受支持。下一步不应扩大比较范围，而应先做 fixed-goal validation experiment，并显式完成 SMDP accounting audit。只有相同 options 在干净 stationary 条件下确实有帮助后，才应重新打开 changing-goal transfer claim。
 
 ## Reproduction / 复现
 

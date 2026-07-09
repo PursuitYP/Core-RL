@@ -1,10 +1,10 @@
 # Doorway Options for Reusable Subtasks
 
-Status: quarantined negative-result study. This is an independent proposal about whether doorway options behave like reusable subtasks in Four Rooms. The current evidence does not support a transfer claim; it shows that fixed-goal sanity checks and explicit SMDP accounting must pass before any positive claim about reusable options.
+Status: independent bounded negative-result study. This proposal asks whether doorway options behave like reusable subtasks in Four Rooms. The current evidence does not support a transfer claim; it shows that fixed-goal validation and explicit SMDP accounting must pass before any positive claim about reusable options.
 
 ## Abstract
 
-Options are often motivated as temporally extended actions that can make exploration, planning, and transfer easier. This study tests that idea in a deliberately small Four Rooms navigation task using hand-coded doorway options. The core methodological rule is real environment-step accounting: an option may compress several primitive moves into one high-level decision, but it still consumes the same interaction steps. In the current changing-goal pilot, primitive control slightly outperforms both short and long doorway-option controllers when reward is measured per real environment step. Options are selected and sometimes reach their local doorway targets, but their commitment cost is not repaid by better goal recovery or better final reward. The result is therefore quarantined as a negative pilot rather than evidence for reusable-subtask transfer.
+Options are often motivated as temporally extended actions that can make exploration, planning, and transfer easier. This study tests that idea in a deliberately small Four Rooms navigation task using hand-coded doorway options. The core methodological rule is real environment-step accounting: an option may compress several primitive moves into one high-level decision, but it still consumes the same interaction steps. In the current changing-goal pilot, primitive control slightly outperforms both short and long doorway-option controllers when reward is measured per real environment step. Options are selected and sometimes reach their local doorway targets, but their commitment cost is not repaid by better goal recovery or better final reward. The result is therefore a bounded negative pilot rather than evidence for reusable-subtask transfer.
 
 ## Proposal Template Answers
 
@@ -16,7 +16,7 @@ Implemented comparison: Primitive control is compared with two option-augmented 
 
 Observation or metric: The primary metric is reward per real environment step. Diagnostic metrics include option usage rate, option duration, option success, steps since goal switch, and recovery after goal changes.
 
-Compute need and fallback: The experiment is CPU-scale and reproducible with the command in the Reproduction section. The fallback is to keep the study quarantined as a negative accounting result until a fixed-goal sanity case and SMDP backup audit pass.
+Compute need and fallback: The experiment is CPU-scale and reproducible with the command in the Reproduction section. The fallback is to keep the study as a bounded negative accounting result until a fixed-goal validation case and SMDP backup audit pass.
 
 ## Research Motivation/Question/Method
 
@@ -69,13 +69,13 @@ The main lesson is that option availability is not the same as reusable-subtask 
 
 Several mechanisms plausibly explain the pilot. First, commitment cost may dominate: an option spends multiple real steps following a subpolicy that can become misaligned with the current goal. Second, the changing-goal regime can make a previously sensible doorway locally stale. Third, the larger top-level action set may slow value learning if option values are not learned quickly enough. Fourth, long options can look better under decision-step plots because they make fewer top-level choices, while environment-step accounting exposes the true interaction cost.
 
-The decisive limitation is the missing fixed-goal sanity case. A changing-goal transfer experiment is hard to interpret unless the same option definitions first help in a stationary setting where doorway travel should be useful. Until that gate passes, the correct interpretation is a quarantined negative pilot: the current setup does not support reusable-subtask transfer, and the implementation/evaluation pipeline still needs a simpler sanity win.
+The decisive limitation is the missing fixed-goal validation case. A changing-goal transfer experiment is hard to interpret unless the same option definitions first help in a stationary setting where doorway travel should be useful. Until that gate passes, the correct interpretation is a bounded negative pilot: the current setup does not support reusable-subtask transfer, and the implementation/evaluation pipeline still needs a simpler validation win.
 
-The fixed-goal sanity gate should require a fixed start-goal distribution, the same short and long doorway options, reward per real environment step, steps to goal, option duration, option termination locations, and an explicit audit that the SMDP backup uses duration and accumulated reward. If options cannot match or beat primitive control there, the study should remain a negative accounting result rather than a transfer study.
+The fixed-goal validation gate should require a fixed start-goal distribution, the same short and long doorway options, reward per real environment step, steps to goal, option duration, option termination locations, and an explicit audit that the SMDP backup uses duration and accumulated reward. If options cannot match or beat primitive control there, the study should remain a negative accounting result rather than a transfer study.
 
 ## Threats To Validity
 
-The current pilot lacks the fixed-goal sanity case, so it cannot separate transfer difficulty from a generally unhelpful option implementation.
+The current pilot lacks the fixed-goal validation case, so it cannot separate transfer difficulty from a generally unhelpful option implementation.
 
 The options are hand-coded. This tests option utility and accounting, not option discovery.
 
@@ -92,7 +92,7 @@ The current report emphasizes real-step performance and logged diagnostics, but 
 | Reviewer angle | Critique | Current treatment | Remaining risk |
 |---|---|---|---|
 | Research question | The topic can easily become "options scored higher" rather than a focused RL question. | The report states a narrow question about reusable subtasks under real-step SMDP accounting. | A positive version still needs a cleaner sanity experiment. |
-| Temporal abstraction | Doorway options are plausible, but plausibility is not utility. | The evidence level is quarantined negative. | Needs a fixed-goal sanity win before transfer language. |
+| Temporal abstraction | Doorway options are plausible, but plausibility is not utility. | The evidence level is bounded negative. | Needs a fixed-goal validation win before transfer language. |
 | Accounting | Decision-step metrics can falsely favor options. | Reward per real environment step is the primary metric. | Backup details and edge cases need audit detail before a positive claim. |
 | Transfer | Changing-goal results are premature without stationary success. | Transfer is explicitly blocked until fixed-goal sanity passes. | The goal schedule may need redesign after sanity. |
 | Interpretation | A negative pilot can be oversold as evidence that options do not work. | The conclusion is limited to this tested setup. | More environments and option definitions would be needed for a general conclusion. |
@@ -108,7 +108,7 @@ Local references:
 
 ## Conclusion
 
-The independent conclusion is conservative: in the tested changing-goal Four Rooms pilot, hand-coded doorway options do not improve reward per real environment step over primitive control. The current transfer claim is unsupported and should remain quarantined. The next valid step is not a broader comparison; it is a fixed-goal sanity experiment plus an explicit SMDP accounting audit. Only after the same options help under clean stationary conditions should the changing-goal transfer claim be reopened.
+The independent conclusion is conservative: in the tested changing-goal Four Rooms pilot, hand-coded doorway options do not improve reward per real environment step over primitive control. The current transfer claim is unsupported. The next valid step is not a broader comparison; it is a fixed-goal validation experiment plus an explicit SMDP accounting audit. Only after the same options help under clean stationary conditions should the changing-goal transfer claim be reopened.
 
 ## Reproduction
 

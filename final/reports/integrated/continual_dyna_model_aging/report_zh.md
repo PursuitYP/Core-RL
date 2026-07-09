@@ -92,6 +92,10 @@ half-life sweep 是主要科学控制。很短的 half-life 会快速不信任�
 
 当前 extended result path 是 `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`。
 
+第二轮 drift extension 已经实现为 runner `continual_dyna_model_aging_drift`。Smoke result 位于 `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke`，extended CPU task 是 `core-rl-dyna-drift-extended-rerun-30016335`。Drift modes 包括 abrupt switch、gradual phase mixing 和 stochastic phase changes。下面的 smoke figure 只用于验证 runner 和 plotting path 正常，不作为统计结论；真正的 drift interpretation 必须等待 extended CPU result 写出标准 artifacts。
+
+![Smoke drift reward heatmap.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke/figures/report_drift_reward_heatmap.png)
+
 下面三张 heatmap 是当前主结果图。它们比早期多折线图更适合回答本课题问题：freshness-aware planning 是否减少 stale computation，以及这种减少是否能在不同 planning budget 和 half-life 下转化为 reward/recovery。
 
 ![Late average reward heatmap by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_dyna_aging_reward_heatmap.png)
@@ -106,7 +110,7 @@ half-life sweep 是主要科学控制。很短的 half-life 会快速不信任�
 
 ![Late stale-backup rate by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_stale_backup_rate_post_late_by_budget.png)
 
-![Late model error by planning budget and model mode.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_mean_model_error_post_late_by_budget.png)
+![Late model error by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_mean_model_error_post_late_by_budget.png)
 
 Extended run 中，planning budget `20` 时 keep-model 的 late stale-backup rate 为 `0.213 +/- 0.065`。Recency aging 在 half-life `250` 时几乎降到 `0`，在 half-life `1500` 时约 `0.00058 +/- 0.00017`，在 half-life `4000` 时约 `0.0204 +/- 0.0044`。这说明不依赖 oracle change detector 的 freshness weighting 可以显著改变 planning computation 的内容。
 

@@ -19,7 +19,7 @@
 | Centered TD Diagnostics | 独立 reward-centering 机制诊断 | `experiments/alberta_core_rl/results/centered_td_diagnostics/20260708T160958Z_main` | `centered_td_diagnostics/report.md` / `report_zh.md` |
 | On-policy Stability Atlas | 独立 feature-scale stability atlas | `experiments/alberta_core_rl/results/onpolicy_stability_atlas/20260708T160958Z_main` | `onpolicy_stability_atlas/report.md` / `report_zh.md` |
 | GVF Question Design | GVF useful prediction redesign aid | `experiments/alberta_core_rl/results/gvf_question_design/20260708T160958Z_main` | `gvf_question_design/report.md` / `report_zh.md` |
-| Nonstationary Bandit | dropped sanity check | `experiments/alberta_core_rl/results/nonstationary_bandit/20260708T160958Z_main` | `nonstationary_bandit/report.md` / `report_zh.md` |
+| Nonstationary Bandit | limited-scope plasticity study | `experiments/alberta_core_rl/results/nonstationary_bandit/20260708T160958Z_main` | `nonstationary_bandit/report.md` / `report_zh.md` |
 | Streaming Representation | dropped auxiliary-prediction diagnostic | `experiments/alberta_core_rl/results/streaming_representation/20260708T160958Z_main` | `streaming_representation/report.md` / `report_zh.md` |
 
 最终审阅时，优先读 `final/indexes/status_zh.md`、`final/indexes/results_zh.md` 和每个 proposal 的 `report_zh.md`。`final/archive/` 只保留早期碎片和审计记录，不作为当前结论来源。

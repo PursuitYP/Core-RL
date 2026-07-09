@@ -1,12 +1,12 @@
 # Nonstationary Bandit Plasticity 诊断
 
-状态：独立的 plasticity sanity diagnostic。结果有用且可复现，但仍不足以支撑 submission-grade Core RL claim。
+状态：独立的 limited-scope plasticity study。结果有用且可复现，但仍不足以支撑 submission-grade Core RL claim。
 
 ## 摘要
 
-这篇 mini-report 把 drifting multi-armed bandit 作为 continual adaptation 的最小测试。聚焦问题是：一个基础 online learner 在没有 replay 的情况下，是否还能保持足够 plasticity 来跟踪变化中的 action values。实验确认了预期现象：reward distribution 改变后，constant-alpha action-value estimates 比 sample averages 更能适应。
+本研究把 drifting multi-armed bandit 作为 continual adaptation 的最小测试。聚焦问题是：一个基础 online learner 在没有 replay 的情况下，是否还能保持足够 plasticity 来跟踪变化中的 action values。实验确认了预期现象：reward distribution 改变后，constant-alpha action-value estimates 比 sample averages 更能适应。
 
-这个结果是有效的独立 diagnostic，不是其他 proposal 的附录。它回答了一个窄 plasticity question，并检查了 experiment pipeline、绘图和解释语言。它的限制同样重要：该任务没有 state、没有 temporal credit assignment、没有 bootstrapped value functions、没有 learned model、没有 planning，也没有 options。因此应把它隔离为 sanity diagnostic，而不是提升为完整 Core RL project。
+这个结果是有效的独立 study，其范围刻意保持狭窄。它回答了一个窄 plasticity question，并检查了 experiment pipeline、绘图和解释语言。它的限制同样重要：该任务没有 state、没有 temporal credit assignment、没有 bootstrapped value functions、没有 learned model、没有 planning，也没有 options。因此它应作为 bounded plasticity result 来推动更丰富的 Core RL settings，而不是单独作为完整 Core RL project。
 
 ## 1. Proposal Template Answers / 提案模板回答
 
@@ -46,7 +46,7 @@ Main run：
 
 ![Best-action rate in drifting bandit.](../../../../experiments/alberta_core_rl/results/nonstationary_bandit/20260708T160958Z_main/figures/best_action_rate_by_algorithm_curve.png)
 
-这个设计应作为 sanity check 阅读。主要观察是 learning rule 在 reward shift 后是否恢复，而不是 bandit setting 是否足以建模 continual RL。
+这个设计是最小机制检查。主要观察是 learning rule 在 reward shift 后是否恢复，而不是 bandit setting 是否足以建模 continual RL。
 
 ## 4. Results / 结果
 
@@ -74,14 +74,14 @@ Main run：
 
 | Reviewer critique | 当前回应 | 必要下一步 |
 |---|---|---|
-| 问题对 Core RL 来说太浅。 | 报告明确标为 plasticity sanity diagnostic。 | 若恢复，应围绕 contextual prediction、continuing control 或 average reward 重设计。 |
+| 问题对 Core RL 来说太浅。 | 报告明确标为 limited-scope plasticity result。 | 若恢复，应围绕 contextual prediction、continuing control 或 average reward 重设计。 |
 | 五个 seeds 太少，不能支撑强 empirical claim。 | Claim 是定性且受限的。 | 只有在 diagnostic 本身仍有价值时再增加 seeds。 |
 | Bandit 没有 temporal credit assignment。 | 该限制被作为隔离结果的理由。 | Final project 应转向小型 Markov 或 continuing-control task。 |
 | Gradient bandit comparisons 没有深入分析。 | 它们只作为轻量参考。 | 没有单独设计前，不围绕它们建立 final claim。 |
 
 ## 8. Conclusion / 结论
 
-这个 proposal 是独立且结论受限的 diagnostic：它确认在 drifting bandit 中，constant step sizes 比 sample averages 更能保持 plasticity，但不建立 submission-grade Core RL result。它最合适的用途是记录一个最小 adaptation phenomenon，并推动带 state、value functions 或 continuing control 的更丰富重设计。
+这个 proposal 是独立且结论受限的 plasticity study：它确认在 drifting bandit 中，constant step sizes 比 sample averages 更能保持 plasticity，但不建立 submission-grade Core RL result。它最合适的用途是记录一个最小 adaptation phenomenon，并推动带 state、value functions 或 continuing control 的更丰富重设计。
 
 ## 9. Reproduction / 复现
 

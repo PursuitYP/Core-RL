@@ -21,7 +21,7 @@
 - 测试的 GVFs 已经解决 T-maze control；
 - 某个 cumulant/discount pair 普遍最好；
 - TD error 是主要成功指标；
-- 在没有 downstream probes 的情况下，GVF predictive state 已经被验证。
+- 在没有 downstream probes 的情况下，predictive-state construction 已经被验证。
 
 ## Research Motivation/Question/Method / 研究动机/问题/方法
 
@@ -197,7 +197,7 @@ Fallback：如果 downstream usefulness tests 来不及完成，就把本研究�
 
 ## Conclusion / 结论
 
-本 proposal 是关于 GVF question design 的独立 mini-study。当前结果有价值，因为它避免一个常见错误：在没有测量 predictions 对 control 保留了什么信息时，就把准确 predictions 当作 useful state。本研究应保持为 redesign target，直到加入 cue decodability 和 downstream action ablations；只有那时才能声称某个 GVF question set 改善了 state construction，而不只是产生了 learnable predictions。
+本 proposal 是关于 GVF question design 的独立 focused study。当前结果有价值，因为它避免一个常见错误：在没有测量 predictions 对 control 保留了什么信息时，就把准确 predictions 当作 useful state。本研究仍是 redesign target，直到加入 cue decodability 和 downstream action ablations；只有那时才能声称某个 GVF question set 改善了 state construction，而不只是产生了 learnable predictions。
 
 ## Reproduction / 复现
 

@@ -1,12 +1,12 @@
 # Streaming Representation With Auxiliary Prediction
 
-Status: independent negative auxiliary-prediction diagnostic. The current target should be redesigned around task-relevant predictions before any positive representation claim.
+Status: independent negative auxiliary-prediction study. The current target should be redesigned around task-relevant predictions before any positive representation claim.
 
 ## Abstract
 
-This mini-report tests a common representation-learning intuition in a small streaming RL setting: adding an auxiliary prediction objective might improve the representation used for online value prediction. The experiment compares value-only normalized TD with a value learner that also predicts next features, using a nonstationary sensor stream and no replay. The result is negative: the auxiliary next-feature target does not materially reduce the main value-prediction error.
+This study tests a common representation-learning intuition in a small streaming RL setting: adding an auxiliary prediction objective might improve the representation used for online value prediction. The experiment compares value-only normalized TD with a value learner that also predicts next features, using a nonstationary sensor stream and no replay. The result is negative: the auxiliary next-feature target does not materially reduce the main value-prediction error.
 
-The result is useful because it shows that an auxiliary loss is not automatically a useful prediction. The auxiliary target must be relevant to the value or control question the agent is trying to answer. This proposal should therefore be read as an independent negative diagnostic and redesign target, not as evidence against auxiliary learning or GVFs in general.
+The result is useful because it shows that an auxiliary loss is not automatically a useful prediction. The auxiliary target must be relevant to the value or control question the agent is trying to answer. This proposal is therefore an independent negative result and redesign target, not evidence against auxiliary learning or GVFs in general.
 
 ## 1. Proposal Template Answers
 

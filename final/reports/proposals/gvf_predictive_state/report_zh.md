@@ -64,7 +64,7 @@ Compute need / fallback：当前 result 是 five-seed pilot。诚实 fallback �
 
 ![不同 state construction 的 trial accuracy。](../../../../experiments/alberta_core_rl/results/useful_gvfs_state/20260708T155740Z_main/figures/trial_accuracy_by_algorithm_curve.png)
 
-![GVF values 和 cue traces 随 maze position 的变化。](../../../../experiments/alberta_core_rl/results/useful_gvfs_state/20260708T155740Z_main/figures/gvf_trace_by_position.png)
+![GVF values 和 cue traces 随 maze position 的变化。](figures/gvf_trace_by_position_panels.png)
 
 ## 实验设计依据
 
@@ -103,7 +103,7 @@ Strict baseline reviewer 会指出：如果 trace memory 这么便宜，GVF 必�
 | GVF | prediction accuracy 不等于 useful state。 | 报告 trial accuracy，并加入 trace/oracle baselines。 | 仍缺 direct cue-decodability。 |
 | Baseline | 如果 trace memory 解任务，GVF 必须接近它。 | 包含 trace 和 oracle 强 baseline。 | GVF 仍接近 chance。 |
 | 证据 | 5 seeds 和一个 maze length 有限。 | 报告定位为 negative pilot。 | 需要更多 seeds、maze lengths 和 direct cue probes。 |
-| Alberta Plan | GVF 很重要，因此负结果必须精确。 | 结论限定于当前 GVF design。 | 更好的 GVF questions 可能成功。 |
+| Alberta Plan | GVF 很重要，因此负结果必须精确。 | 结论限定于当前 predictive-question design。 | 更好的 predictive questions 可能成功。 |
 | 严格老师 | 不要把它写成正向 proposal。 | status 和 conclusion 都称为 redesign target。 | final material 必须保留 negative evidence level。 |
 
 ## 结论

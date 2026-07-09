@@ -1,0 +1,7 @@
+{
+  "proposal": "useful_predictive_knowledge",
+  "suite": "smoke",
+  "seeds": [0, 1],
+  "steps": 1000,
+  "notes": "Smoke run for the larger useful-predictive-knowledge proposal."
+}

@@ -92,11 +92,11 @@ The scale conditions are not meant to be realistic sensor models by themselves. 
 
 ## Results
 
-![Tail RMSE stability atlas by algorithm, scale, and alpha.](figures/report_log_rmse_heatmap.png)
+![Tail RMSE stability atlas shown as readable panels by algorithm, scale, and alpha.](figures/report_log_rmse_heatmap_panels.png)
 
-![Seed-level divergence-rate atlas by algorithm, scale, and alpha.](figures/report_divergence_heatmap.png)
+![Seed-level divergence-rate atlas shown as readable panels by algorithm, scale, and alpha.](figures/report_divergence_heatmap_panels.png)
 
-![Tail output-change atlas by algorithm, scale, and alpha.](figures/report_prediction_change_heatmap.png)
+![Tail output-change atlas shown as readable panels by algorithm, scale, and alpha.](figures/report_prediction_change_heatmap_panels.png)
 
 | Algorithm | Lambda | Seed-conditions diverged | Non-diverged final RMSE mean | Interpretation |
 |---|---:|---:|---:|---|

@@ -197,7 +197,7 @@ Fallback: Keep the study as a question-design diagnostic if downstream usefulnes
 
 ## Conclusion
 
-This proposal is an independent mini-study on GVF question design. Its current result is useful because it prevents a common mistake: treating accurate predictions as useful state without measuring what they preserve for control. The study should remain a redesign target until it adds cue decodability and downstream action ablations; only then can it claim that a GVF question set improves state construction rather than merely producing learnable predictions.
+This proposal is an independent focused study on GVF question design. Its current result is useful because it prevents a common mistake: treating accurate predictions as useful state without measuring what they preserve for control. The study remains a redesign target until it adds cue decodability and downstream action ablations; only then can it claim that a GVF question set improves state construction rather than merely producing learnable predictions.
 
 ## Reproduction
 

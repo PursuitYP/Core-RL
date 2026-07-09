@@ -4,7 +4,7 @@
 
 ## 摘要
 
-这篇 mini-report 研究持续预测型 agent 中一个窄但重要的失败模式：在线性函数逼近下，off-policy bootstrapped value learning 可能变得不稳定。Testbed 是 Baird-style seven-state prediction problem，包含 zero reward、behavior-target policy mismatch 和 online TD updates。这直接关联 GVF/Horde-style background prediction，因为 agent 可能在按一个 behavior policy 行动时，从 ordinary experience 中学习许多其他 policy 下的 predictions。
+本研究考察持续预测型 agent 中一个窄但重要的失败模式：在线性函数逼近下，off-policy bootstrapped value learning 可能变得不稳定。Testbed 是 Baird-style seven-state prediction problem，包含 zero reward、behavior-target policy mismatch 和 online TD updates。这直接关联 GVF/Horde-style background prediction，因为 agent 可能在按一个 behavior policy 行动时，从 ordinary experience 中学习许多其他 policy 下的 predictions。
 
 当前 pilot 在三个 step size 上比较 semi-gradient off-policy TD 和 TDC-style correction。Semi-gradient TD 出现严重 weight-norm growth。TDC-style learner 在较小 step size 下保持稳定，但在最大测试 step size 下也失败。因此本文贡献是一个受限 warning：off-policy predictions 在被当作 agent knowledge 之前，需要显式 stability checks。
 

@@ -1,12 +1,12 @@
 # Nonstationary Bandit Plasticity Diagnostic
 
-Status: independent plasticity sanity diagnostic. The result is useful and reproducible, but it remains too shallow for a submission-grade Core RL claim.
+Status: independent limited-scope plasticity study. The result is useful and reproducible, but it remains too shallow for a submission-grade Core RL claim.
 
 ## Abstract
 
-This mini-report evaluates a drifting multi-armed bandit as the smallest possible test of continual adaptation. The focused question is whether an elementary online learner can keep enough plasticity to track changing action values without replay. The experiment confirms the expected pattern: constant-alpha action-value estimates adapt better than sample averages after the reward distribution changes.
+This study evaluates a drifting multi-armed bandit as the smallest possible test of continual adaptation. The focused question is whether an elementary online learner can keep enough plasticity to track changing action values without replay. The experiment confirms the expected pattern: constant-alpha action-value estimates adapt better than sample averages after the reward distribution changes.
 
-The result is a valid independent diagnostic with a deliberately narrow scope. It answers a small plasticity question and checks the experiment pipeline, plotting, and interpretation language. Its limitation is equally important: the task has no state, no temporal credit assignment, no bootstrapped value functions, no learned model, no planning, and no options. It should therefore be treated as a sanity diagnostic rather than promoted as a full Core RL project.
+The result is a valid independent study with a deliberately narrow scope. It answers a small plasticity question and checks the experiment pipeline, plotting, and interpretation language. Its limitation is equally important: the task has no state, no temporal credit assignment, no bootstrapped value functions, no learned model, no planning, and no options. It should therefore be used as a bounded plasticity result that motivates richer Core RL settings, not as a full Core RL project by itself.
 
 ## 1. Proposal Template Answers
 
@@ -46,7 +46,7 @@ Primary figure:
 
 ![Best-action rate in drifting bandit.](../../../../experiments/alberta_core_rl/results/nonstationary_bandit/20260708T160958Z_main/figures/best_action_rate_by_algorithm_curve.png)
 
-The design should be read as a sanity check. The main observation is whether a learning rule recovers after the reward shift, not whether the bandit setting is a sufficient model of continual RL.
+The design is a minimal mechanism check. The main observation is whether a learning rule recovers after the reward shift, not whether the bandit setting is a sufficient model of continual RL.
 
 ## 4. Results
 
@@ -74,14 +74,14 @@ This mechanism is relevant to persistent adaptation, step-size adaptation, rewar
 
 | Reviewer critique | Current response | Required next action |
 |---|---|---|
-| The question is too shallow for Core RL. | The report explicitly labels the study as a plasticity sanity diagnostic. | Redesign around contextual prediction, continuing control, or average reward if revived. |
+| The question is too shallow for Core RL. | The report explicitly labels the study as a limited-scope plasticity result. | Redesign around contextual prediction, continuing control, or average reward if revived. |
 | Five seeds are too few for a strong empirical claim. | The claim is qualitative and bounded. | Add seeds only if the diagnostic itself remains useful. |
 | Bandits have no temporal credit assignment. | This limitation is treated as a reason to quarantine the result. | Move to a small Markov or continuing-control task for a final project. |
 | Gradient bandit comparisons are not deeply analyzed. | They are included only as lightweight references. | Do not build a final claim around them without a separate design. |
 
 ## 8. Conclusion
 
-This proposal is an independent negative-bounded diagnostic: it confirms that constant step sizes preserve plasticity better than sample averages in a drifting bandit, but it does not establish a submission-grade Core RL result. Its best use is to document a minimal adaptation phenomenon and to motivate a richer redesign with state, value functions, or continuing control.
+This proposal is an independent bounded plasticity study: it confirms that constant step sizes preserve plasticity better than sample averages in a drifting bandit, but it does not establish a submission-grade Core RL result. Its best use is to document a minimal adaptation phenomenon and to motivate a richer redesign with state, value functions, or continuing control.
 
 ## 9. Reproduction
 

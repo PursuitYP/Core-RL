@@ -71,3 +71,65 @@ def plot_predictive_state(result_dir: Path, figure_dir: Path | None = None) -> l
         plt.close(fig)
         outputs.append(out)
     return outputs
+
+
+def _upk_label(row: dict) -> str:
+    alg = str(_condition(row, "algorithm"))
+    if alg.startswith("gvf_"):
+        gamma = float(_condition(row, "gamma"))
+        return f"{_safe_label(alg)}\ngamma={gamma:g}"
+    return _safe_label(alg)
+
+
+def plot_useful_predictive_knowledge(result_dir: Path, figure_dir: Path | None = None) -> list[Path]:
+    ensure_mpl_config(repo_root())
+    import matplotlib.pyplot as plt
+
+    rows = _load_condition_summary(result_dir)
+    lengths = _sorted_unique([_condition(row, "maze_length") for row in rows])
+    fig_dir = figure_dir or result_dir / "figures"
+    fig_dir.mkdir(parents=True, exist_ok=True)
+    outputs: list[Path] = []
+    metrics = [
+        ("trial_accuracy", "Tail trial accuracy", "report_upk_trial_accuracy_by_length.png", (0.0, 1.05)),
+        (
+            "decision_cue_decoding_correct",
+            "Decision-time cue decoding",
+            "report_upk_decision_decoding_by_length.png",
+            (0.0, 1.05),
+        ),
+        ("cue_alignment_margin", "Tail signed cue margin", "report_upk_cue_margin_by_length.png", None),
+    ]
+    for metric, ylabel, filename, ylim in metrics:
+        ncols = min(2, len(lengths))
+        nrows = math.ceil(len(lengths) / ncols)
+        fig, axes_arr = plt.subplots(nrows, ncols, figsize=(6.6 * ncols, 4.4 * nrows), sharey=ylim is not None)
+        axes = list(axes_arr.flat) if hasattr(axes_arr, "flat") else [axes_arr]
+        for ax, length in zip(axes, lengths):
+            length_rows = [row for row in rows if int(float(_condition(row, "maze_length"))) == int(float(length))]
+            length_rows = sorted(length_rows, key=lambda row: (_condition(row, "algorithm"), float(_condition(row, "gamma") or 0.0)))
+            labels = [_upk_label(row) for row in length_rows]
+            means = []
+            errs = []
+            for row in length_rows:
+                mean, ci95 = _metric(row, metric)
+                means.append(mean)
+                errs.append(0.0 if not math.isfinite(ci95) else ci95)
+            ax.bar(range(len(labels)), means, yerr=errs, capsize=2.5)
+            if metric in {"trial_accuracy", "decision_cue_decoding_correct"}:
+                ax.axhline(0.5, color="black", linestyle="--", linewidth=1.0, alpha=0.55)
+            ax.set_title(f"maze length {int(float(length))}")
+            ax.set_xticks(range(len(labels)))
+            ax.set_xticklabels(labels, rotation=38, ha="right", fontsize=8)
+            ax.grid(True, axis="y", alpha=0.25)
+            if ylim is not None:
+                ax.set_ylim(*ylim)
+        for ax in axes[len(lengths) :]:
+            ax.axis("off")
+        axes[0].set_ylabel(ylabel)
+        fig.tight_layout()
+        out = fig_dir / filename
+        fig.savefig(out, dpi=180)
+        plt.close(fig)
+        outputs.append(out)
+    return outputs

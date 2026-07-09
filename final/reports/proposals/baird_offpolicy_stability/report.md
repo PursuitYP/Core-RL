@@ -4,7 +4,7 @@ Status: independent off-policy stability warning. The current evidence is a Bair
 
 ## Abstract
 
-This mini-report studies a narrow failure mode for continual predictive agents: off-policy bootstrapped value learning can become unstable under linear function approximation. The testbed is a Baird-style seven-state prediction problem with zero reward, behavior-target policy mismatch, and online TD updates. This is directly relevant to GVF/Horde-style background prediction, where an agent may learn many predictions from ordinary experience while behaving according to a different policy.
+This study examines a narrow failure mode for continual predictive agents: off-policy bootstrapped value learning can become unstable under linear function approximation. The testbed is a Baird-style seven-state prediction problem with zero reward, behavior-target policy mismatch, and online TD updates. This is directly relevant to GVF/Horde-style background prediction, where an agent may learn many predictions from ordinary experience while behaving according to a different policy.
 
 The pilot compares semi-gradient off-policy TD with a TDC-style correction across three step sizes. Semi-gradient TD shows severe weight-norm growth. The TDC-style learner remains stable at smaller tested step sizes but also fails at the largest tested step size. The contribution is therefore a bounded warning: off-policy predictions need explicit stability checks before they are treated as agent knowledge.
 

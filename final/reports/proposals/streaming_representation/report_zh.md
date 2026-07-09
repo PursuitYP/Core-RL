@@ -1,12 +1,12 @@
 # Streaming Representation With Auxiliary Prediction
 
-状态：独立的 negative auxiliary-prediction diagnostic。当前 target 需要围绕 task-relevant predictions 重设计后，才能提出正向 representation claim。
+状态：独立的 negative auxiliary-prediction study。当前 target 需要围绕 task-relevant predictions 重设计后，才能提出正向 representation claim。
 
 ## 摘要
 
-这篇 mini-report 在一个小型 streaming RL setting 中检验一个常见 representation-learning 直觉：加入 auxiliary prediction objective 可能改善 online value prediction 所用的 representation。实验在 nonstationary sensor stream 中比较 value-only normalized TD 与同时预测 next features 的 value learner，并且不使用 replay。结果是负面的：auxiliary next-feature target 没有实质降低主 value-prediction error。
+本研究在一个小型 streaming RL setting 中检验一个常见 representation-learning 直觉：加入 auxiliary prediction objective 可能改善 online value prediction 所用的 representation。实验在 nonstationary sensor stream 中比较 value-only normalized TD 与同时预测 next features 的 value learner，并且不使用 replay。结果是负面的：auxiliary next-feature target 没有实质降低主 value-prediction error。
 
-这个结果有用，因为它说明 auxiliary loss 不会自动成为 useful prediction。Auxiliary target 必须与 agent 要回答的 value 或 control question 相关。因此，这个 proposal 应被读作独立 negative diagnostic 和 redesign target，而不是反对 auxiliary learning 或 GVFs 的一般证据。
+这个结果有用，因为它说明 auxiliary loss 不会自动成为 useful prediction。Auxiliary target 必须与 agent 要回答的 value 或 control question 相关。因此，这个 proposal 是独立 negative result 和 redesign target，而不是反对 auxiliary learning 或 GVFs 的一般证据。
 
 ## 1. Proposal Template Answers / 提案模板回答
 

@@ -168,7 +168,7 @@ The main result is value-scale invariance under a larger seed and alpha sweep. D
 
 Reward-centered Sarsa keeps Q norm much smaller, roughly `22-35` across the tested reward shifts and alphas, with zero divergence. Its unshifted reward remains around `2.55-2.60` across reward shifts. Differential Sarsa shows the same qualitative scale-stability pattern, with unshifted reward around `2.55-2.61` and similarly modest Q norms. Ordinary discounted Sarsa degrades under large positive and negative shifts, especially at higher alpha.
 
-The high-priority accept-rate figure is included to guard against a misleading reward-only interpretation. Reward centering is not counted as successful merely because it improves a scalar average; it must also preserve the task-relevant accept/reject tendency under reward translations. The divergence panel is mostly a sanity check for this run, but it makes explicit that the key difference is value-scale inflation rather than many hard numerical crashes.
+The high-priority accept-rate figure is included to guard against a misleading reward-only interpretation. Reward centering is not counted as successful merely because it improves a scalar average; it must also preserve the task-relevant accept/reject tendency under reward translations. The divergence panel is mostly a consistency check for this run, but it makes explicit that the key difference is value-scale inflation rather than many hard numerical crashes.
 
 The key interpretation is that reward centering removes most of the nuisance component of the TD target. It does not change the environment or provide extra samples; it changes the learning signal so that the learner focuses on reward deviations rather than reward origin.
 

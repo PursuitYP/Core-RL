@@ -19,7 +19,7 @@ This distinction is deliberate. The project requirement asked for independent pr
 | Centered TD Diagnostics | Self-designed/extended | Supporting | `experiments/alberta_core_rl/configs/centered_td_diagnostics` | `experiments/alberta_core_rl/results/centered_td_diagnostics/20260708T160958Z_main` | `centered_td_diagnostics/report.md` |
 | On-policy Stability Atlas | Self-designed/extended | Supporting | `experiments/alberta_core_rl/configs/onpolicy_stability_atlas` | `experiments/alberta_core_rl/results/onpolicy_stability_atlas/20260708T160958Z_main` | `onpolicy_stability_atlas/report.md` |
 | GVF Question Design | Self-designed/extended | Supporting/redesign aid | `experiments/alberta_core_rl/configs/gvf_question_design` | `experiments/alberta_core_rl/results/gvf_question_design/20260708T160958Z_main` | `gvf_question_design/report.md` |
-| Nonstationary Bandit | Self-designed/extended | Dropped sanity check | `experiments/alberta_core_rl/configs/nonstationary_bandit` | `experiments/alberta_core_rl/results/nonstationary_bandit/20260708T160958Z_main` | `nonstationary_bandit/report.md` |
+| Nonstationary Bandit | Self-designed/extended | Limited-scope plasticity study | `experiments/alberta_core_rl/configs/nonstationary_bandit` | `experiments/alberta_core_rl/results/nonstationary_bandit/20260708T160958Z_main` | `nonstationary_bandit/report.md` |
 | Streaming Representation | Self-designed/extended | Dropped diagnostic | `experiments/alberta_core_rl/configs/streaming_representation` | `experiments/alberta_core_rl/results/streaming_representation/20260708T160958Z_main` | `streaming_representation/report.md` |
 
 ## Evidence Tiers

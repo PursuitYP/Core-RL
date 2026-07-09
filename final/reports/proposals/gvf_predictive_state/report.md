@@ -114,7 +114,7 @@ Figures:
 
 ![Trial accuracy by state construction.](../../../../experiments/alberta_core_rl/results/useful_gvfs_state/20260708T155740Z_main/figures/trial_accuracy_by_algorithm_curve.png)
 
-![GVF values and cue traces by maze position.](../../../../experiments/alberta_core_rl/results/useful_gvfs_state/20260708T155740Z_main/figures/gvf_trace_by_position.png)
+![GVF values and cue traces by maze position.](figures/gvf_trace_by_position_panels.png)
 
 ## Experiment Design Rationale
 

@@ -92,11 +92,11 @@ scale conditions 本身不是现实 sensor model，而是 invariance tests。uni
 
 ## Results
 
-![不同 algorithm、scale 和 alpha 下的 tail RMSE stability atlas。](figures/report_log_rmse_heatmap.png)
+![按 algorithm、scale 和 alpha 分面展示的 tail RMSE stability atlas。](figures/report_log_rmse_heatmap_panels.png)
 
-![不同 algorithm、scale 和 alpha 下的 seed-level divergence-rate atlas。](figures/report_divergence_heatmap.png)
+![按 algorithm、scale 和 alpha 分面展示的 seed-level divergence-rate atlas。](figures/report_divergence_heatmap_panels.png)
 
-![不同 algorithm、scale 和 alpha 下的 tail output-change atlas。](figures/report_prediction_change_heatmap.png)
+![按 algorithm、scale 和 alpha 分面展示的 tail output-change atlas。](figures/report_prediction_change_heatmap_panels.png)
 
 | Algorithm | Lambda | Seed-conditions diverged | Non-diverged final RMSE mean | Interpretation |
 |---|---:|---:|---:|---|
