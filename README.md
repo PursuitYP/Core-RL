@@ -19,11 +19,11 @@ Start with `experiments/alberta_core_rl/` if you want to run or inspect code. Th
 
 ## Current Strong Proposal Lines
 
-The strongest current line is `Scale-Invariant Continuing Control`, which combines reward centering and output-controlled Sarsa in a continuing access-control task. The main scientific question is whether an online control agent can stay stable when arbitrary reward origins and feature units change.
+The strongest current line is `Scale-Invariant Continuing Control`, a larger independent continuing-control study that combines reward centering and output-controlled Sarsa in access-control. The main scientific question is whether an online control agent can stay stable when arbitrary reward origins and feature units change.
 
 The strongest planning line is `Continual Dyna With Model Aging`, which asks when a learned model entry should still be trusted for planning after the environment changes. The most reliable current signal is stale-backup reduction, not simple reward superiority.
 
-`Reward-Centered Continuing Sarsa` and `Output-Controlled TD` are strong mechanism studies that support the integrated invariance work. `Predictive State Plasticity` is currently a valuable negative/redesign gate: learned GVF state remains near chance in T-maze control while trace/oracle memory works.
+`Reward-Centered Continuing Sarsa` and `Output-Controlled TD` are strong independent mechanism studies. `Predictive State Plasticity` is currently a valuable negative/redesign gate: learned GVF state remains near chance in T-maze control while trace/oracle memory works.
 
 ## Running Experiments
 
@@ -41,7 +41,7 @@ Extended runs use `config_extended.json` when available. Outputs from extended c
 
 Each standalone proposal should be readable by opening its own `report.md`. Important final-facing documents should have matching English and Chinese versions. Current bilingual coverage is tracked in `final/indexes/bilingual_coverage.md` and `final/indexes/bilingual_coverage_zh.md`.
 
-The current review cycle is tracked in `final/indexes/reviewer_audit.md` and `final/indexes/reviewer_audit_zh.md`. These files record reviewer criticisms, actions already taken, and open items such as expanding Chinese reports, adding figure regeneration commands, and incorporating extended results.
+The current review cycle is tracked in `final/indexes/reviewer_audit.md`, `final/indexes/status.md`, and their Chinese counterparts. These files record reviewer criticisms, actions already taken, open CPU jobs, generated PDFs, and pending extended results.
 
 ## Project Constraints
 
