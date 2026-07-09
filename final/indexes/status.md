@@ -17,6 +17,8 @@ The proposals are intentionally not treated as equally strong. Reward-Centered S
 
 Each canonical proposal folder under `final/reports/proposals/<proposal>/` has a `report.md` and `report_zh.md`, and integrated reports follow the same pattern. The first structural repair pass is now complete: all 16 English reports and 16 Chinese reports contain visible Proposal Template answers, independent scope, evidence level, experiment-design rationale, and reviewer-audit style critique records. This does not make every report paper-perfect; weak proposals still need either deeper experiments or honest negative/quarantine framing, which is now stated inside the reports.
 
+All 16 English `report.md` files were exported to `report.pdf` in the same report directories after the latest edits. The PDF manifest is `final/indexes/english_report_pdf_manifest.json`; the export recorded `missing_images=0` for every PDF.
+
 Older split fragments are preserved for auditability under `final/archive/proposal_fragments/<proposal>/`. They are not the current source to cite. If an archived fragment conflicts with a current report, the current `final/reports/**/report.md` is the active artifact, but the active artifact may still need revision under `final/indexes/revise_plan_20260709.md`.
 
 ## Three Larger Independent Proposals

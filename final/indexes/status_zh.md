@@ -17,6 +17,8 @@
 
 每个正式 proposal 目录下都有 `report.md` 和 `report_zh.md`，integrated reports 也采用同样结构。第一轮结构修复已经完成：16 个英文报告和 16 个中文报告都已经显式包含 Proposal Template answers、独立范围、证据等级、实验设计依据和 reviewer-audit style 批评记录。这不意味着每个 report 都已经 paper-perfect；弱 proposal 仍需要继续补实验，或者诚实保持 negative/quarantine 定位，而这些定位已经写进报告。
 
+最新编辑后，16 个英文 `report.md` 都已经同步导出为同目录下的 `report.pdf`。PDF manifest 是 `final/indexes/english_report_pdf_manifest.json`；导出记录显示每个 PDF 都是 `missing_images=0`。
+
 旧的 split fragments 保留在 `final/archive/proposal_fragments/<proposal>/` 用于审计，但不再是当前引用来源。如果 archived fragment 和当前 report 冲突，以当前 `final/reports/**/report.md` 为准；不过当前 report 本身仍要按照 `final/indexes/revise_plan_20260709_zh.md` 继续修订。
 
 ## 三个更大的独立 Proposal
