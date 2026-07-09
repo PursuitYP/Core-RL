@@ -1,0 +1,6 @@
+{
+  "proposal": "nonstationary_bandit",
+  "suite": "minimal",
+  "seeds": [0, 1, 2],
+  "steps": 2000
+}

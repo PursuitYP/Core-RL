@@ -1,0 +1,7 @@
+{
+  "proposal": "scale_invariant_continuing_control",
+  "suite": "smoke",
+  "seeds": [0],
+  "steps": 120,
+  "notes": "Fast smoke test for the independent integrated scale-invariance proposal."
+}

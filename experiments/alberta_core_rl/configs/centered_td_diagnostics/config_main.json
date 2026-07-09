@@ -1,0 +1,13 @@
+{
+  "proposal": "centered_td_diagnostics",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "two_loop_reward_shift_diagnostic",
+  "primary_metrics": [
+    "value_norm",
+    "td_error",
+    "reward_bar",
+    "delta_bar"
+  ]
+}

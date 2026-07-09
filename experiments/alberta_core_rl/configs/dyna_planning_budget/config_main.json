@@ -1,0 +1,13 @@
+{
+  "proposal": "dyna_planning_budget",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "changing_continuing_gridworld",
+  "primary_metrics": [
+    "avg_reward",
+    "stale_backup_rate",
+    "model_size",
+    "q_norm"
+  ]
+}

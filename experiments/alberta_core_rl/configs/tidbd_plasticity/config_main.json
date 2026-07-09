@@ -1,0 +1,13 @@
+{
+  "proposal": "tidbd_plasticity",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "nonstationary_sensor_prediction",
+  "primary_metrics": [
+    "abs_td_error",
+    "old_feature_step_size",
+    "new_feature_step_size",
+    "distractor_feature_step_size"
+  ]
+}

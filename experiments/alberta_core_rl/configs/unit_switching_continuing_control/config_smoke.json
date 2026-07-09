@@ -1,0 +1,7 @@
+{
+  "proposal": "unit_switching_continuing_control",
+  "suite": "smoke",
+  "seeds": [0],
+  "steps": 300,
+  "notes": "Smoke test for single-stream unit switching in continuing access-control."
+}

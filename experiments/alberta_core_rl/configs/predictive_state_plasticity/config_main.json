@@ -1,0 +1,7 @@
+{
+  "proposal": "predictive_state_plasticity",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "notes": "First main pilot for predictive-state plasticity: raw, trace, old GVF, redesigned cue GVF, and oracle across T-maze lengths."
+}

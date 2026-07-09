@@ -1,0 +1,18 @@
+# Python/cache artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local plotting/runtime cache
+.mplconfig/
+
+# Generated experiment outputs are reproducible from configs and scripts.
+# Keep curated reports and result indexes in draft/ or final/ instead.
+experiments/alberta_core_rl/results/
+
+# Large/imported course and reference resources
+resources/
+
+# Local scratch files
+.pytest_cache/
+.ruff_cache/

@@ -1,0 +1,12 @@
+{
+  "proposal": "baird_offpolicy_stability",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "baird_star_diagnostic",
+  "primary_metrics": [
+    "weight_norm",
+    "diverged",
+    "td_error"
+  ]
+}

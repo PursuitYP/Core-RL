@@ -1,0 +1,7 @@
+{
+  "proposal": "continual_dyna_model_aging",
+  "suite": "smoke",
+  "seeds": [0],
+  "steps": 200,
+  "notes": "Fast smoke test for the independent integrated Dyna model-aging proposal."
+}

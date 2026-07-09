@@ -1,0 +1,12 @@
+{
+  "proposal": "nonstationary_bandit",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "drifting_bandit_reward_shift",
+  "primary_metrics": [
+    "best_action_rate",
+    "cumulative_regret",
+    "reward"
+  ]
+}

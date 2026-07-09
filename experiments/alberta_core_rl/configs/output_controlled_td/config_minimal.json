@@ -1,0 +1,6 @@
+{
+  "proposal": "output_controlled_td",
+  "suite": "minimal",
+  "seeds": [0, 1, 2],
+  "steps": 2000
+}

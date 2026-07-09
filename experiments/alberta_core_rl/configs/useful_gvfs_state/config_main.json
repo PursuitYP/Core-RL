@@ -1,0 +1,14 @@
+{
+  "proposal": "useful_gvfs_state",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "long_aliased_tmaze",
+  "primary_metrics": [
+    "trial_accuracy",
+    "avg_reward",
+    "gvf_left_value",
+    "gvf_right_value",
+    "gvf_abs_td_error"
+  ]
+}

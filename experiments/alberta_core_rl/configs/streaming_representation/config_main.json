@@ -1,0 +1,12 @@
+{
+  "proposal": "streaming_representation",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "nonstationary_sensor_auxiliary_prediction",
+  "primary_metrics": [
+    "abs_td_error",
+    "aux_mse",
+    "weight_norm"
+  ]
+}

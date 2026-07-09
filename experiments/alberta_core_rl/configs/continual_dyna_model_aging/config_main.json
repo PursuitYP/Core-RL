@@ -1,0 +1,7 @@
+{
+  "proposal": "continual_dyna_model_aging",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "notes": "Main pilot for Dyna model freshness: keep, oracle flush, recency aging, and recency/error gating."
+}

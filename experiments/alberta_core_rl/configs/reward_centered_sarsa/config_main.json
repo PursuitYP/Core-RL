@@ -1,0 +1,14 @@
+{
+  "proposal": "reward_centered_sarsa",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "access_control_queue",
+  "primary_metrics": [
+    "avg_unshifted_reward",
+    "accept_rate",
+    "high_priority_accept",
+    "q_norm",
+    "td_error"
+  ]
+}

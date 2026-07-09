@@ -1,0 +1,6 @@
+{
+  "proposal": "baird_offpolicy_stability",
+  "suite": "minimal",
+  "seeds": [0, 1, 2],
+  "steps": 2000
+}

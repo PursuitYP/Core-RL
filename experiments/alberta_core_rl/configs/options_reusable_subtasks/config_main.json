@@ -1,0 +1,14 @@
+{
+  "proposal": "options_reusable_subtasks",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "larger_four_rooms",
+  "primary_metrics": [
+    "reward_per_env_step",
+    "avg_reward",
+    "duration",
+    "option_used",
+    "steps_since_goal_switch"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "proposal": "output_controlled_td",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "tile_random_walk_prediction",
+  "primary_metrics": [
+    "rmse",
+    "diverged",
+    "prediction_change",
+    "step_size",
+    "weight_norm"
+  ]
+}

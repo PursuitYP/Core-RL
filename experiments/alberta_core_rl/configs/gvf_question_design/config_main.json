@@ -1,0 +1,12 @@
+{
+  "proposal": "gvf_question_design",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "tmaze_gvf_question_sweep",
+  "primary_metrics": [
+    "abs_td_error",
+    "prediction",
+    "weight_norm"
+  ]
+}

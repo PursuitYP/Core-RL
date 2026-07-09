@@ -1,0 +1,7 @@
+{
+  "proposal": "predictive_state_plasticity",
+  "suite": "smoke",
+  "seeds": [0],
+  "steps": 200,
+  "notes": "Fast smoke test for the independent integrated predictive-state plasticity proposal."
+}

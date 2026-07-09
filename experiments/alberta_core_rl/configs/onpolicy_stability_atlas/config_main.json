@@ -1,0 +1,12 @@
+{
+  "proposal": "onpolicy_stability_atlas",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "random_walk_td_lambda_alpha_scale_grid",
+  "primary_metrics": [
+    "rmse",
+    "weight_norm",
+    "diverged"
+  ]
+}

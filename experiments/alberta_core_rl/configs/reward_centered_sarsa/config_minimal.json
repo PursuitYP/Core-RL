@@ -1,0 +1,6 @@
+{
+  "proposal": "reward_centered_sarsa",
+  "suite": "minimal",
+  "seeds": [0, 1, 2],
+  "steps": 2000
+}

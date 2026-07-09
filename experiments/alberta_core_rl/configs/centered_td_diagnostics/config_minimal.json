@@ -1,0 +1,6 @@
+{
+  "proposal": "centered_td_diagnostics",
+  "suite": "minimal",
+  "seeds": [0, 1, 2],
+  "steps": 2000
+}

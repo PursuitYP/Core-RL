@@ -1,0 +1,6 @@
+{
+  "proposal": "gvf_question_design",
+  "suite": "minimal",
+  "seeds": [0, 1, 2],
+  "steps": 2000
+}

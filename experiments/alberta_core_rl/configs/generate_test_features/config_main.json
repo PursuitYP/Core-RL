@@ -1,0 +1,13 @@
+{
+  "proposal": "generate_test_features",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "main_environment": "delay_shift_trace_conditioning",
+  "primary_metrics": [
+    "abs_error",
+    "closest_rho_distance",
+    "replacement_count",
+    "max_utility_rho"
+  ]
+}

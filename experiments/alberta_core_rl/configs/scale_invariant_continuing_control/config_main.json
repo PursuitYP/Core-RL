@@ -1,0 +1,7 @@
+{
+  "proposal": "scale_invariant_continuing_control",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "notes": "Main pilot for reward-shift by feature-scale invariance in continuing access-control Sarsa."
+}

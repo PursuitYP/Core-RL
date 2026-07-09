@@ -1,0 +1,15 @@
+name: core-rl
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - pandas
+  - matplotlib
+  - scipy
+  - seaborn
+  - tabulate
+  - tqdm
+  - pypdf
+prefix: /data/yupeng/conda_envs/core-rl
