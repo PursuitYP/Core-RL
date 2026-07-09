@@ -1,0 +1,130 @@
+[
+  {
+    "images": 3,
+    "missing_images": 0,
+    "pages": 6,
+    "pdf": "final/reports/integrated/continual_dyna_model_aging/report.pdf",
+    "source": "final/reports/integrated/continual_dyna_model_aging/report.md",
+    "source_lines": 150
+  },
+  {
+    "images": 3,
+    "missing_images": 0,
+    "pages": 5,
+    "pdf": "final/reports/integrated/predictive_state_plasticity/report.pdf",
+    "source": "final/reports/integrated/predictive_state_plasticity/report.md",
+    "source_lines": 180
+  },
+  {
+    "images": 6,
+    "missing_images": 0,
+    "pages": 9,
+    "pdf": "final/reports/integrated/scale_invariant_continuing_control/report.pdf",
+    "source": "final/reports/integrated/scale_invariant_continuing_control/report.md",
+    "source_lines": 181
+  },
+  {
+    "images": 1,
+    "missing_images": 0,
+    "pages": 4,
+    "pdf": "final/reports/proposals/baird_offpolicy_stability/report.pdf",
+    "source": "final/reports/proposals/baird_offpolicy_stability/report.md",
+    "source_lines": 150
+  },
+  {
+    "images": 1,
+    "missing_images": 0,
+    "pages": 4,
+    "pdf": "final/reports/proposals/centered_td_diagnostics/report.pdf",
+    "source": "final/reports/proposals/centered_td_diagnostics/report.md",
+    "source_lines": 133
+  },
+  {
+    "images": 2,
+    "missing_images": 0,
+    "pages": 6,
+    "pdf": "final/reports/proposals/dyna_planning_budget/report.pdf",
+    "source": "final/reports/proposals/dyna_planning_budget/report.md",
+    "source_lines": 118
+  },
+  {
+    "images": 1,
+    "missing_images": 0,
+    "pages": 4,
+    "pdf": "final/reports/proposals/generate_test_features/report.pdf",
+    "source": "final/reports/proposals/generate_test_features/report.md",
+    "source_lines": 145
+  },
+  {
+    "images": 2,
+    "missing_images": 0,
+    "pages": 5,
+    "pdf": "final/reports/proposals/gvf_predictive_state/report.pdf",
+    "source": "final/reports/proposals/gvf_predictive_state/report.md",
+    "source_lines": 153
+  },
+  {
+    "images": 1,
+    "missing_images": 0,
+    "pages": 4,
+    "pdf": "final/reports/proposals/gvf_question_design/report.pdf",
+    "source": "final/reports/proposals/gvf_question_design/report.md",
+    "source_lines": 142
+  },
+  {
+    "images": 1,
+    "missing_images": 0,
+    "pages": 4,
+    "pdf": "final/reports/proposals/nonstationary_bandit/report.pdf",
+    "source": "final/reports/proposals/nonstationary_bandit/report.md",
+    "source_lines": 117
+  },
+  {
+    "images": 2,
+    "missing_images": 0,
+    "pages": 5,
+    "pdf": "final/reports/proposals/onpolicy_stability_atlas/report.pdf",
+    "source": "final/reports/proposals/onpolicy_stability_atlas/report.md",
+    "source_lines": 141
+  },
+  {
+    "images": 1,
+    "missing_images": 0,
+    "pages": 4,
+    "pdf": "final/reports/proposals/options_reusable_subtasks/report.pdf",
+    "source": "final/reports/proposals/options_reusable_subtasks/report.md",
+    "source_lines": 143
+  },
+  {
+    "images": 3,
+    "missing_images": 0,
+    "pages": 6,
+    "pdf": "final/reports/proposals/output_controlled_td/report.pdf",
+    "source": "final/reports/proposals/output_controlled_td/report.md",
+    "source_lines": 184
+  },
+  {
+    "images": 4,
+    "missing_images": 0,
+    "pages": 6,
+    "pdf": "final/reports/proposals/reward_centered_sarsa/report.pdf",
+    "source": "final/reports/proposals/reward_centered_sarsa/report.md",
+    "source_lines": 211
+  },
+  {
+    "images": 1,
+    "missing_images": 0,
+    "pages": 4,
+    "pdf": "final/reports/proposals/streaming_representation/report.pdf",
+    "source": "final/reports/proposals/streaming_representation/report.md",
+    "source_lines": 124
+  },
+  {
+    "images": 1,
+    "missing_images": 0,
+    "pages": 4,
+    "pdf": "final/reports/proposals/tidbd_plasticity/report.pdf",
+    "source": "final/reports/proposals/tidbd_plasticity/report.md",
+    "source_lines": 152
+  }
+]

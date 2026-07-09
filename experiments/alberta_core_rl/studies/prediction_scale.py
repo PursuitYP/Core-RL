@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import time
+
 import numpy as np
 
 from ..core import should_log_step
@@ -69,12 +71,42 @@ def proposal_output_controlled_td(seeds: list[int], suite: str, steps: int) -> t
         scales = ["one", "ten", "hundred", "uneven", "lognormal"]
         alphas = [0.01, 0.03, 0.1, 0.3]
     rows: list[dict] = []
+    total = len(seeds) * len(scales) * len(methods) * len(alphas)
+    condition_index = 0
     for seed in seeds:
         for scale in scales:
             for method in methods:
                 for alpha in alphas:
+                    condition_index += 1
                     lam = 0.8 if "trace" in method or method == "true_online" else 0.0
-                    rows.extend(run_random_walk_td(seed, steps, scale, method, alpha=alpha, lam=lam, representation=representation))
+                    start = time.perf_counter()
+                    print(
+                        "[output_controlled_td] "
+                        f"start {condition_index}/{total} seed={seed} scale={scale} "
+                        f"method={method} alpha={alpha} lambda={lam} steps={steps}",
+                        flush=True,
+                    )
+                    condition_rows = run_random_walk_td(
+                        seed,
+                        steps,
+                        scale,
+                        method,
+                        alpha=alpha,
+                        lam=lam,
+                        representation=representation,
+                    )
+                    rows.extend(condition_rows)
+                    elapsed = time.perf_counter() - start
+                    tail = condition_rows[-1] if condition_rows else {}
+                    print(
+                        "[output_controlled_td] "
+                        f"done {condition_index}/{total} seed={seed} scale={scale} "
+                        f"method={method} alpha={alpha} lambda={lam} "
+                        f"rows={len(condition_rows)} last_step={tail.get('step')} "
+                        f"rmse={tail.get('rmse')} diverged={tail.get('diverged')} "
+                        f"elapsed_sec={elapsed:.2f}",
+                        flush=True,
+                    )
     summary = {
         "question": "Can output-level step-size control make streaming TD robust to feature scale?",
         "main_metric": "rmse",
