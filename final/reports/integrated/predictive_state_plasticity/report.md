@@ -2,12 +2,12 @@
 
 ## Abstract
 
-Predictive knowledge is a central Alberta Plan idea, but a prediction is valuable to an agent only if it improves learning or control. The current GVF predictive-state experiment is a negative result: a simple trace-memory baseline solves a T-maze, while the learned GVF state remains near chance. This proposal turns that failure into a richer research program: how can a streaming agent with limited features select, adapt, and retain predictions that carry control-relevant hidden information?
+Predictive knowledge is a central Alberta Plan idea, but a prediction is valuable to an agent only if it improves learning or control. The extended GVF predictive-state experiment is a negative result: trace memory and oracle memory solve a partially observable T-maze, while the learned GVF state remains near chance even with 20 seeds, 20000 online steps, and maze lengths up to 30. This proposal turns that failure into a sharper research program: how can a streaming agent with limited features select, adapt, and retain predictions that carry control-relevant hidden information?
 
 
 ## Standalone Study Summary
 
-This study asks whether learned predictions become useful state for control under partial observability. The RL problem is a T-maze with an early hidden cue and a delayed junction decision; raw observation is insufficient unless the agent retains cue information. The current implemented comparison uses raw features, hand-coded trace memory, recurrent GVFs, redesigned cue GVFs, and oracle memory with online linear Sarsa control. The experiment varies maze length and representation mode; the main metrics are trial accuracy, cue-alignment margin, GVF TD error, and control TD error. The current result is a useful negative gate: cue-GVF outputs contain some cue-aligned signal but do not yet improve control over chance, while trace and oracle memory solve the task. The next experiment must separate GVF question design, output scaling, control utilization, and feature-selection/plasticity mechanisms.
+This study asks whether learned predictions become useful state for control under partial observability. The RL problem is a T-maze with an early hidden cue and a delayed junction decision; raw observation is insufficient unless the agent retains cue information. The implemented comparison uses raw features, hand-coded trace memory, recurrent GVFs, redesigned cue GVFs, and oracle memory with online linear Sarsa control. The extended experiment varies maze length and representation mode over 20 seeds and 20000 online steps; the main metrics are trial accuracy, cue-alignment margin, GVF TD error, and control TD error. The result is a useful negative gate: cue-GVF outputs have some cue-aligned signal but do not improve control over chance, while trace and oracle memory solve the task. The next experiment must separate GVF question design, output scaling, control utilization, and feature-selection/plasticity mechanisms.
 
 ## Research Motivation
 
@@ -55,7 +55,7 @@ Primary environment:
 - Long aliased T-maze.
 - Cue appears at start and is hidden during the corridor.
 - Correct junction action depends on the cue.
-- Current implemented pilot keeps cue semantics fixed and varies corridor length. Phase-change experiments are planned but not yet implemented.
+- Current implemented extended run keeps cue semantics fixed and varies corridor length. Phase-change experiments are planned but not yet implemented.
 
 Secondary environment:
 
@@ -64,10 +64,10 @@ Secondary environment:
 Conditions:
 
 - Current implemented modes: raw observation, trace memory, recurrent GVF, cue GVF, and oracle memory.
-- Current implemented corridor lengths: `8`, `12`, `20`.
+- Current implemented corridor lengths: `8`, `12`, `20`, `30`.
 - Planned, not yet implemented: fixed feature budgets `8`, `16`, `32`.
 - Planned, not yet implemented: scheduled but unannounced phase switches.
-- Seeds `0-19` for final sweeps.
+- Seeds `0-19` and `20000` online steps in the extended first-gate run.
 
 Metrics:
 
@@ -81,7 +81,7 @@ Metrics:
 
 ## Expected Results And Failure Modes
 
-Expected positive pattern: oracle memory and fixed trace memory should define upper bounds. Naive GVFs may fail unless their questions align with hidden cue information. Generate-and- test should help only if utility is tied to downstream control; TIDBD should reveal which features remain plastic after a phase switch.
+Expected positive pattern: oracle memory and fixed trace memory should define upper bounds. Naive GVFs may fail unless their questions align with hidden cue information. Generate-and-test should help only if utility is tied to downstream control; TIDBD should reveal which features remain plastic after a phase switch.
 
 Failure modes:
 
@@ -98,28 +98,29 @@ The proposal should not claim "GVFs work" unless the learned predictions visibly
 
 The existing GVF predictive-state run shows trace memory and oracle memory near `0.94` trial accuracy, while recurrent GVF remains near chance. The GVF question-design diagnostic also shows that easy predictions are not necessarily useful. Generate-and-test and TIDBD runs provide mechanism evidence but not yet a positive integrated state-construction story.
 
-A dedicated first-gate pilot was added:
+A dedicated extended first-gate run was added:
 
-`experiments/alberta_core_rl/results/predictive_state_plasticity/20260708T174842Z_main`
+`experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`
 
-This pilot compares raw observation, trace memory, old recurrent GVF, redesigned cue-GVF, and oracle memory across T-maze lengths `8`, `12`, and `20`.
+This run compares raw observation, trace memory, old recurrent GVF, redesigned cue-GVF, and oracle memory across T-maze lengths `8`, `12`, `20`, and `30`, using seeds `0-19` and `20000` online steps per condition.
 
 Main result:
 
-- Trace memory and oracle memory solve all tested lengths, with tail trial accuracy around `0.93-0.96`.
+- Trace memory and oracle memory solve the shorter and medium lengths; trace memory remains far above chance even at length `30`, though it drops to about `0.827 +/- 0.013`.
+- Oracle memory remains near `0.931-0.950` across all tested lengths.
 - Raw observation and old recurrent GVF remain near chance.
-- Redesigned cue-GVF has positive cue-alignment margins, so it carries some hidden-cue signal.
-- Despite that, cue-GVF control accuracy remains near chance, about `0.47-0.49`.
+- Redesigned cue-GVF has some positive cue-alignment margin at shorter lengths, but the margin weakens as length grows.
+- Cue-GVF control accuracy remains near chance across all tested lengths: about `0.504`, `0.508`, `0.505`, and `0.494` for lengths `8`, `12`, `20`, and `30`.
 
 Interpretation: the redesigned GVF is a better diagnostic signal but still not sufficient state. The next stage must either strengthen the predictive feature, improve how control uses it, or add explicit feature-plasticity/selection mechanisms.
 
 Main figures below use seed-tail condition summaries with 95% confidence intervals. They show the current negative gate more clearly than the earlier overloaded curve plots: cheap trace/oracle memory works, while learned GVF features remain near chance.
 
-![Tail trial accuracy by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260708T174842Z_main/figures/report_trial_accuracy_by_maze_length.png)
+![Tail trial accuracy by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_trial_accuracy_by_maze_length.png)
 
-![Tail cue-alignment margin by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260708T174842Z_main/figures/report_cue_alignment_margin_by_maze_length.png)
+![Tail cue-alignment margin by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_cue_alignment_margin_by_maze_length.png)
 
-![Tail GVF absolute TD error by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260708T174842Z_main/figures/report_gvf_abs_td_error_by_maze_length.png)
+![Tail GVF absolute TD error by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_gvf_abs_td_error_by_maze_length.png)
 
 ## Reviewer Critique And Revisions
 
@@ -155,4 +156,15 @@ cd /mnt/shared-storage-user/yupeng/Core-RL
 PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
   /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
   --config experiments/alberta_core_rl/configs/predictive_state_plasticity/config_extended.json
+```
+
+Regenerate the report figures:
+
+```bash
+cd /mnt/shared-storage-user/yupeng/Core-RL
+
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_report_figures.py \
+  --kind predictive-state \
+  --result-dir experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended
 ```
