@@ -1,73 +1,89 @@
 # TIDBD-Lite Plasticity
 
-Status: independent supporting mechanism study; not yet a positive performance proposal.
+Status: independent mechanism diagnostic; current evidence is not a positive performance proposal.
 
 ## Abstract
 
-This proposal studies per-feature step-size adaptation as a lightweight plasticity mechanism for streaming TD prediction. In a nonstationary sensor stream, feature relevance changes after a phase switch. A TIDBD-style learner should increase step sizes for newly useful features while keeping distractors quiet. The current main pilot shows this mechanism qualitatively: new-feature step size rises after the switch and distractor step size stays low. However, normalized TD still has lower late prediction error than the current TIDBD-lite implementation. The proposal is therefore a mechanism study, not a performance win.
+This proposal studies per-feature step-size adaptation as a possible mechanism for plasticity in streaming TD prediction. The setting is a nonstationary sensor stream where the relevant feature group changes after a phase switch. A TIDBD-style learner should increase step sizes for newly relevant features, keep distractor step sizes low, and recover prediction accuracy after the change.
 
+The current pilot supports only the mechanism part of that story. TIDBD-lite shows interpretable feature-wise alpha dynamics after the switch, but normalized TD has slightly lower late prediction error. The proposal is therefore a mechanism diagnostic, not a performance victory. Its value is to separate "the learner changes its internal learning rates in a sensible way" from "the learner improves the prediction objective."
 
-## Standalone Study Summary
+## Claim Boundary
 
-This study examines per-feature step-size plasticity in a streaming prediction setting. The RL problem is not a full control task; it is a diagnostic stream where feature relevance changes and a learner must adapt without replay. The implemented method is TIDBD-lite, compared with fixed or normalized TD baselines. The experiment records prediction/TD error, feature-group behavior, per-feature alpha trajectories, and post-change adaptation. The current evidence shows visible step-size adaptation but no clear prediction-error advantage over normalized TD. The study is therefore a supporting mechanism diagnostic, not a positive performance proposal.
+The report makes one bounded claim:
 
-## Research Motivation
+> In the current nonstationary stream, TIDBD-lite shows visible per-feature step-size adaptation, but this adaptation has not yet produced a prediction-error advantage over normalized TD.
 
-Continual agents face changing feature relevance. A fixed global step size is a compromise: large enough to adapt quickly, but small enough not to destabilize irrelevant or noisy features. Per-feature step-size adaptation offers a more local form of plasticity.
+The report deliberately does not claim:
 
-The Alberta Plan treats step-size adaptation and feature utility as early building blocks for long-lived agents. This proposal asks whether a simple per-feature adaptive TD learner can detect changing relevance in the stream itself.
+- that TIDBD-lite is a canonical TIDBD reproduction;
+- that per-feature adaptation already improves performance;
+- that alpha movement alone proves useful plasticity;
+- that alpha dynamics alone justify any broader plasticity conclusion.
 
-## Research Question
+## Research Motivation/Question/Method
 
-Can per-feature step-size adaptation track changing feature relevance in streaming TD?
+Continual agents operate in streams where feature relevance changes. A fixed global step size is a compromise: if it is large, irrelevant or noisy features can destabilize learning; if it is small, newly relevant features may adapt too slowly. Per-feature step-size adaptation offers a local mechanism for plasticity: each feature can adjust its learning rate according to its recent contribution to prediction updates.
+
+The Alberta Plan treats step-size adaptation and feature utility as early building blocks for long-lived agents. This proposal asks whether a lightweight adaptive TD learner can detect relevance change from the stream itself, before claiming any large control benefit.
+
+### Focused RL Question
+
+Main question:
+
+> Can per-feature step-size adaptation track changing feature relevance in online TD prediction?
+
+Subquestions:
+
+- Do step sizes for newly relevant features increase after a switch?
+- Do distractor features remain comparatively quiet?
+- Does the mechanism improve recovery speed or late prediction error relative to fixed and normalized TD baselines?
 
 Hypothesis:
 
 > After a relevance switch, a TIDBD-style learner should increase step sizes for newly relevant features, maintain lower step sizes for distractors, and recover prediction accuracy faster than fixed-alpha TD.
 
-The current result supports the first two mechanism claims but not the stronger prediction error claim.
+The current result supports the first two mechanism claims, but not the stronger performance claim.
 
-## Alberta Plan Connection
+### Core RL Connection
 
-The proposal connects to:
+This is a core RL proposal because it studies online TD prediction, step-size adaptation, and feature utility with linear function approximation. It connects to:
 
 - meta-learning of step sizes;
-- online prediction;
-- continual adaptation;
+- online prediction from a stream;
+- continual adaptation under nonstationarity;
 - feature relevance tracking;
-- limited computation with linear function approximation.
+- limited computation without replay.
 
-It is not a deep plasticity study. The point is to inspect feature-wise learning-rate dynamics in a small streaming setting.
+The proposal is deliberately not a deep plasticity benchmark. It is a small inspection tool for feature-wise learning-rate dynamics.
 
-## Related Work
+### Related Work
 
-TIDBD extends incremental delta-bar-delta ideas to TD learning with feature-wise step sizes. The Alberta Plan mentions per-weight step-size adaptation as part of early continual learning. Plasticity work in continual learning motivates recovery and feature-level diagnostics, though much of that literature uses deep networks outside this project.
+TIDBD extends incremental delta-bar-delta ideas to TD learning with feature-wise step sizes. The Alberta Plan discusses per-weight step-size adaptation as part of early continual-learning machinery. Broader plasticity work motivates recovery after nonstationarity, but much of that literature uses deep networks or replay settings outside this project's preferred scope.
 
 Local references:
 
 - `resources/alberta_plan_related/tidbd_1804.03334.pdf`
 - `resources/alberta_plan_related/alberta_plan_2208.11173.pdf`
 
-## Environment
+### Method
 
 The setting is a nonstationary sensor prediction stream:
 
 - one feature group is relevant before a switch;
-- a different group becomes relevant after the switch;
+- a different feature group becomes relevant after the switch;
 - distractor features remain mostly irrelevant;
-- the learner updates online without replay.
+- updates are online, with no replay buffer and no offline refitting.
 
 This is a mechanism environment. It creates controlled feature-relevance changes that can be measured directly.
 
-## Methods
-
 Compared methods:
 
-- fixed TD with alphas `0.01`, `0.03`, `0.1`;
+- fixed TD with alphas `0.01`, `0.03`, and `0.1`;
 - normalized TD;
 - TIDBD-lite.
 
-The local implementation is deliberately labeled TIDBD-lite. It is not claimed to be a full canonical reproduction of all TIDBD details.
+The local adaptive method is intentionally called TIDBD-lite. It uses a simplified per-feature meta-gradient-like update and should not be presented as canonical TIDBD until the full algorithm is implemented and checked.
 
 ## Experimental Design
 
@@ -78,92 +94,109 @@ Current main pilot:
 - Switch: halfway through the stream.
 - Result path: `experiments/alberta_core_rl/results/tidbd_plasticity/20260708T154941Z_main`.
 
-Metrics:
+Primary measurements:
 
 - absolute TD error;
 - old-relevant feature step sizes;
 - new-relevant feature step sizes;
 - distractor step sizes;
-- recovery windows.
+- post-switch recovery windows.
 
 Primary figure:
 
 ![Absolute TD error for TIDBD-lite and TD baselines.](../../../../experiments/alberta_core_rl/results/tidbd_plasticity/20260708T154941Z_main/figures/abs_td_error_by_algorithm_curve.png)
 
+Design logic:
+
+| Design element | Why it is needed |
+|---|---|
+| Feature relevance switch | Creates a known plasticity challenge. |
+| Group-wise alpha logs | Tests whether adaptation moves toward the newly relevant features. |
+| Distractor group | Detects indiscriminate alpha growth. |
+| Normalized TD baseline | Tests whether simpler update scaling explains the benefit. |
+| Recovery windows | Separates immediate adaptation from late steady-state error. |
+
 ## Results
 
-TIDBD-lite shows the intended feature-wise plasticity signal. New-feature step size rises from about `0.0068` before the switch to about `0.0093` in the late post-change window. Distractor step size remains near `0.0068`.
+TIDBD-lite shows the intended feature-wise mechanism:
 
-However, normalized TD remains the stronger prediction-error baseline. Late post-change absolute TD error is about `0.4419` for normalized TD and about `0.4493` for TIDBD-lite. This means the mechanism signal does not yet justify a performance claim.
+- New-feature step size rises from about `0.0068` before the switch to about `0.0093` in the late post-change window.
+- Distractor step size remains near `0.0068`.
+
+However, normalized TD remains the stronger prediction-error baseline:
+
+- late post-change absolute TD error for normalized TD is about `0.4419`;
+- late post-change absolute TD error for TIDBD-lite is about `0.4493`.
+
+This means the internal mechanism is visible, but the external prediction objective has not improved enough to support a performance claim.
+
+The late post-change error comparison is:
+
+| Strategy | Late post-change absolute TD error |
+|---|---:|
+| Normalized TD | `0.4419` |
+| TIDBD-lite | `0.4493` |
+| Fixed TD, alpha `0.01` | `0.4881` |
+| Fixed TD, alpha `0.03` | `0.6279` |
+| Fixed TD, alpha `0.1` | `0.6591` |
 
 ## Analysis
 
-The proposal separates two claims that are often conflated:
+The current result suggests several possible failure mechanisms:
 
-- The learner changes step sizes in a sensible feature-specific direction.
-- That adaptation improves the prediction objective.
+- Meta-update lag: alpha changes may occur, but not quickly enough to improve recovery after a single switch.
+- Scale competition: normalized TD may already solve much of the update-magnitude problem that TIDBD-lite is trying to solve.
+- Weak utility signal: the simplified meta-gradient may not separate useful features from correlated distractors strongly enough.
+- One-switch environment: a single change may be too limited to expose cumulative plasticity benefits.
+- Algorithm gap: TIDBD-lite may miss important details from canonical TIDBD or AutoStep.
 
-The first claim is supported. The second is not yet supported. This distinction makes the proposal scientifically useful: it identifies a mechanism that behaves plausibly but is not strong enough under the current environment and implementation.
+These mechanisms are the reason the report treats alpha dynamics as evidence of mechanism behavior, not as evidence of a better learner.
+
+## Next Experiments
+
+The next experiments should test mechanism and performance separately:
+
+1. Canonical algorithm check: implement full TIDBD or AutoStep and verify update equations against the reference.
+2. Repeated switches: use multiple relevance changes to test whether per-feature adaptation accumulates an advantage over fixed or normalized TD.
+3. Recovery AUC: report error area after each switch, not only late-window mean error.
+4. Alpha-utility correlation: measure whether features with increased alpha also contribute more to prediction improvement.
+5. Normalization ablation: compare per-feature adaptation with and without output/update normalization.
+6. Control transfer only after success: test a small control task only if prediction recovery improves in the diagnostic stream.
 
 ## Threats To Validity
 
-The implementation is TIDBD-lite, not a canonical TIDBD reproduction.
+- The implementation is TIDBD-lite, not canonical TIDBD.
+- The environment has only one switch.
+- Normalized TD is a strong baseline and may explain much of the observed adaptation need.
+- Current metrics do not yet include feature correlation, utility contribution, or recovery AUC.
+- Mean group alpha can hide feature-level variance inside each group.
 
-The environment has one switch. Repeated changes may better expose plasticity advantages.
+## Reviewer Critique
 
-Normalized TD is a strong baseline because it controls update size directly; a fair final study should compare per-feature adaptation and output normalization more systematically.
-
-The current metrics do not include feature correlation or utility contribution beyond step-size groups.
-
-## Reviewer Critique And Revisions
-
-Plasticity reviewer:
-
-- Mean step size alone is insufficient.
-
-Revision made:
-
-- Added group-wise old/new/distractor step-size logs and recovery windows.
-
-Strict reviewer concern:
-
-- Do not call a local simplified algorithm "TIDBD" without qualification.
-
-Revision made:
-
-- The report uses TIDBD-lite terminology.
-
-Required next revision:
-
-- Implement canonical TIDBD or AutoStep, add repeated relevance switches, and report recovery AUC rather than only late error.
-
-## Conclusion
-
-TIDBD-Lite Plasticity is a valid independent mechanism proposal, but not yet a positive performance story. It shows meaningful per-feature step-size adaptation after a relevance switch, while normalized TD remains stronger on prediction error. The next version should upgrade the algorithm and environment before making broader claims about plasticity.
+| Reviewer angle | Likely critique | Report response | Required next action |
+|---|---|---|---|
+| Algorithm reviewer | TIDBD-lite is not canonical TIDBD. | The report uses TIDBD-lite terminology throughout. | Implement canonical TIDBD or AutoStep. |
+| Plasticity reviewer | Alpha movement alone is not utility evidence. | The report separates mechanism dynamics from prediction improvement. | Add alpha-utility correlation and recovery AUC. |
+| Baseline reviewer | Normalized TD is already better on error. | The report treats this as a limit, not as a nuisance. | Add normalization ablations and repeated switches. |
+| Strict instructor | Do not present a mechanism as a performance win. | The claim is explicitly diagnostic. | Keep final framing as mechanism study unless performance metrics improve. |
 
 ## Proposal Template Answers
 
-Focused RL question: Can per-feature step-size adaptation track changing feature relevance in a streaming prediction/control setting? The current setting is a TIDBD-lite diagnostic, not canonical TIDBD. The comparison is TIDBD-lite versus fixed/normalized TD-style baselines; the metrics are prediction error, alpha trajectories, relevance switches, and recovery. Compute is modest; fallback is a mechanism diagnostic until canonical TIDBD or AutoStep is implemented.
+Focused RL question: Can per-feature step-size adaptation track changing feature relevance in streaming TD prediction?
 
-## Independent Research Scope
+Setting/testbed: A nonstationary sensor prediction stream with an old-relevant group, a new-relevant group, and distractors.
 
-This report studies feature-wise plasticity signals, not a finished performance method. It should not be merged into Predictive State Plasticity as completed positive evidence. Its role is to show whether alpha dynamics respond to relevance changes and what remains missing.
+Implemented comparison: TIDBD-lite versus fixed-alpha TD and normalized TD baselines.
 
-## Evidence Level
+Observation/metric: Prediction error, group-wise alpha trajectories, recovery windows, and planned recovery AUC and alpha-utility correlation.
 
-Evidence level: supporting mechanism diagnostic. The current TIDBD-lite implementation shows interpretable alpha dynamics, but normalized TD has stronger error in some conditions. Therefore the report cannot claim that TIDBD-lite improves performance.
+Compute need: Small CPU-only runs.
 
-## Experiment Design Rationale
+Fallback: Keep the report as a mechanism diagnostic until canonical TIDBD or AutoStep and stronger recovery metrics are implemented.
 
-The experiment is useful only if it separates "alpha changes visibly" from "learning improves." The next design should implement canonical TIDBD/AutoStep, add repeated relevance switches, and report recovery AUC, not only final error.
+## Conclusion
 
-## Reviewer Audit
-
-| Reviewer angle | Critique | Action taken | Remaining risk |
-|---|---|---|---|
-| Algorithm | TIDBD-lite is not canonical TIDBD. | Evidence level is diagnostic. | Needs canonical TIDBD/AutoStep. |
-| Performance | Alpha adaptation may not improve error. | Report distinguishes alpha dynamics from prediction gain. | Normalized TD may remain stronger. |
-| Strict instructor | Do not use plasticity language without utility evidence. | Required next metrics include recovery AUC and repeated switches. | Current result is supporting only. |
+This proposal is an independent mechanism study of plasticity in streaming TD prediction. The current evidence supports a narrow conclusion: TIDBD-lite adapts feature-wise step sizes in an interpretable direction, but normalized TD still has slightly lower late prediction error. The project should therefore be reported as diagnostic evidence and a redesign target, with any stronger plasticity claim deferred until canonical adaptive step-size algorithms and recovery-focused metrics show a behavioral advantage.
 
 ## Reproduction
 

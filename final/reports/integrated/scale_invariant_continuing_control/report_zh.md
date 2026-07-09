@@ -2,7 +2,7 @@
 
 英文对应报告：`report.md`
 
-状态：综合型主线候选；已有 fixed-condition pilot 和 no-reset unit-switching extended evidence。当前结论应写成“组合方法防止灾难性不稳定，但 abrupt feature-unit change 后 recovery 仍未解决”，不能写成 unit invariance 已经完全解决。
+状态：独立综合 Core-RL proposal；已有 fixed-condition pilot 和 no-reset unit-switching extended evidence。当前结论应写成“组合方法防止灾难性不稳定，但 abrupt feature-unit change 后 recovery 仍未解决”，不能写成 unit invariance 已经完全解决。
 
 ## 摘要
 
@@ -20,27 +20,33 @@ Setting / testbed：主环境是 continuing access-control queue with linear act
 
 Implemented comparison：比较 discounted Sarsa、reward-centered Sarsa、differential Sarsa、normalized Sarsa、normalized reward-centered Sarsa 和 normalized differential variants。核心变量是 reward shifts 与 feature scales 的交叉，以及不重置 agent 的在线 reward/feature unit changes。
 
-Metric / figure：只有当方法在 reward shifts 和 feature scales 下同时保持 unshifted reward、policy probes、Q norm、output-change magnitude 和 divergence 稳定时，才支持本 proposal。unit-switching figures 尤其重要，因为它们测试 continual recovery，而不是 separate fixed-condition tuning。
+Metric / figure：只有当方法在 reward shifts 和 feature scales 下同时保持 unshifted reward、policy probes、Q norm、output-change magnitude 和 divergence 稳定时，才支持本 proposal。unit-switching figures 尤其重要，因为它们测试 continual recovery，而不是只测试单独固定条件下的 tuning。
 
 Compute need / fallback：main pilot 和 unit-switching extension 已完成。fixed-condition 20-seed extended CPU sweep 作为 `core-rl-scale-invariant-extended-33723554` 正在运行；在 artifacts 写出前，fallback 是提交 fixed-condition pilot evidence 加更强的 no-reset unit-switching evidence，并明确 full-grid confirmation pending。
 
 ## 独立研究范围
 
-这是一个更大的 integrated proposal，但它仍然是独立研究，不是强行拼接 Reward-Centered Sarsa 和 Output-Controlled TD。reward-only 和 prediction-only reports 是 component evidence；本报告自己的研究对象是 combined control problem、reward/feature unit interaction，以及 no-reset unit-change failure mode。
+这是一个关于 continuing control 中 unit sensitivity 的较大独立研究。它问一个单一 online control learner 在 reward origin 和 feature scale 两种任意 measurement conventions 改变时，是否仍能保持稳定。本研究包含自己的环境、方法、指标、fixed-condition experiment 和 no-reset unit-switching experiment。
 
 本报告不声称一般意义上解决 unit invariance。当前范围是 synthetic but controlled unit manipulations 下的 linear access-control Sarsa。fixed-condition pilot 支持 compositional stability；no-reset extension 则显示 abrupt feature-unit changes 即使避免 catastrophic divergence，也仍会损害长期 reward。
 
 ## 证据等级
 
-证据等级：强 integrated-candidate evidence，但还不是 final full-grid evidence。已完成 fixed-condition pilot 展示 reward centering 和 update normalization 的 interaction；已完成 20-seed unit-switching run 对 continual-learning relevance 更强，因为它在同一 stream 中改变 units，不重置 weights。运行中的 `20260709T063128Z_extended` fixed-condition sweep 目前没有 artifacts，不能作为 evidence。
+证据等级：强候选证据，但还不是 final full-grid evidence。已完成 fixed-condition pilot 展示 reward centering 和 update normalization 的 interaction；已完成 20-seed unit-switching run 对 continual-learning relevance 更强，因为它在同一 stream 中改变 units，不重置 weights。运行中的 `20260709T063128Z_extended` fixed-condition sweep 目前没有 artifacts，不能作为 evidence。
 
 当前 claim 必须收紧：combined centering/normalization 在当前测试 variants 和 access-control 设置中对 stable unit changes 是必要的，并且能在 no-reset switches 下避免严重数值不稳定；但它没有完全解决 abrupt feature-scale changes 后的 reward recovery。成熟最终论文还需要 running extended grid、gradual scale drift、beta sensitivity 和 policy-distance probes。
+
+## 论文式贡献与 Claim 边界
+
+本报告的贡献是把两个局部 invariance mechanisms 推进成一个单一 continuing-control 问题：当 reward units 和 feature units 都是任意约定时，agent 能否保持稳定？fixed-condition experiment 测试两个机制是否能组合；no-reset switch experiment 测试这些机制是否能承受更接近 continual interpretation 的单位变化。这使本 proposal 不只是把两个方法拼在一起。
+
+claim 边界是：当前证据支持 tested unit changes 下的稳定性改进，不支持“unit invariance 已解决”。在 access-control setting 中，combined centering/normalization 避免了最严重的 numerical failure，但 abrupt feature-scale switch 仍会降低 long-run reward。真正开放的问题是 unit change 后的 recalibration 和 recovery，而不仅是防止 divergence。
 
 ## 研究动机
 
 Alberta Plan 强调从 ordinary experience 中持续学习。对于这样的 agent，单位敏感性不是 cosmetic issue，而是核心稳定性问题。一个长期 agent 不会在 sensor rescale 或 reward baseline shift 后获得干净的重新调参阶段。如果 reward origin 或 feature scale 改变了有效学习问题，那么 agent 的能力就依赖任务外的人为约定。
 
-Reward-Centered Sarsa 已经说明 reward-shift robustness 是 continuing control 的关键问题；Output-Controlled TD 已经说明 feature-scale robustness 是 streaming prediction 的关键问题。本综合课题把两者放进同一个 control loop，检验两个机制是否可以组合，还是会相互干扰。
+研究动机来自同一个 control loop 内的单位问题：access-control agent 应该从 reward differences 和 state-action evidence 中学习 accept/reject behavior，而不是依赖 reward zero point 或 one-hot features 的数值大小。combined stress test 有价值，是因为 reward translation 与 feature scaling 会通过 TD-error magnitude、action-value scale 和 effective step size 相互作用。
 
 ## 研究问题
 
@@ -115,14 +121,14 @@ unit-switching 进一步说明，稳定性和恢复性是两个层次。组合�
 | 审查角度 | 批评 | 已处理 | 剩余风险 |
 |---|---|---|---|
 | Alberta Plan | unit invariance 必须服务 continual agents，而不是 synthetic stress。 | 加入 no-reset unit-switching stream，并以 temporal-uniform learning 下 measurement conventions 改变为问题。 | 真实 sensor drift 尚未建模。 |
-| Core RL | integrated proposal 可能只是两个 tricks 的松散组合。 | 报告定义单一 combined invariance question，并测试 interaction failures。 | 仍需 running full-grid extended sweep。 |
+| Core RL | 研究可能被误解成两个 tricks 的松散组合。 | 报告定义单一 combined invariance question，并在同一个 control setting 中测试 interaction failures。 | 仍需 running full-grid extended sweep。 |
 | Stability | 避免 divergence 不等于 control 好。 | 报告 unshifted reward、Q norm、output change 和 divergence。 | 仍缺 policy-distance probes 和 recovery AUC。 |
 | 统计 | fixed-condition pilot 弱于 unit-switch extension。 | 分离 pilot evidence 和 completed 20-seed unit-switch evidence。 | running extended fixed grid 尚无 artifacts。 |
 | 严格老师 | 不要声称 unit invariance 已解决。 | 结论明确 abrupt feature-scale recovery 仍开放。 | 仍需 gradual drift 和 beta/gamma sensitivity。 |
 
 ## 结论
 
-Scale-Invariant Continuing Control 是当前强综合型 Core-RL 候选之一。它有清晰问题、可解释 continuing-control environment、非平凡机制交互和严格的 no-reset extension。当前最诚实的结论是：reward centering 和 output normalization 分别解决不同的 unit sensitivity，组合机制显著提高稳定性；但 abrupt feature-unit switch 后的完全恢复仍未解决。下一步应运行 full `scale_invariant_continuing_control/config_extended.json`，并设计 gradual unit drift 版本。
+Scale-Invariant Continuing Control 有清晰问题、可解释 continuing-control environment、非平凡机制交互和严格的 no-reset extension。当前最诚实的结论是：centering 和 normalization 分别处理不同的 unit sensitivity，组合机制显著提高稳定性；但 abrupt feature-unit switch 后的完全恢复仍未解决。下一步应等待 full `scale_invariant_continuing_control/config_extended.json` 结果，并设计 gradual unit drift 版本。
 
 ## 复现
 

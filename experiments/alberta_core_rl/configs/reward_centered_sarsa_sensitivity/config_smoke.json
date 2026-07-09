@@ -1,0 +1,7 @@
+{
+  "proposal": "reward_centered_sarsa_sensitivity",
+  "suite": "smoke",
+  "seeds": [0],
+  "steps": 300,
+  "notes": "Smoke test for reward-centered Sarsa beta/gamma sensitivity under no-reset reward-origin switching."
+}

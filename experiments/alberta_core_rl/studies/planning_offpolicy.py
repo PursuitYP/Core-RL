@@ -266,3 +266,139 @@ def proposal_continual_dyna_model_aging(seeds: list[int], suite: str, steps: int
         "question": "Can online model aging reduce stale Dyna backups without discarding the whole model?",
         "n_rows": len(rows),
     }
+
+
+def _drift_phase(
+    t: int,
+    switch_step: int,
+    steps: int,
+    drift_mode: str,
+    previous_phase: int,
+    rng: np.random.Generator,
+) -> tuple[int, float]:
+    if drift_mode == "abrupt":
+        return int(t >= switch_step), float(t >= switch_step)
+    if t < switch_step:
+        return 0, 0.0
+    if drift_mode == "gradual":
+        ramp = max(1, steps // 4)
+        probability = min(1.0, max(0.0, (t - switch_step) / ramp))
+        return int(rng.random() < probability), probability
+    if drift_mode == "stochastic":
+        probability = 0.02
+        if rng.random() < probability:
+            return 1 - previous_phase, probability
+        return previous_phase, probability
+    raise ValueError(f"unknown drift_mode: {drift_mode}")
+
+
+def proposal_continual_dyna_model_aging_drift(seeds: list[int], suite: str, steps: int) -> tuple[list[dict], dict]:
+    """Dyna model-aging stress test with abrupt, gradual, and stochastic nonstationarity."""
+    rows: list[dict] = []
+    drift_modes = ["abrupt"] if suite == "smoke" else ["abrupt", "gradual", "stochastic"]
+    planning_steps_set = [5] if suite == "smoke" else [1, 5, 20]
+    model_modes = ["keep_model", "oracle_flush", "recency_aging", "recency_error_gate"]
+    half_lives = [250.0, 750.0] if suite != "smoke" else [250.0]
+    if suite == "main" and steps >= 20000:
+        planning_steps_set = [1, 5, 20]
+        half_lives = [100.0, 250.0, 750.0, 1500.0]
+    alpha = 0.1
+    gamma = 0.95
+    epsilon = 0.1
+    for seed in seeds:
+        for drift_mode in drift_modes:
+            for planning_steps in planning_steps_set:
+                for model_mode in model_modes:
+                    half_life_values = half_lives if model_mode in {"recency_aging", "recency_error_gate"} else [0.0]
+                    for half_life in half_life_values:
+                        rng = np.random.default_rng(seed)
+                        env = ContinuingGridworld(size=9 if suite == "main" else 7, seed=seed)
+                        env.reset()
+                        q = np.zeros((env.n_states, env.n_actions))
+                        model: dict[tuple[int, int], dict[str, float]] = {}
+                        avg_reward = 0.0
+                        stale_backup_rate = 0.0
+                        planning_abs_td = 0.0
+                        phase = 0
+                        phase_changes = 0
+                        switch_step = steps // 2
+                        for t in range(steps):
+                            next_phase, phase_probability = _drift_phase(t, switch_step, steps, drift_mode, phase, rng)
+                            if next_phase != phase:
+                                phase_changes += 1
+                                if model_mode == "oracle_flush":
+                                    model.clear()
+                            phase = next_phase
+                            env.set_phase(phase)
+                            s = env.state_index()
+                            action = int(rng.integers(env.n_actions)) if rng.random() < epsilon else int(np.argmax(q[s]))
+                            sp, reward = env.step(action)
+                            real_td = reward + gamma * float(np.max(q[sp])) - q[s, action]
+                            q[s, action] += alpha * real_td
+                            key = (s, action)
+                            previous = model.get(key)
+                            model_error = 0.0
+                            if previous is not None:
+                                model_error = abs(float(previous["reward"]) - reward) + float(int(previous["next_state"]) != sp)
+                                model_error = 0.8 * float(previous["model_error"]) + 0.2 * model_error
+                            model[key] = {
+                                "next_state": float(sp),
+                                "reward": float(reward),
+                                "phase": float(phase),
+                                "last_seen": float(t),
+                                "model_error": float(model_error),
+                            }
+                            keys = list(model.keys())
+                            probs = _model_key_probabilities(keys, model, t, model_mode, half_life)
+                            stale_backups = 0
+                            backup_abs_td_values = []
+                            for _ in range(planning_steps):
+                                if not keys:
+                                    break
+                                if probs is None:
+                                    sampled = keys[int(rng.integers(len(keys)))]
+                                else:
+                                    sampled = keys[int(rng.choice(len(keys), p=probs))]
+                                ms, ma = sampled
+                                entry = model[(ms, ma)]
+                                msp = int(entry["next_state"])
+                                stale = int(int(entry["phase"]) != phase)
+                                stale_backups += stale
+                                td = float(entry["reward"]) + gamma * float(np.max(q[msp])) - q[ms, ma]
+                                q[ms, ma] += alpha * td
+                                backup_abs_td_values.append(abs(td))
+                            stale_fraction = stale_backups / max(1, planning_steps)
+                            stale_backup_rate += 0.02 * (stale_fraction - stale_backup_rate)
+                            if backup_abs_td_values:
+                                planning_abs_td += 0.02 * (float(np.mean(backup_abs_td_values)) - planning_abs_td)
+                            avg_reward += 0.02 * (reward - avg_reward)
+                            if should_log_step(t, steps):
+                                rows.append(
+                                    {
+                                        "seed": seed,
+                                        "step": t,
+                                        "algorithm": f"dyna_{planning_steps}_{model_mode}",
+                                        "environment": "changing_gridworld_model_aging_drift",
+                                        "drift_mode": drift_mode,
+                                        "planning_steps": planning_steps,
+                                        "model_mode": model_mode,
+                                        "half_life": half_life,
+                                        "phase": phase,
+                                        "phase_probability": phase_probability,
+                                        "phase_changes": phase_changes,
+                                        "steps_since_switch": t - switch_step,
+                                        "recovery_window": recovery_window(t, switch_step),
+                                        "reward": reward,
+                                        "avg_reward": avg_reward,
+                                        "real_abs_td": abs(real_td),
+                                        "planning_abs_td": planning_abs_td,
+                                        "model_size": len(model),
+                                        "stale_backup_rate": stale_backup_rate,
+                                        "mean_model_error": float(np.mean([entry["model_error"] for entry in model.values()])),
+                                        "q_norm": float(np.linalg.norm(q)),
+                                    }
+                                )
+    return rows, {
+        "question": "Does model aging remain useful when nonstationarity is gradual or stochastic rather than one abrupt switch?",
+        "n_rows": len(rows),
+    }

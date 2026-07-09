@@ -46,7 +46,7 @@ class LinearTD:
     def _step_size(self, x: np.ndarray, z: np.ndarray | None = None) -> float:
         if self.method == "fixed" or self.method == "true_online":
             return self.alpha
-        if self.method == "normalized":
+        if self.method in {"normalized", "true_online_normalized"}:
             denom = self.eps + float(np.dot(x, x))
             return min(self.alpha_max, self.alpha / denom)
         if self.method == "trace_normalized":
@@ -64,7 +64,7 @@ class LinearTD:
         v_before = self.value(x)
         v_next = self.value(x_next)
         delta = reward + gamma * v_next - v_before
-        if self.method == "true_online":
+        if self.method in {"true_online", "true_online_normalized"}:
             step_size = self._step_size(x)
             dot_zx = float(np.dot(self.z, x))
             self.z = gamma * self.lam * self.z + (1.0 - step_size * gamma * self.lam * dot_zx) * x

@@ -18,7 +18,7 @@ What will we look at? 主要证据是 RMSE、seed-level divergence、weight norm
 
 ## 独立研究范围
 
-本 proposal 是关于 streaming value prediction 中 update units 的独立研究。它隔离 broader unit-invariance problem 中的 feature-scale side：底层 random-walk prediction problem 在概念上保持不变，只改变 feature vector 的单位和尺度。reward-origin effects、control behavior 和 model-based planning 不属于本报告范围，分别由其他 proposal 处理。
+本 proposal 是关于 streaming value prediction 中 update units 的独立研究。它隔离 feature-scale invariance problem：底层 random-walk prediction problem 在概念上保持不变，只改变 feature vector 的单位和尺度。reward-origin effects、control behavior 和 model-based planning 不属于本报告范围，因此这里的 claim 限定在线性函数逼近下的 streaming prediction。
 
 本报告也不应被理解为对 true-online TD(lambda) 的一般否定。当前 true-online 条件是 feature-scale stress test 中的 raw-alpha trace baseline。它的 divergence 说明在 feature rescaling 下 raw parameter-space alpha 不公平，而不是说明 true-online TD(lambda) 在合适 tuning 或 normalization 下本质不稳定。
 
@@ -26,7 +26,13 @@ What will we look at? 主要证据是 RMSE、seed-level divergence、weight norm
 
 证据等级：强独立主线候选，主要支持 prediction-side update geometry 机制；但 trace baseline 仍有公平性 caveat。完成的 CPU run 包含 20 seeds、20000 steps、5 种 feature-scale patterns、4 个 alphas 和 4 个 algorithms。关键结果按 seed-level event 统计：normalized TD 和 trace-normalized TD 在完整网格中没有 divergent seed-condition；fixed TD 和 raw-alpha true-online baseline 各有 141/400 个 seed-conditions 发散。
 
-当前证据还不是 control result，也不是完整 true-online TD(lambda) audit。下一步必须加入 max-stable-alpha table、normalized true-online TD(lambda)，以及同一条 stream 中的 no-reset feature-scale switch。只有完成这些后，才能声称 output-controlled updates 可以解决 control agent 中的 feature-unit drift。
+当前证据还不是 control result，也不是完整 true-online TD(lambda) audit。fairness follow-up 已经实现为 `output_controlled_td_fairness_audit`，smoke 结果为 `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`，extended CPU task 为 `core-rl-output-fairness-extended-rerun-29576456`。在该 extended sweep 完成前，报告不能声称 output-controlled updates 已解决 control agent 中的 feature-unit drift。
+
+## 论文式贡献与 Claim 边界
+
+本报告的贡献是 streaming TD 在线性函数逼近下的 update-unit study。它把 feature scaling 从 nuisance hyperparameter 问题转化为可测的稳定性问题：alpha 到底指定 raw parameter displacement，还是 intended prediction change？extended result 提供 seed-level stability atlas，并显示 feature normalization 和 trace normalization 可以防止整类 scale-induced divergence。
+
+claim 边界是：这是 prediction-side mechanism result，不是完整 control improvement 结果，也不是对 true-online TD(lambda) 算法家族的公平排名。当前 true-online 条件是 raw-alpha baseline；负责任的结论是 raw alpha 在 feature-scale stress 下不是可比单位，而不是 true-online TD(lambda) 本身弱。
 
 ## Research Motivation
 
@@ -46,7 +52,7 @@ Hypothesis：normalized TD variants 应该比 fixed-step TD 在 feature scales �
 
 ## Related Work
 
-最直接的近年动机来自 Intentional Updates for Streaming Reinforcement Learning：在 batch-size-one learning 中，parameter-space step size 会产生不可预测的 output change，因此应先指定 update 的 intended outcome。Reward Centering 在 reward side 提出平行的 invariance 问题：arbitrary reward offsets 不应改变 continuing-control behavior。Streaming Deep RL Finally Works 和 Squeezing More from the Stream 提供 no-replay streaming regime 的背景；本项目为了保持 Core RL 和可解释性，故意停留在线性方法。True Online TD(lambda) 是重要的在线 trace baseline；当前 raw-alpha 实现必须谨慎解释，因为 true-online methods 在合适 step-size 使用下本来是很强的算法。
+最直接的近年动机来自 Intentional Updates for Streaming Reinforcement Learning：在 batch-size-one learning 中，parameter-space step size 会产生不可预测的 output change，因此应先指定 update 的 intended outcome。Normalized LMS 提供了更早的 scale-aware prediction-learning precedent。Streaming Deep RL Finally Works 和 Squeezing More from the Stream 提供 no-replay streaming regime 的背景；本项目为了保持 Core RL 和可解释性，故意停留在线性方法。True Online TD(lambda) 是重要的在线 trace baseline；当前 raw-alpha 实现必须谨慎解释，因为 true-online methods 在合适 step-size 使用下本来是很强的算法。
 
 ## Environment
 
@@ -103,13 +109,25 @@ Normalized TD 在完整网格中没有任何 seed-level divergence。Scale `hund
 
 Raw-alpha true-online TD(lambda) baseline 需要谨慎解读。它和 fixed TD 的 diverged seed-condition 数量相同，包括所有 `hundred` conditions；但它在未发散条件下 RMSE 很低，因为 surviving conditions 多数是更容易的 scale settings。因此这是一条关于公平 step-size comparison 的警示，不是对 true-online TD(lambda) 本身的否定。
 
+### 第二轮 Fairness Audit 状态
+
+Fairness audit 是同一研究问题内部的独立补充实验。它加入 normalized true-online TD(lambda) variant，并扩大 alpha/scale grid，避免把 raw-alpha trace baseline 当成 true-online TD(lambda) 的最终评价。当前 smoke run 只用于验证 runner、schema 和 plotting path，但它已经确认 fixed、normalized、trace-normalized、true-online 和 normalized true-online variants 能在同一套指标下记录。
+
+Smoke result path：`experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`
+
+Pending extended result path：`experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended`
+
+CPU task：`core-rl-output-fairness-extended-rerun-29576456`，在 2026-07-09 17:02 HKT 仍为 running。由于标准 artifacts 尚未写出，该 pending run 还不能作为 evidence。
+
+![Smoke fairness-audit RMSE heatmap.](../../../../experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke/figures/report_log_rmse_heatmap.png)
+
 ## Analysis
 
 Heatmaps 支持核心机制：当 feature scale 改变时，fixed alpha 不是一个好的 streaming prediction progress 单位。在 large 或 uneven scales 下，同一个 TD error 可能仅仅因为 feature vector 更大而产生巨大 output change。Normalized TD 改变 update 的分母，使 feature direction 变大时 effective step size 收缩。Trace-normalized TD 把同一思想应用到 accumulated eligibility trace。
 
 结果也说明为什么只做 one-alpha leaderboard 会误导。True-online TD(lambda) 有强理论和以往经验支持，但当实验操控的是 feature magnitude 时，用 raw-alpha true-online baseline 去和 normalized methods 比较并不公平。下一版应该加入 max-stable-alpha audit 和 normalized true-online variant，再决定如何评价 true-online TD(lambda)。
 
-## Threats To Validity
+## 局限与有效性威胁
 
 当前任务是 prediction-only。这让 feature-scale mechanism 很干净，但如果要说明 control 侧也受益，需要在 Sarsa 或 actor-critic 中做进一步实验。
 
@@ -137,7 +155,7 @@ Reproducibility reviewer：CPU job 之前看起来像卡住，因为旧 runner �
 
 ## Conclusion
 
-Extended evidence 支持本 proposal 的主要观点：streaming TD 应该控制 prediction space 中的 update consequence，而不仅仅是 raw parameter movement。Normalized TD 和 trace-normalized TD(lambda) 在所有测试 feature scales 和 alphas 下稳定，而 fixed TD 在 scale stress 下非常脆弱。这个 proposal 作为独立 Core RL 研究很强，也为更大的 Scale-Invariant Continuing Control proposal 提供了直接动机。
+Extended evidence 支持本 proposal 的主要观点：streaming TD 应该控制 prediction space 中的 update consequence，而不仅仅是 raw parameter movement。Normalized TD 和 trace-normalized TD(lambda) 在所有测试 feature scales 和 alphas 下稳定，而 fixed TD 在 scale stress 下非常脆弱。当前仍需等待 normalized true-online fairness sweep 的 extended 结果，以判断 raw-alpha true-online 的失败主要是单位不公平，还是这个 testbed 中更深的 trace-learning 问题。
 
 ## Reproduction / 复现
 
@@ -168,4 +186,12 @@ PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconf
   --kind output-td \
   --result-dir experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended \
   --figure-dir final/reports/proposals/output_controlled_td/figures
+```
+
+Fairness audit smoke command：
+
+```bash
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
+  --config experiments/alberta_core_rl/configs/output_controlled_td_fairness_audit/config_smoke.json
 ```

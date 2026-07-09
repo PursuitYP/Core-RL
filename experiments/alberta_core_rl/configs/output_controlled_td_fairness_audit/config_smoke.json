@@ -1,0 +1,7 @@
+{
+  "proposal": "output_controlled_td_fairness_audit",
+  "suite": "smoke",
+  "seeds": [0],
+  "steps": 300,
+  "notes": "Smoke test for true-online TD fairness audit over fixed, normalized, trace-normalized, true-online, and normalized true-online TD."
+}

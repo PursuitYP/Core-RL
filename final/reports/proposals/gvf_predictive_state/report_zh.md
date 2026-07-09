@@ -16,19 +16,19 @@ Implemented comparison：pilot 比较 raw observation、short history、trace me
 
 Metric / figure：主证据是 trial-end accuracy，并用 position-level GVF/trace trajectories 辅助解释。GVF feature 必须接近 trace memory 或至少优于 raw observation；仅仅降低 GVF TD error 不算成功。
 
-Compute need / fallback：当前 standalone result 是 five-seed pilot。诚实 fallback 是把它报告为 negative redesign target，并使用 integrated Predictive State Plasticity extended run 作为更强证据。
+Compute need / fallback：当前 result 是 five-seed pilot。诚实 fallback 是把它报告为 negative redesign target，并要求 additional seeds、corridor lengths 和 cue-decodability probes 提供更强证据。
 
 ## 独立研究范围
 
-本 proposal 是 integrated Predictive State Plasticity 的较小 standalone precursor。它只回答一个窄问题：初始 recurrent GVF design 是否能在 T-maze 中成为 useful state。它不评价 generate-and-test、TIDBD、feature replacement 或完整 predictive-state program。
+本 proposal 只回答一个窄问题：当前 recurrent GVF design 是否能在 T-maze 中成为 useful state。它不评价这个 GVF-state mechanism 之外的更广泛 representation-learning machinery。
 
 范围之所以窄，是因为结果是负的。它不能用来宣称 GVFs 不能构造 state；它应该用于推动更好的 GVF question design、direct cue-decodability probes 和更严格 useful-prediction evaluation。
 
 ## 证据等级
 
-证据等级：negative pilot / redesign target。这个结果足以说明当前 recurrent-GVF pilot 不应被提交为 positive GVF-state result。它没有 integrated 20-seed Predictive State Plasticity run 强，后者应作为最终证据来源。
+证据等级：negative pilot / redesign target。这个结果足以说明当前 recurrent-GVF pilot 不应被提交为 positive GVF-state result。它仍受限于 five seeds 和一个 maze length。
 
-因此本报告应作为 failure mechanism 引用：cheap trace memory 能解任务，recurrent GVF 不能。任何最终 predictive-state claim 都应依赖 extended integrated run 或新的 cue-decodability experiments。
+核心 failure mechanism 很清楚：cheap trace memory 能解任务，而当前 recurrent GVF 不能。任何更强的 predictive-state claim 都需要更大规模 runs 和直接 cue-decodability evidence。
 
 ## 研究动机
 
@@ -84,9 +84,9 @@ Raw observation、short history 和 recurrent GVF 仍接近 chance，约为 `0.5
 
 这也给 GVF 研究提出了更严格标准：不是所有 prediction 都值得进入 agent state。一个 useful GVF 应该同时满足至少三个条件：它预测的问题与 hidden variable 或未来 decision 有关；它的 output scale 和 dynamics 能被 control learner 使用；它在 downstream control 上接近或超过简单 memory baseline。
 
-## 有效性威胁
+## 局限与有效性威胁
 
-当前只测试一种 recurrent GVF design，不能据此否定 GVFs。报告缺少直接 cue-decodability linear probe，因此“GVF 未携带 cue”主要由 control accuracy 和 trajectory plot 推断。Maze length 固定为 `12`，后续应扫 corridor length 和 cue semantics。GVF cumulant/discount 选择也可能不对，需要与 `GVF Question Design` 和 `Predictive State Plasticity` 结合重做。
+当前只测试一种 recurrent GVF design，不能据此否定 GVFs。报告缺少直接 cue-decodability linear probe，因此“GVF 未携带 cue”主要由 control accuracy 和 trajectory plot 推断。Maze length 固定为 `12`，后续应扫 corridor length 和 cue semantics。GVF cumulant/discount 选择也可能不对，需要在本实验内加入 question-design diagnostics。
 
 ## 审稿式批评与回应
 
@@ -96,15 +96,15 @@ Strict baseline reviewer 会指出：如果 trace memory 这么便宜，GVF 必�
 
 下一步必须加入 cue-decodability probe、hidden-cue correlation plot 和更贴近未来 cue-relevant events 的 cumulant 设计。
 
-逐 proposal 审查矩阵：
+审查矩阵：
 
 | 审查角度 | 批评 | 已处理 | 剩余风险 |
 |---|---|---|---|
 | GVF | prediction accuracy 不等于 useful state。 | 报告 trial accuracy，并加入 trace/oracle baselines。 | 仍缺 direct cue-decodability。 |
 | Baseline | 如果 trace memory 解任务，GVF 必须接近它。 | 包含 trace 和 oracle 强 baseline。 | GVF 仍接近 chance。 |
-| 证据 | 5 seeds 和一个 maze length 有限。 | 报告定位为 negative pilot。 | extended evidence 应来自 Predictive State Plasticity。 |
+| 证据 | 5 seeds 和一个 maze length 有限。 | 报告定位为 negative pilot。 | 需要更多 seeds、maze lengths 和 direct cue probes。 |
 | Alberta Plan | GVF 很重要，因此负结果必须精确。 | 结论限定于当前 GVF design。 | 更好的 GVF questions 可能成功。 |
-| 严格老师 | 不要把它写成正向 proposal。 | status 和 conclusion 都称为 redesign target。 | 若纳入 final material，需要与 integrated report 同步。 |
+| 严格老师 | 不要把它写成正向 proposal。 | status 和 conclusion 都称为 redesign target。 | final material 必须保留 negative evidence level。 |
 
 ## 结论
 

@@ -1,45 +1,65 @@
 # GVF Question Design
 
-Status: independent diagnostic study for GVF redesign.
+Status: independent useful-prediction design diagnostic; current evidence is for redesign, not for a completed GVF control claim.
 
 ## Abstract
 
-This proposal studies a design problem that sits before GVFs can be used as agent state: which predictive questions are worth learning? In a T-maze stream, we train linear GVF predictors for different cumulants and discounts. The current run shows that some questions are easy but not useful, such as bias predictions, while cue and junction questions expose the difference between prediction accuracy and downstream state relevance. The study is not a final control result; it is a principled diagnostic for designing useful predictive state.
+This proposal studies a design problem that comes before using GVFs as agent state: which predictive questions are worth learning? A GVF can have low prediction error and still be useless if it predicts a constant, a locally visible signal, or a variable unrelated to the hidden information needed for control. The central message is therefore:
 
+> prediction error != usefulness.
 
-## Standalone Study Summary
+The current diagnostic uses a T-maze stream and trains linear GVF predictors for different cumulants and discount horizons. Bias predictions are easy but not useful; cue and junction questions expose the need to evaluate predictions by their relation to hidden cue information and downstream junction action. The contribution is a useful-prediction design diagnostic, not a final result showing that GVF state improves control.
 
-This diagnostic study asks which GVF questions are useful, not merely predictable. The RL problem is a controlled prediction setting where different cumulants/questions can be learned online and compared for downstream relevance. The implemented GVF learners differ in cumulant and horizon. The experiment measures GVF prediction error, cue relevance, and utility proxies for downstream state construction. The current evidence supports an important design lesson: easy predictions are not necessarily useful state. The next step is to connect the best question candidates to the T-maze control task.
+## Claim Boundary
 
-## Research Motivation
+The report makes one bounded claim:
 
-GVFs are often described as predictive knowledge, but a prediction is only useful to an agent if it helps answer a decision-relevant question. A low-error GVF can be useless if it predicts a constant or a signal unrelated to the hidden variable needed for control.
+> In the current T-maze question-design diagnostic, low GVF prediction error is not enough to identify useful state features; GVF questions need explicit usefulness probes such as cue decodability and downstream control ablations.
 
-The failed GVF Predictive State experiment makes this design issue concrete. A recurrent GVF did not solve the T-maze even though the task was solvable by trace memory. This diagnostic asks what questions should be considered before inserting GVFs into the control state.
+The report deliberately does not claim:
 
-## Research Question
+- that the tested GVFs already solve T-maze control;
+- that one cumulant/discount pair is universally best;
+- that TD error is the main success metric;
+- that GVF predictive state has been validated without downstream probes.
 
-Which GVF cumulant/discount questions are easy to predict, and which look potentially useful for T-maze state construction?
+## Research Motivation/Question/Method
+
+The Alberta Plan treats GVFs as a route toward rich predictive knowledge. That agenda requires not only learning answers, but also choosing questions. If an agent learns thousands of accurate but irrelevant predictions, the resulting state can be larger, slower, and no more useful for decision-making.
+
+A T-maze makes the problem concrete. The task can be solved with a trace-like memory of the cue, but a recurrent GVF design can still fail if its questions do not preserve the relevant information. Such a failure should not be interpreted only as an algorithmic bug. It may indicate a question-design failure: the learned predictions did not preserve the control-relevant hidden cue at the junction.
+
+### Focused RL Question
+
+Main question:
+
+> Which GVF cumulant and discount questions are merely learnable, and which are plausible candidates for useful predictive state in a partially observable T-maze?
+
+Subquestions:
+
+- Which GVFs have low TD error?
+- Which GVFs preserve information about the hidden cue at the junction?
+- Which GVF feature sets improve, do not affect, or harm downstream junction action?
 
 Hypothesis:
 
-> Prediction error alone will not identify useful GVF questions. Useful questions must be evaluated by their relation to hidden cue information or downstream control.
+> Prediction error alone will not identify useful GVF questions. A useful question must be evaluated by its relationship to hidden state information or downstream control.
 
-## Alberta Plan Connection
+### Core RL Connection
 
-The proposal targets:
+This is a core RL proposal because it studies prediction questions and state construction under partial observability. It connects to:
 
-- GVFs;
-- predictive knowledge;
-- agent-state construction;
+- GVFs and predictive knowledge;
+- online agent-state construction;
 - question discovery and evaluation;
-- useful prediction rather than raw prediction accuracy.
+- useful prediction rather than raw prediction accuracy;
+- small interpretable diagnostics before control-scale experiments.
 
-It is an independent study because question design is a prerequisite for any GVF-based state proposal.
+The proposal is independent because it asks a standalone design question: what should a GVF-based state learner predict?
 
-## Related Work
+### Related Work
 
-Horde and GVF work motivate learning many predictions. Useful-prediction work asks which predictions improve learning or behavior. Online agent-state work motivates predictions as state features under partial observability.
+Horde and GVF work motivate learning many predictions from a stream. Useful-prediction work asks which predictions improve learning or behavior. Online agent-state work motivates predictions as state features under partial observability.
 
 Local references:
 
@@ -47,37 +67,47 @@ Local references:
 - `resources/alberta_plan_related/horde_lifelong_offpolicy_1206.6262.pdf`
 - `resources/alberta_plan_related/learning_agent_state_online_2112.15236.pdf`
 
-## Environment
+### Method
 
-The setting is a T-maze stream with signals:
+The setting is a T-maze stream with observable signals:
 
 - left cue;
 - right cue;
 - junction;
 - bias.
 
-The hidden control-relevant variable is the cue that should determine the junction action.
+The hidden control-relevant variable is the earlier cue that should determine the action at the junction. This makes the task useful for separating easy prediction from useful memory.
 
-## Methods
-
-Linear TD predictors are trained for each cumulant and discount combination. The study varies:
+The method trains linear TD predictors for each cumulant and discount combination. The varied design factors are:
 
 - cumulant identity;
 - discount horizon.
 
-It records prediction errors and value profiles, but interprets them through the lens of usefulness.
+Current cumulants:
+
+- `left_cue`;
+- `right_cue`;
+- `junction`;
+- `bias`.
+
+Current discounts:
+
+- `0`;
+- `0.5`;
+- `0.9`;
+- `0.98`.
+
+The current learner records prediction behavior. The next version must add explicit usefulness tests.
 
 ## Experimental Design
 
 Current main diagnostic:
 
-- Cumulants: `left_cue`, `right_cue`, `junction`, `bias`.
-- Discounts: `0`, `0.5`, `0.9`, `0.98`.
 - Seeds: `0-4`.
 - Steps: `5000`.
 - Result path: `experiments/alberta_core_rl/results/gvf_question_design/20260708T160958Z_main`.
 
-Metrics:
+Current measurements:
 
 - absolute TD error;
 - prediction value;
@@ -87,73 +117,87 @@ Primary figure:
 
 ![GVF TD error by cumulant and discount.](../../../../experiments/alberta_core_rl/results/gvf_question_design/20260708T160958Z_main/figures/abs_td_error_by_cumulant-gamma_curve.png)
 
+Design logic:
+
+| Design element | Why it is needed |
+|---|---|
+| Multiple cumulants | Separates trivial signals from cue-related and decision-location signals. |
+| Multiple discounts | Tests whether horizon choice changes what information is preserved. |
+| T-maze stream | Provides a simple partial-observability problem with known hidden cue. |
+| TD error | Measures learnability, but not usefulness. |
+| Planned cue probe | Measures whether the prediction helps recover the hidden variable. |
+| Planned control ablation | Measures whether the prediction affects decision quality. |
+
 ## Results
 
-Bias GVFs are trivial and accurate, but they are not useful state. Cue GVFs have nontrivial errors and discount-dependent predictions. Junction predictions are predictable, but they do not directly solve cue memory.
+The current run shows three qualitatively different categories:
 
-The result shows that easy prediction and useful prediction are different categories.
+- Bias GVFs are trivial and accurate, but not useful for cue memory.
+- Cue GVFs have nontrivial errors and discount-dependent value profiles, making them plausible candidates for state features.
+- Junction predictions are learnable, but by themselves do not solve the memory problem because the junction signal arrives where the decision is made rather than preserving the earlier cue.
+
+The result supports the core diagnostic lesson: learnability and usefulness are different properties.
+
+The current result summary gives this pattern in numerical form. Bias predictions at gamma `0`, `0.5`, and `0.9` have near-zero tail absolute TD error, while the long-horizon bias GVF at gamma `0.98` has tail absolute TD error around `0.1002`. Cue GVFs have tail absolute TD error around `0.0960-0.1666` across the tested discounts, and junction GVFs are around `0.1706-0.2563`. These numbers are useful for auditing learnability, but they do not answer whether the predictions preserve the hidden cue at the decision point.
 
 ## Analysis
 
-The diagnostic explains why the current GVF predictive-state design failed. Selecting GVFs because they are easy or stable can produce features that do not preserve the hidden cue. For T-maze control, the right diagnostic is not just TD error; it is whether a prediction helps decode the cue at the junction.
+The likely failure mechanism in the earlier GVF predictive-state design is not simply high prediction error. Several failure modes are possible:
 
-The next version should add explicit cue-decodability metrics and downstream junction-action tests for each GVF feature set.
+- Trivial-prediction failure: a bias or local signal is predicted accurately but carries no hidden cue information.
+- Horizon mismatch: the discount makes the prediction too myopic or too diffuse to preserve the cue until the junction.
+- Location mismatch: a junction prediction marks the decision point but does not identify the correct action.
+- Representation bottleneck: the GVF answer may be learned but not encoded in a way the controller can use.
+- Objective mismatch: minimizing TD error can reward predictability rather than decision relevance.
+
+These mechanisms explain why "low TD error" should not be treated as success. A useful-prediction proposal must ask "useful for what?" and answer with a measured probe.
+
+## Next Experiments
+
+The next experiments should make usefulness operational:
+
+1. Cue-decodability probe: train a small linear probe from GVF outputs to the hidden cue at the junction.
+2. Downstream control ablation: compare controllers with raw observations only, observations plus each GVF group, and observations plus trace-memory baseline.
+3. Question-set ablation: test cue-only, junction-only, bias-only, and mixed GVF feature sets.
+4. Horizon audit: measure how discount changes cue preservation at the decision point, not only TD error.
+5. Negative controls: shuffle cue labels or use bias-only features to verify that probes do not report usefulness by accident.
+
+The proposal should remain a design diagnostic until at least one usefulness metric is implemented.
 
 ## Threats To Validity
 
-The current study infers usefulness rather than directly testing each GVF feature in control.
+- Current usefulness is inferred, not directly measured.
+- There is no hidden-cue linear probe yet.
+- There is no downstream control ablation yet.
+- The cumulant set is small and hand-designed.
+- Current figures may overemphasize TD error because the usefulness metrics are still planned.
 
-It does not yet include a linear probe for hidden cue information.
+## Reviewer Critique
 
-The cumulant set is small and hand-designed.
-
-The result is diagnostic; it should not be treated as a final GVF state-construction claim.
-
-## Reviewer Critique And Revisions
-
-Useful-prediction reviewer:
-
-- Accuracy and usefulness must be separated.
-
-Revision made:
-
-- The report explicitly labels bias GVFs as easy but not useful.
-
-Strict reviewer concern:
-
-- A GVF question-design study needs a downstream usefulness metric.
-
-Required next revision:
-
-- Add cue-decodability and downstream control ablations for each cumulant/discount group.
-
-## Conclusion
-
-GVF Question Design is a valuable independent diagnostic. It shows why a GVF proposal must ask "what is this prediction for?" before adding predictions as state. The study should feed directly into a redesigned GVF Predictive State proposal with usefulness metrics.
+| Reviewer angle | Likely critique | Report response | Required next action |
+|---|---|---|---|
+| Useful prediction | Accuracy and usefulness are being conflated. | The report explicitly states prediction error != usefulness. | Add cue-decodability and control-usefulness metrics. |
+| GVF reviewer | The question set is hand-designed and small. | The study is framed as a diagnostic, not automatic question discovery. | Add ablations and a principled question-selection table. |
+| Control reviewer | No downstream decision test yet. | Evidence level is redesign guidance only. | Run junction-action ablations for each GVF feature set. |
+| Strict instructor | Do not sell GVF state without showing state utility. | The claim is bounded to question-design diagnosis. | Keep final conclusion diagnostic unless usefulness probes pass. |
 
 ## Proposal Template Answers
 
-Focused RL question: Which GVF questions are likely to become useful state rather than merely easy predictions? The setting is a controlled GVF question-design diagnostic; the comparison varies cumulants/discounts and inspects prediction behavior. The required metrics are prediction error plus downstream usefulness probes such as cue decodability and control ablation. Compute is modest; fallback is a redesign guide for GVF Predictive State.
+Focused RL question: Which GVF questions are likely to become useful state rather than merely easy predictions?
 
-## Independent Research Scope
+Setting/testbed: A controlled T-maze prediction stream with cue, junction, and bias signals.
 
-This report is a GVF design diagnostic. It should not be presented as proof that a GVF state helps control, because the current evidence is mostly about prediction behavior. Its role is to decide which GVF questions deserve downstream control evaluation.
+Implemented comparison: Linear GVF predictors over cumulant and discount choices.
 
-## Evidence Level
+Observation/metric: Current metrics are TD error, prediction value, and weight norm; required next metrics are cue decodability and downstream control ablation.
 
-Evidence level: supporting redesign tool. The report is useful because it separates easy-to-predict cumulants from potentially useful ones. It is not positive evidence until cue-decodability or control-ablation metrics are added.
+Compute need: Small CPU-only runs.
 
-## Experiment Design Rationale
+Fallback: Keep the study as a question-design diagnostic if downstream usefulness tests are not completed.
 
-Prediction error alone is not enough because an easy prediction can be irrelevant. The next design should pair each cumulant/discount with a hidden-cue probe and a downstream-control ablation. That makes the experiment answer "useful for what?" rather than only "learnable how well?"
+## Conclusion
 
-## Reviewer Audit
-
-| Reviewer angle | Critique | Action taken | Remaining risk |
-|---|---|---|---|
-| GVF | Easy prediction is not useful prediction. | Report is framed as design diagnostic. | Needs cue decodability. |
-| Control | No downstream ablation yet. | Evidence level is supporting/redesign. | Cannot claim useful state. |
-| Strict instructor | Avoid treating TD error as the main success metric. | Required next metrics include control relevance. | Current figures may still overemphasize prediction error. |
+This proposal is an independent mini-study on GVF question design. Its current result is useful because it prevents a common mistake: treating accurate predictions as useful state without measuring what they preserve for control. The study should remain a redesign target until it adds cue decodability and downstream action ablations; only then can it claim that a GVF question set improves state construction rather than merely producing learnable predictions.
 
 ## Reproduction
 

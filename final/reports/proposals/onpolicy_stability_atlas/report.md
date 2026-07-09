@@ -1,15 +1,15 @@
 # On-Policy TD(lambda) Stability Atlas
 
-Status: independent diagnostic study; supports but does not replace Output-Controlled TD.
+Status: independent diagnostic study of fixed-step-size on-policy TD(lambda) stability.
 
 ## Abstract
 
-This proposal maps the practical stability region of on-policy TD(lambda) under feature scaling, step-size changes, and eligibility traces. It is not an intervention study; it is an atlas that shows where ordinary fixed-alpha TD becomes fragile. The current main run finds that scale `one` is mostly stable, while larger and uneven feature scales sharply shrink the stable alpha/lambda region. This diagnostic strengthens the Output-Controlled TD proposal by showing why feature-scale robustness is not a cosmetic issue.
+This study maps the practical stability region of on-policy TD(lambda) under feature scaling, step-size changes, and eligibility traces. It is not an intervention study; it is an atlas that shows where ordinary fixed-alpha TD becomes fragile. The current main run finds that scale `one` is mostly stable, while larger and uneven feature scales sharply shrink the stable alpha/lambda region. The diagnostic shows why feature-scale robustness is a central stability issue for streaming value learning.
 
 
 ## Standalone Study Summary
 
-This diagnostic study maps stability boundaries for on-policy TD(lambda). The RL problem is linear value prediction under different feature scales and trace settings. The implemented sweep varies alpha, lambda, and feature scale for TD-style learners. The experiment measures RMSE, weight norm, TD error, and divergence. The current evidence supports the broader Output-Controlled TD story: fixed step sizes have scale-dependent stability regions. The atlas is useful as supporting evidence but is not itself a complete final proposal.
+This diagnostic study maps stability boundaries for on-policy TD(lambda). The RL problem is linear value prediction under different feature scales and trace settings. The implemented sweep varies alpha, lambda, and feature scale for TD-style learners. The experiment measures RMSE, weight norm, TD error, and divergence. The current evidence shows that fixed step sizes have scale-dependent stability regions. The atlas is useful as a standalone diagnostic map of where ordinary parameter-step TD(lambda) becomes unreliable.
 
 ## Research Motivation
 
@@ -29,7 +29,7 @@ The atlas asks where failures occur, not which new algorithm fixes them.
 
 ## Alberta Plan Connection
 
-The proposal targets:
+The study targets:
 
 - value prediction;
 - online TD learning;
@@ -51,7 +51,7 @@ Local references:
 
 ## Environment
 
-The setting is a random-walk prediction problem with scaled tabular features. It is simpler than the tile-coded Output-Controlled TD main experiment, which makes it suitable for a dense alpha/lambda/scale atlas.
+The setting is a random-walk prediction problem with scaled tabular features. The small state space makes it suitable for a dense alpha/lambda/scale atlas while keeping every divergence and error pattern inspectable.
 
 ## Methods
 
@@ -94,13 +94,13 @@ This pattern supports the hypothesis that fixed alpha is not portable across rep
 
 ## Analysis
 
-The atlas explains why output-controlled updates are needed. If alpha were an intrinsic measure of learning progress, the same alpha/lambda grid would show similar behavior across scales. It does not. The interaction with lambda is especially important because traces can increase the effective update direction norm even when the current feature vector is small.
+The atlas shows why update magnitudes should be interpreted through their effects on predictions, not only through raw parameter displacement. If alpha were an intrinsic measure of learning progress, the same alpha/lambda grid would show similar behavior across scales. It does not. The interaction with lambda is especially important because traces can increase the effective update direction norm even when the current feature vector is small.
 
 The atlas is descriptive by design. Its value is to identify dangerous regions and motivate normalization or intentional update mechanisms.
 
 ## Threats To Validity
 
-The representation is simpler than the main tile-coded prediction experiment.
+The representation is simpler than many tile-coded prediction settings.
 
 The atlas does not implement a new method. It should be judged as a diagnostic, not an algorithmic contribution.
 
@@ -116,7 +116,7 @@ Stability reviewer:
 
 Revision made:
 
-- The report explicitly links atlas failures to output-controlled TD.
+- The analysis links atlas failures to normalization and update-size design.
 
 Strict reviewer concern:
 
@@ -124,35 +124,35 @@ Strict reviewer concern:
 
 Decision:
 
-- Keep as an independent diagnostic appendix-style study with full reproducibility.
+- Keep as an independent diagnostic study with full reproducibility.
 
 ## Conclusion
 
-The On-Policy TD(lambda) Stability Atlas is a focused diagnostic proposal. It shows that feature scale and trace length materially change fixed-alpha stability. The result supports the broader output-control argument while remaining an independent map of TD(lambda) failure regions.
+The On-Policy TD(lambda) Stability Atlas is a focused diagnostic study. It shows that feature scale and trace length materially change fixed-alpha stability. The result provides an independent map of TD(lambda) failure regions and a concrete basis for scale-aware update design.
 
 ## Proposal Template Answers
 
-Focused RL question: How does TD(lambda) stability change across alpha, lambda, and feature scale in an online prediction problem? The setting is a tile-coded prediction stream; the comparison is descriptive rather than a new algorithm. The main evidence should be max-stable-alpha maps or heatmaps, not a single curve. Compute is small to moderate; fallback is to use this as a diagnostic appendix for Output-Controlled TD.
+Focused RL question: How does TD(lambda) stability change across alpha, lambda, and feature scale in an online prediction problem? The setting is a scaled random-walk prediction stream; the comparison is descriptive rather than a new algorithm. The main evidence is max-stable-alpha maps or heatmaps, not a single curve. Compute is small to moderate; the fallback is to report the clearest heatmap and max-stable-alpha diagnostics without claiming a remedy.
 
 ## Independent Research Scope
 
-This atlas is independent as a diagnostic map, but it is not an intervention study. It explains why output-controlled or normalized updates are needed by showing where ordinary parameter-step TD(lambda) becomes fragile.
+This atlas is independent as a diagnostic map, but it is not an intervention study. It explains why scale-normalized or prediction-space update measures are needed by showing where ordinary parameter-step TD(lambda) becomes fragile.
 
 ## Evidence Level
 
-Evidence level: supporting atlas. It is valuable for mechanism and baseline calibration, but it should not be submitted as a main positive method because it does not propose or test a remedy.
+Evidence level: diagnostic atlas. It is valuable for mechanism and baseline calibration, but it should not be presented as a positive method because it does not propose or test a remedy.
 
 ## Experiment Design Rationale
 
-The alpha/lambda/scale grid is the scientific object. It turns stability from an anecdotal divergence into a map of boundaries. The next repair should convert overloaded learning curves into actual atlas figures: tail RMSE and divergence heatmaps by `scale x alpha x lambda`.
+The alpha/lambda/scale grid is the scientific object. It turns stability from an anecdotal divergence into a map of boundaries. The final presentation should emphasize atlas figures: tail RMSE and divergence heatmaps by `scale x alpha x lambda`.
 
 ## Reviewer Audit
 
 | Reviewer angle | Critique | Action taken | Remaining risk |
 |---|---|---|---|
-| Stability | A curve is not an atlas. | Report frames heatmaps/max-stable-alpha as required next figures. | Current report may still rely on dense curves. |
-| Method | No new algorithm is introduced. | Evidence level is supporting diagnostic. | Must not replace Output-Controlled TD. |
-| Strict instructor | The study needs a reason beyond plotting. | It motivates normalized update units. | Needs direct alignment with Output-Controlled metrics. |
+| Stability | A curve is not an atlas. | Heatmaps/max-stable-alpha are framed as required next figures. | Current presentation may still rely on dense curves. |
+| Method | No new algorithm is introduced. | Evidence level is diagnostic. | Cannot claim method improvement without an intervention. |
+| Strict instructor | The study needs a reason beyond plotting. | It motivates normalized update units. | Needs direct connection between heatmap regions and stability metrics. |
 
 ## Reproduction
 

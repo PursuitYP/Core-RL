@@ -1,6 +1,6 @@
 # Continual Dyna With Model Aging 中文报告
 
-状态：综合型主线候选；planning/model-based 方向中研究问题最清楚的 proposal 之一。当前已有 20-seed extended half-life/budget sweep。
+状态：独立 planning/model-based proposal。当前已有 20-seed extended half-life/budget sweep，并已实现 gradual/stochastic drift extension 的 smoke run 和 CPU extended rerun。
 
 ## 摘要
 
@@ -20,19 +20,25 @@ Implemented comparison：比较 no planning、keep-model Dyna、oracle model flu
 
 Metric / figure：主要证据是 late reward、stale-backup rate、model error、planning budget 和 half-life 的关系。一个有价值的结果可以是 tradeoff curve，而不一定是单一 winner，因为核心问题是 model freshness 如何改变 computation 的价值。
 
-Compute need / fallback：20-seed extended grid 已完成。如果没有时间跑第二环境，诚实 fallback 是把本课题提交为 abrupt-change model-freshness study，并明确 gradual/stochastic drift 是 future work。
+Compute need / fallback：20-seed abrupt-change grid 已完成。gradual/stochastic drift extension 已经实现并重新提交到 CPU task；在结果完成前，诚实 fallback 是把本课题提交为 abrupt-change model-freshness study，并明确 drift generalization 仍是 pending evidence。
 
 ## 独立研究范围
 
-这个 integrated proposal 是独立 planning study，不应被合并成 Dyna Planning Budget 的小变体。Budget proposal 问 planning 数量在 change 前后如何帮助或伤害；本报告问 continual agent 如何决定 learned model 的哪些部分值得 planning。核心对象是 model aging 下的 search control。
+这是一个关于 model aging 下 search control 的独立 planning study。它问 continual agent 如何决定 learned model 的哪些部分值得 planning。核心对象不只是 planning budget 的大小，而是被选中进行 simulated backup 的 model entries 是否新鲜、可信、仍然值得消耗计算。
 
 本报告不研究 replay buffers 或 offline model learning。model 是 compact、online updated，并被查询用于 planning backups。这与课程约束直接相关：agent 不存储旧 experience 并 replay，而是维护可能过时的 learned model entries。
 
 ## 证据等级
 
-证据等级：强 integrated-candidate evidence，支持 abrupt nonstationarity 和 model-freshness diagnostics。已完成结果包含 20 seeds、4 个 planning budgets、多种 model-handling rules 和 4 个 aging half-lives。它直接测量 stale-backup rate 和 model error，因此支持 mechanism claim，而不是只支持 reward claim。
+证据等级：强证据，支持 abrupt nonstationarity 和 model-freshness diagnostics。已完成结果包含 20 seeds、4 个 planning budgets、多种 model-handling rules 和 4 个 aging half-lives。它直接测量 stale-backup rate 和 model error，因此支持 mechanism claim，而不是只支持 reward claim。
 
-但证据还不足以做一般 nonstationary planning claim。当前环境变化是 abrupt 且 deterministic，stale entries 比较容易定义。更完整研究应加入 gradual drift、repeated changes 和 stochastic transition environment。因此当前结论应强调“freshness-aware search control 在 abrupt changing gridworld 中减少 stale backups”，而不是“model aging 解决 continual planning”。
+但证据还不足以做一般 nonstationary planning claim。当前已完成环境变化是 abrupt 且 deterministic，stale entries 比较容易定义。drift extension 已经实现为 `continual_dyna_model_aging_drift` 并以 `core-rl-dyna-drift-extended-rerun-30016335` 运行中；在 artifacts 可用前，当前结论应强调“freshness-aware search control 在 abrupt changing gridworld 中减少 stale backups”，而不是“model aging 解决 continual planning”。
+
+## 论文式贡献与 Claim 边界
+
+本报告的贡献是 planning-computation analysis，而不是又一条 Dyna reward curve。它把 model freshness 当成决定哪些 simulated backups 获得有限计算的变量，并且把 stale-backup rate 与 reward、model error 一起报告。这直接对应 Alberta Plan 中长期 agent 如何在 ordinary experience 下管理 learned models 的问题。
+
+claim 边界是：当前结果最强地支持 abrupt、可检查的 nonstationarity。它显示 recency 和 recency/error search control 可以在没有 oracle change signal 的情况下减少 stale computation，但没有证明某个 half-life 或 aging rule 普遍最优。更像论文的下一步是检验同样的 freshness tradeoff 是否出现在 gradual 或 stochastic drift 中。
 
 ## 研究动机
 
@@ -70,7 +76,7 @@ Continual setting 改变了问题本质。长期 agent 的 model entry 是过去
 
 ## 实验设计
 
-当前 extended run 的变量是 model mode、planning budget 和 half-life。主要指标包括 real-step average reward、stale-backup rate、model one-step prediction error、planning TD magnitude、model size、Q norm 和 recovery window。报告图使用 late post-change seed-tail condition summaries，并在图例中显式区分 `250/750/1500/4000` 等 half-life，而不是很多曲线挤在一张图里或静默丢掉 half-life 维度。
+当前 extended run 的变量是 model mode、planning budget 和 half-life。主要指标包括 real-step average reward、stale-backup rate、model one-step prediction error、planning TD magnitude、model size、Q norm 和 recovery window。报告图使用 late post-change seed-tail condition summaries，并把 heatmap 作为主视图：行表示 planning budget 与 model handling，列表示 half-life 或非 aging controls，颜色表示 measured outcome。这样避免早期多曲线图被长图例压缩，也不会静默丢掉 half-life 维度。
 
 成功标准不是“某个方法在一个 budget 下 reward 稍高”。更严谨的判据是：方法是否在不用 oracle change detector 的情况下减少 stale backups；减少 stale backups 是否伴随 post-change recovery 改善或至少不显著破坏 pre-change benefit；不同 planning budget 下是否出现一致 tradeoff；半衰期是否过于敏感。
 
@@ -85,6 +91,16 @@ half-life sweep 是主要科学控制。很短的 half-life 会快速不信任�
 ## 当前结果
 
 当前 extended result path 是 `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`。
+
+下面三张 heatmap 是当前主结果图。它们比早期多折线图更适合回答本课题问题：freshness-aware planning 是否减少 stale computation，以及这种减少是否能在不同 planning budget 和 half-life 下转化为 reward/recovery。
+
+![Late average reward heatmap by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_dyna_aging_reward_heatmap.png)
+
+![Late stale-backup rate heatmap by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_dyna_aging_stale_heatmap.png)
+
+![Late model-error heatmap by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_dyna_aging_model_error_heatmap.png)
+
+下面的 bar-summary figures 是 secondary check：它们更直接展示 seed uncertainty，因此适合用来确认 heatmap 中看到的 regime 是否跨 seeds 稳定。
 
 ![Late average reward by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_avg_reward_post_late_by_budget.png)
 
@@ -106,7 +122,7 @@ Budget `5` 下，keep-model 和 oracle flush 的 late reward 都很强，约 `0.
 
 为什么 stale-backup rate 比 reward 更关键？在小 gridworld 中，agent 可能靠真实交互逐渐恢复 reward，即使 planning 仍有浪费。但 Alberta Plan 设想的 agent 会有许多 predictions、models、options 和 control values 竞争有限计算。即使 reward 没有立刻崩溃，把 background computation 花在过期知识上也会降低整个 agent 的长期可扩展性。
 
-## 有效性威胁
+## 局限与有效性威胁
 
 第一，当前环境是 abrupt deterministic change，因此 stale model entries 比较容易定义。这对机制诊断有用，但可能高估 freshness heuristic 在 stochastic/gradual drift 中的清晰性。
 
@@ -133,12 +149,12 @@ Statistics reviewer 会指出：“reward winner 依赖 half-life。”回应是
 | Alberta Plan | planning 应是 ordinary experience 中 learned models 的问题，不是 offline replay。 | 使用 online learned model 和 planning backups，不使用 replay buffer。 | 环境仍是 compact synthetic gridworld。 |
 | Planning reviewer | reward alone 无法诊断 stale planning。 | 报告 stale-backup rate、model error、planning budget 和 half-life。 | planning utility per backup 还需要更完整表格。 |
 | Nonstationarity reviewer | abrupt change 可能让 aging 看起来太容易。 | 结论限制在 abrupt changing gridworld。 | 仍需 gradual/stochastic drift 和 repeated changes。 |
-| 统计 | half-life sensitivity 可能被单条曲线隐藏。 | 图例区分 half-life，并报告数值例子。 | compact Pareto table 会更清楚。 |
+| 统计 | half-life sensitivity 可能被单条曲线隐藏。 | 主结果改为 heatmap，并报告数值例子。 | compact Pareto table 会更清楚。 |
 | 严格老师 | 不要声称 universal reward superiority。 | 报告强调 stale-backup reduction 和 tradeoffs。 | 部分 reward comparison 仍依赖 budget。 |
 
 ## 结论
 
-Continual Dyna Model Aging 把 Dyna 从“多做 planning 是否更快”的熟悉故事推进到更有 Alberta Plan 意义的问题：长期 agent 什么时候应该信任自己的 learned model？当前 extended sweep 支持 model freshness 是 first-class planning variable：recency aging 和 recency/error gating 能显著减少 stale backups，不需要 oracle change detector。Reward 结论更条件化，取决于 planning budget 与 half-life。下一步应加入 gradual/stochastic drift；即使 reward winner 改变，freshness-aware search control 减少过期 planning computation 仍是清晰且有价值的 Core RL 结论。
+Continual Dyna Model Aging 把 Dyna 从“多做 planning 是否更快”的熟悉故事推进到更有 Alberta Plan 意义的问题：长期 agent 什么时候应该信任自己的 learned model？当前 extended sweep 支持 model freshness 是 first-class planning variable：recency aging 和 recency/error gating 能显著减少 stale backups，不需要 oracle change detector。Reward 结论更条件化，取决于 planning budget 与 half-life。drift extension 已经实现并运行中；它将决定 abrupt-change 结论在 gradual 和 stochastic nonstationarity 下能保留多少。
 
 ## 复现
 

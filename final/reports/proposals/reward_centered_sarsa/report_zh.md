@@ -10,7 +10,7 @@
 
 ## 独立研究总结
 
-本研究测试 continuing control 中的 reward-shift invariance。RL 问题是 access-control queue：agent 观察服务器空闲数量和当前 customer priority，然后持续在线决定 accept/reject，不存在离线训练阶段或 replay buffer。实现的方法是 discounted Sarsa、reward-centered Sarsa 和 differential Sarsa，均使用 tabular/linear action values。实验改变 constant reward shifts，并记录 unshifted reward、accept behavior、high-priority acceptance、reward baseline、TD error 和 Q norm。当前最强证据来自 20 seeds、20000 steps 的 alpha sweep：ordinary discounted Sarsa 会产生明显依赖 reward shift 的 value scale，而 centered 和 differential variants 在 value norm 与 unshifted reward 上更稳定。下一步需要继续补 beta/gamma sensitivity，并在同一条 stream 中途切换 reward origin，检查 reward baseline 的恢复速度。
+本研究测试 continuing control 中的 reward-shift invariance。RL 问题是 access-control queue：agent 观察服务器空闲数量和当前 customer priority，然后持续在线决定 accept/reject，不存在离线训练阶段或 replay buffer。实现的方法是 discounted Sarsa、reward-centered Sarsa 和 differential Sarsa，均使用 tabular/linear action values。实验改变 constant reward shifts，并记录 unshifted reward、accept behavior、high-priority acceptance、reward baseline、TD error 和 Q norm。当前最强证据来自 20 seeds、20000 steps 的 alpha sweep：ordinary discounted Sarsa 会产生明显依赖 reward shift 的 value scale，而 centered 和 differential variants 在 value norm 与 unshifted reward 上更稳定。beta/gamma sensitivity 和同一条 stream 中途切换 reward origin 的实验已经实现并提交 CPU extended run；在结果落盘前，这部分只作为 pending validation。
 
 ## Proposal Template Answers / 提案模板回答
 
@@ -26,15 +26,21 @@ Compute need / fallback：当前 alpha/reward-shift extended evidence 已完成�
 
 ## 独立研究范围
 
-本 proposal 是关于 continuing control 中 reward-origin invariance 的独立研究。它不依赖 Output-Controlled TD 或 Scale-Invariant Continuing Control 才能读懂：那些报告研究 feature scale 或 combined unit effects，本报告只隔离 reward side。它也不声称解决所有 average-reward learning、reward shaping 或 nonstationarity；它的范围更窄也更清楚：constant reward translation 不应该迫使 access-control Sarsa 重新调 step size、不应该造成任意 value-scale expansion，也不应该改变 accept/reject behavior。
+本 proposal 是关于 continuing control 中 reward-origin invariance 的独立研究。它不声称解决所有 average-reward learning、reward shaping 或 nonstationarity；范围更窄也更清楚：constant reward translation 不应该迫使 access-control Sarsa 重新调 step size、不应该造成任意 value-scale expansion，也不应该改变 accept/reject behavior。
 
-它与 Centered TD Diagnostics 的边界也需要明确。diagnostic report 在 tiny prediction setting 中解释机制；本报告提供 control environment、policy probes、seed sweep 和主要证据。如果最终只选择一个 reward-centering 方向提交，本报告应作为主 paper-style study，diagnostic 只作为 supporting material。
+本研究同时包含 mechanism-level measurements 和 control-level measurements。value-scale、TD-error、reward-baseline、policy-probe 和 accept-rate diagnostics 共同构成本研究对 reward-origin invariance claim 的证据链。
 
 ## 证据等级
 
-证据等级：强独立主线候选，但仍有明确未完成 sensitivity tests。已完成结果包含 20 seeds、每个 condition 20000 online steps、5 个 reward shifts、3 个 alphas 和 3 个 algorithms。它足以支持 fixed-condition claim：ordinary discounted Sarsa 对 reward origin 敏感，而 centered/differential variants 明显更稳健。
+证据等级：强独立主线候选，并有一个 follow-up sweep 正在运行。已完成结果包含 20 seeds、每个 condition 20000 online steps、5 个 reward shifts、3 个 alphas 和 3 个 algorithms。它足以支持 fixed-condition claim：ordinary discounted Sarsa 对 reward origin 敏感，而 centered/differential variants 明显更稳健。
 
-但这还不是完整 continual-adaptation paper。当前没有 no-reset midstream reward-origin switch，没有 reward baseline 的 beta sweep，也没有 discounted variants 的 gamma sweep。因此当前结论应限制在 separate streams across fixed reward origins 的 invariance，而不是同一条 stream 中 reward sensor 改变后的适应能力。
+但这还不是完整 continual-adaptation paper，直到新的 switch sweep 完成。beta/gamma/no-reset 实验已经实现为 `reward_centered_sarsa_sensitivity`，smoke 结果为 `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke`，extended CPU task 为 `core-rl-reward-sensitivity-extended-rerun-28457861`。在该 job 写出标准 artifacts 前，保守结论仍应限制在 separate streams across fixed reward origins 的 invariance，而不是同一条 stream 中 reward sensor 改变后的适应能力。
+
+## 论文式贡献与 Claim 边界
+
+本报告的贡献是 continuing control 中 reward-origin sensitivity 的受控 invariance analysis。它把 reward origin 从一个看似工程细节的问题写成 Core RL 问题，使用可解释的 access-control queue 作为 continuing testbed，并且把任务真实的 unshifted reward 与 learner 看到的 arbitrary shifted reward 分开。最重要的经验贡献不是某个表格中 reward-centered Sarsa 分数更高，而是 centered/differential updates 在 reward translation 下同时保持 value scale、TD-error scale 和行为更稳定。
+
+同样重要的是 claim 边界。本报告没有证明 reward centering 总是优于 differential methods，也没有证明一个 beta 能适应所有 nonstationarity。更严谨的结论是：在当前 tested access-control streams 中，average-reward-style removal of reward offsets 对 practical reward-origin invariance 是必要设计；ordinary discounted Sarsa 会编码一个很大的 nuisance value component。
 
 ## 研究动机
 
@@ -76,7 +82,9 @@ Alberta Plan 把智能体看作在 temporally uniform experience stream 中持�
 
 主要指标包括 unshifted average reward、Q norm、TD-error scale、reward-bar estimate、accept rate 和 policy probes。判断标准不是某个 shifted reward 更高，而是一个方法是否能在不同 reward shifts 下保持 unshifted reward 和 policy probes，同时让 Q norm 和 TD-error scale 近似 invariant。一个方法如果需要为每个 reward shift 单独调 alpha，或者 value norm 因任意 reward offset 膨胀，就不能算解决 continuing reward-origin 问题。
 
-仍未完成的敏感性实验包括 beta values `0.003, 0.01, 0.03`，discounted/centered variants 的 gamma sweep，以及同一条 stream 中途切换 reward origin、不重置 weights 的 nonstationary extension。
+第二轮 sensitivity extension 已经实现为 `reward_centered_sarsa_sensitivity`。它包含 beta values `0.003, 0.01, 0.03`，discounted/centered variants 的 gamma sweep，以及同一条 stream 中途切换 reward origin、不重置 weights 的 nonstationary extension。当前 smoke 结果用于验证 runner 和图表，extended CPU task `core-rl-reward-sensitivity-extended-rerun-28457861` 仍在运行；在标准 artifacts 写出前，这部分不能作为最终 evidence。
+
+![Smoke beta/gamma/no-reset reward sensitivity check.](../../../../experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke/figures/report_reward_sensitivity_reward.png)
 
 ## 实验设计依据
 
@@ -106,25 +114,25 @@ Reward-centered Sarsa 的 Q norm 小得多，在当前 reward shifts 和 alphas 
 
 ## 局限
 
-当前 extended result 已经使用 20 seeds 和 20000 steps，但仍主要只 sweep alpha。beta 对 average reward estimator 很关键：太慢会在 nonstationary reward origin 下 lag，太快会引入 variance。gamma 也还没有系统 sweep。环境是 canonical access-control queue，适合 Core RL mechanism analysis，但不能直接泛化到 deep agents 或大规模机器人任务。reward shifts 目前在每个 run 内固定，下一步必须加入 midstream reward-origin changes，测试真正的 continual adaptation。
+当前 extended result 已经使用 20 seeds 和 20000 steps，但固定 reward-origin 实验仍主要只 sweep alpha。beta 对 average reward estimator 很关键：太慢会在 nonstationary reward origin 下 lag，太快会引入 variance。gamma 也需要系统 sweep。针对这些缺口，no-reset reward-origin switch 实验已经实现并重新提交到 CPU task，当前仍待 extended 结果落盘。环境是 canonical access-control queue，适合 Core RL mechanism analysis，但不能直接泛化到 deep agents 或大规模机器人任务。
 
 ## 审稿式批评与修订
 
-Sutton-style critique：报告不能声称 episodic return improvement，必须聚焦 continuing invariance 和 average-reward reasoning。Experimental critique：最初 5-seed pilot 不足以支撑最终统计结论；这一点已经通过 20-seed extended sweep 部分解决。Baseline critique：differential Sarsa 是严肃 baseline，不应当被放到 appendix。已经完成的修订包括：主环境从 two-loop MDP 升级到 access-control queue；shifted observed reward 和 unshifted task reward 分开记录；运行 seeds `0-19`、steps `20000`、alpha grid 的 extended sweep。仍需修订：beta/gamma ablations 和 midstream reward-shift changes。
+Sutton-style critique：报告不能声称 episodic return improvement，必须聚焦 continuing invariance 和 average-reward reasoning。Experimental critique：最初 5-seed pilot 不足以支撑最终统计结论；这一点已经通过 20-seed extended sweep 部分解决。Baseline critique：differential Sarsa 是严肃 baseline，不应被当成次要对照。已经完成的修订包括：主环境从 two-loop MDP 升级到 access-control queue；shifted observed reward 和 unshifted task reward 分开记录；运行 seeds `0-19`、steps `20000`、alpha grid 的 extended sweep；实现并 smoke-test beta/gamma/no-reset switch sweep。仍需修订：纳入 `core-rl-reward-sensitivity-extended-rerun-28457861` 的 extended 结果。
 
 逐 proposal 审查矩阵：
 
 | 审查角度 | 批评 | 已处理 | 剩余风险 |
 |---|---|---|---|
-| Alberta Plan | 本研究必须是 continual ordinary experience，不是 episodic score。 | 使用 continuing access-control stream，并把 unshifted task reward 与 observed reward 分开。 | 仍缺 midstream reward-origin switch。 |
-| Average-reward RL | Discounted Sarsa 不是唯一相关 baseline。 | 加入 differential Sarsa 作为严肃 average-reward baseline。 | gamma/beta interaction 仍需更大 sweep。 |
+| Alberta Plan | 本研究必须是 continual ordinary experience，不是 episodic score。 | 使用 continuing access-control stream，并把 unshifted task reward 与 observed reward 分开；midstream reward-origin switch runner 已实现。 | extended switch 结果仍待纳入。 |
+| Average-reward RL | Discounted Sarsa 不是唯一相关 baseline。 | 加入 differential Sarsa 作为严肃 average-reward baseline，并实现 beta/gamma switch sweep。 | extended switch 结果仍在运行。 |
 | 统计 | 5 seeds 不足以支撑结论。 | 已完成 20-seed extended sweep。 | 仍可补 AUC 和 paired seed effects。 |
 | 机制 | reward 改善可能隐藏行为变化。 | 加入 Q norm、high-priority acceptance、accept rate 和 divergence figures。 | 仍缺全状态 policy-distance probes。 |
-| 严格老师 | 不应把 reward centering 写成 universal solution。 | 结论限定在 access-control Sarsa 的 reward-origin invariance。 | 更大 continuing environments 才能支撑泛化 claim。 |
+| 严格老师 | 不应把 reward centering 写成 universal solution。 | 结论限定在 access-control Sarsa 的 reward-origin invariance，并把 switch evidence 标为 pending。 | 更大 continuing environments 才能支撑泛化 claim。 |
 
 ## 结论
 
-Reward-Centered Continuing Sarsa 是一个强独立 proposal，因为它提出了一个清楚的 continuing-RL 问题，并且现在有 20-seed extended evidence。结果支持 ordinary discounted Sarsa 对 reward origin 敏感，而 reward-centered 和 differential variants 在 reward shifts 与 alphas 下稳定得多。下一阶段应加入 beta/gamma sensitivity 和 nonstationary reward-origin changes，让课题从 fixed-condition invariance 进一步走向 continual adaptation。
+Reward-Centered Continuing Sarsa 是一个强独立 proposal，因为它提出了一个清楚的 continuing-RL 问题，并且现在有 20-seed extended evidence。结果支持 ordinary discounted Sarsa 对 reward origin 敏感，而 reward-centered 和 differential variants 在 reward shifts 与 alphas 下稳定得多。第二轮 beta/gamma/no-reset switch 实验已经实现并正在 CPU task 中运行；完成后将决定本研究能否从 fixed-condition invariance 进一步提出 continual-adaptation claim。
 
 ## 复现
 
@@ -144,14 +152,22 @@ PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconf
 cd /mnt/shared-storage-user/yupeng/Core-RL
 
 PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
-  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_results.py \
-  --result-dir experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended \
-  --y-key avg_unshifted_reward \
-  --group-keys algorithm reward_shift alpha
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_report_figures.py \
+  --kind reward-centered \
+  --result-dir experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended
+```
+
+第二轮 sensitivity smoke：
+
+```bash
+cd /mnt/shared-storage-user/yupeng/Core-RL
 
 PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
-  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_results.py \
-  --result-dir experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended \
-  --y-key q_norm \
-  --group-keys algorithm reward_shift alpha
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
+  --config experiments/alberta_core_rl/configs/reward_centered_sarsa_sensitivity/config_smoke.json
+
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_report_figures.py \
+  --kind reward-sensitivity \
+  --result-dir experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke
 ```

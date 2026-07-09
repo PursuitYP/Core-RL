@@ -2,7 +2,7 @@
 
 This folder is the final-facing location for the thirteen independent proposal reports. Each proposal is documented as a standalone study, but they are not all submission-grade final topics. The main review path is intentionally simple: open a proposal folder, then read `report.md`; the report itself states whether the study is a main candidate, a conditional proposal, a negative result, or a supporting diagnostic.
 
-This distinction is deliberate. The project requirement asked for independent proposal workflows, not for artificially positive conclusions. A weak or negative proposal can still be useful if it states a focused RL question, gives a reproducible test, and explains why the result fails or should be demoted. For final submission, the strongest candidates are currently Reward-Centered Sarsa, Output-Controlled TD, Dyna Planning Budget as a precursor to model aging, and the larger integrated proposals in `../integrated/`.
+This distinction is deliberate. The project requirement asked for independent proposal workflows, not for artificially positive conclusions. A weak or negative proposal can still be useful if it states a focused RL question, gives a reproducible test, and explains why the result fails or should be demoted. For final submission, the strongest candidates are currently Reward-Centered Sarsa, Output-Controlled TD, Dyna Planning Budget as an independent planning diagnostic, and the larger independent proposals in `../integrated/`.
 
 ## Canonical Proposal Set
 
@@ -28,7 +28,7 @@ Main independent candidates: Reward-Centered Sarsa and Output-Controlled TD have
 
 Conditional or upgradeable candidates: Dyna Planning Budget, GVF Predictive State, Generate-and-Test, TIDBD, Baird, Options, GVF Question Design, On-policy Stability Atlas, Centered TD Diagnostics, Streaming Representation, and Nonstationary Bandit each document an independent question, but some are currently negative, diagnostic, or too narrow to submit unchanged. Their reports should be read as honest research records, not as equally strong final proposals.
 
-Integrated candidates: Scale-Invariant Continuing Control and Continual Dyna Model Aging currently look stronger than most weak single proposals because they combine several Core RL pressures into one coherent research question. Predictive State Plasticity is important but still high-risk because current evidence is a first-gate negative result.
+Larger independent candidates: Scale-Invariant Continuing Control and Continual Dyna Model Aging currently look stronger than most weak single proposals because they combine several Core RL pressures into one coherent research question. Predictive State Plasticity is important but still high-risk because current evidence is a first-gate negative result.
 
 ## File Contract
 
@@ -42,7 +42,7 @@ Weak proposals remain included only when they have an honest negative or dropped
 
 ## Additional Large Independent Proposals
 
-Three larger integrated-but-independent Core RL proposals live in `../integrated/`:
+Three larger independent Core RL proposals live in `../integrated/`:
 
 - Scale-Invariant Continuing Control.
 - Continual Dyna Model Aging.

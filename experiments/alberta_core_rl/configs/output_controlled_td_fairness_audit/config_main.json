@@ -1,0 +1,7 @@
+{
+  "proposal": "output_controlled_td_fairness_audit",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "notes": "Main true-online fairness audit: tile-coded random-walk prediction with matched alpha grid and feature-scale changes."
+}

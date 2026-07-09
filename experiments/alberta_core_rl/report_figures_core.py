@@ -54,6 +54,7 @@ def _short_label(value: Any) -> str:
         "normalized": "norm",
         "trace_normalized": "trace-norm",
         "true_online": "true-online",
+        "true_online_normalized": "to-norm",
         "keep_model": "keep",
         "oracle_flush": "oracle flush",
         "recency_aging": "age",
@@ -290,6 +291,123 @@ def plot_dyna_aging(result_dir: Path) -> list[Path]:
         fig.savefig(out, dpi=180)
         plt.close(fig)
         outputs.append(out)
+    heatmap_metrics = [
+        ("avg_reward", "Late reward by freshness rule and planning budget", "viridis", False, "report_dyna_aging_reward_heatmap.png"),
+        ("stale_backup_rate", "Late stale-backup rate by freshness rule and planning budget", "Reds", False, "report_dyna_aging_stale_heatmap.png"),
+        ("mean_model_error", "Late model error by freshness rule and planning budget", "magma", True, "report_dyna_aging_model_error_heatmap.png"),
+    ]
+    row_keys: list[tuple[str, float]] = []
+    for mode in modes:
+        half_lives = _sorted_unique(
+            [
+                _condition(row, "half_life")
+                for row in rows
+                if _condition(row, "model_mode") == mode and float(_condition(row, "half_life") or 0.0) > 0.0
+            ]
+        )
+        if half_lives:
+            row_keys.extend((mode, float(half_life)) for half_life in half_lives)
+        elif any(_condition(row, "model_mode") == mode for row in rows):
+            row_keys.append((mode, 0.0))
+    row_labels = [
+        f"{_short_label(mode)} h={int(half_life)}" if half_life > 0.0 else _short_label(mode)
+        for mode, half_life in row_keys
+    ]
+    col_labels = [f"{int(float(budget))} backups" for budget in budgets]
+    for metric, title, cmap, log10, name in heatmap_metrics:
+        matrix: list[list[float]] = []
+        for mode, half_life in row_keys:
+            values = []
+            for budget in budgets:
+                matches = [
+                    row
+                    for row in rows
+                    if int(float(_condition(row, "planning_steps"))) == int(float(budget))
+                    and _condition(row, "model_mode") == mode
+                    and math.isclose(float(_condition(row, "half_life") or 0.0), half_life)
+                ]
+                values.append(_mean_over(matches, metric))
+            matrix.append(values)
+        outputs.append(
+            _save_heatmap(
+                matrix,
+                row_labels,
+                col_labels,
+                title,
+                fig_dir / name,
+                cmap=cmap,
+                value_format=".2f",
+                log10=log10,
+            )
+        )
+    return outputs
+
+
+def plot_dyna_drift(result_dir: Path) -> list[Path]:
+    all_rows = _load_condition_summary(result_dir)
+    rows = [
+        row
+        for row in all_rows
+        if _condition(row, "recovery_window") == "post_late"
+    ]
+    if not rows:
+        rows = all_rows
+    fig_dir = result_dir / "figures"
+    fig_dir.mkdir(parents=True, exist_ok=True)
+    drift_modes = ["abrupt", "gradual", "stochastic"]
+    drift_modes = [mode for mode in drift_modes if any(_condition(row, "drift_mode") == mode for row in rows)]
+    budgets = _sorted_unique([_condition(row, "planning_steps") for row in rows])
+    columns = [(mode, budget) for mode in drift_modes for budget in budgets]
+    col_labels = [f"{mode}\n{int(float(budget))} backups" for mode, budget in columns]
+    row_keys: list[tuple[str, float]] = []
+    for mode in ["keep_model", "oracle_flush", "recency_aging", "recency_error_gate"]:
+        half_lives = _sorted_unique(
+            [
+                _condition(row, "half_life")
+                for row in rows
+                if _condition(row, "model_mode") == mode and float(_condition(row, "half_life") or 0.0) > 0.0
+            ]
+        )
+        if half_lives:
+            row_keys.extend((mode, float(half_life)) for half_life in half_lives)
+        elif any(_condition(row, "model_mode") == mode for row in rows):
+            row_keys.append((mode, 0.0))
+    outputs: list[Path] = []
+    for metric, title, cmap, log10, name, reducer in [
+        ("avg_reward", "Post-late reward under drift modes", "viridis", False, "report_drift_reward_heatmap.png", "mean"),
+        ("stale_backup_rate", "Post-late stale-backup rate under drift modes", "Reds", False, "report_drift_stale_heatmap.png", "mean"),
+        ("mean_model_error", "Post-late model error under drift modes", "magma", True, "report_drift_model_error_heatmap.png", "mean"),
+    ]:
+        matrix: list[list[float]] = []
+        for model_mode, half_life in row_keys:
+            values = []
+            for drift_mode, budget in columns:
+                matches = [
+                    row
+                    for row in rows
+                    if _condition(row, "drift_mode") == drift_mode
+                    and int(float(_condition(row, "planning_steps"))) == int(float(budget))
+                    and _condition(row, "model_mode") == model_mode
+                    and math.isclose(float(_condition(row, "half_life") or 0.0), half_life)
+                ]
+                values.append(_mean_over(matches, metric, reducer=reducer))
+            matrix.append(values)
+        row_labels = [
+            f"{_short_label(model_mode)} h={int(half_life)}" if half_life > 0.0 else _short_label(model_mode)
+            for model_mode, half_life in row_keys
+        ]
+        outputs.append(
+            _save_heatmap(
+                matrix,
+                row_labels,
+                col_labels,
+                title,
+                fig_dir / name,
+                cmap=cmap,
+                value_format=".2f",
+                log10=log10,
+            )
+        )
     return outputs
 
 
@@ -357,9 +475,10 @@ def plot_predictive_state(result_dir: Path) -> list[Path]:
     outputs: list[Path] = []
     for metric, ylabel in metrics:
         metric_algorithms = algorithms if metric == "trial_accuracy" else ["recurrent_gvf", "cue_gvf"]
-        fig, axes = plt.subplots(1, len(lengths), figsize=(4.2 * len(lengths), 3.9), sharey=True)
-        if len(lengths) == 1:
-            axes = [axes]
+        ncols = min(2, len(lengths))
+        nrows = math.ceil(len(lengths) / ncols)
+        fig, axes_arr = plt.subplots(nrows, ncols, figsize=(4.8 * ncols, 3.7 * nrows), sharey=True)
+        axes = list(axes_arr.flat) if hasattr(axes_arr, "flat") else [axes_arr]
         for ax, length in zip(axes, lengths):
             means: list[float] = []
             errs: list[float] = []
@@ -388,6 +507,8 @@ def plot_predictive_state(result_dir: Path) -> list[Path]:
             if metric == "trial_accuracy":
                 ax.axhline(0.5, color="black", linestyle="--", linewidth=1.0, alpha=0.6)
                 ax.set_ylim(0.0, 1.05)
+        for ax in axes[len(lengths) :]:
+            ax.axis("off")
         axes[0].set_ylabel(ylabel)
         fig.tight_layout()
         out = fig_dir / f"report_{metric}_by_maze_length.png"
@@ -395,5 +516,3 @@ def plot_predictive_state(result_dir: Path) -> list[Path]:
         plt.close(fig)
         outputs.append(out)
     return outputs
-
-

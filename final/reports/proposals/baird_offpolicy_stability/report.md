@@ -1,169 +1,107 @@
 # Baird Off-Policy Stability
 
-Status: independent supporting diagnostic; requires canonical verification before broad claims.
+Status: independent off-policy stability warning. The current evidence is a Baird-style pilot diagnostic, not a broad theory claim and not a control-performance result.
 
 ## Abstract
 
-This proposal studies the classic off-policy instability caused by bootstrapping, function approximation, and behavior-target policy mismatch. Baird's counterexample is a minimal diagnostic for the deadly triad. The current pilot compares semi-gradient off-policy TD with a TDC-style correction across step sizes. Off-policy TD exhibits rapidly growing weight norms, while TDC is stable at smaller alphas but fails at a larger alpha. The study is useful as a warning for GVF/Horde-style background prediction: off-policy predictions need stability checks before they are used as agent knowledge.
+This mini-report studies a narrow failure mode for continual predictive agents: off-policy bootstrapped value learning can become unstable under linear function approximation. The testbed is a Baird-style seven-state prediction problem with zero reward, behavior-target policy mismatch, and online TD updates. This is directly relevant to GVF/Horde-style background prediction, where an agent may learn many predictions from ordinary experience while behaving according to a different policy.
 
+The pilot compares semi-gradient off-policy TD with a TDC-style correction across three step sizes. Semi-gradient TD shows severe weight-norm growth. The TDC-style learner remains stable at smaller tested step sizes but also fails at the largest tested step size. The contribution is therefore a bounded warning: off-policy predictions need explicit stability checks before they are treated as agent knowledge.
 
-## Standalone Study Summary
+## Claim Boundary
 
-This study is a stability warning for off-policy learning with function approximation. The RL problem is a Baird-style counterexample where behavior and target distributions mismatch and semi-gradient off-policy TD can diverge. The implemented methods compare semi-gradient off-policy TD with a TDC-like correction across step sizes. The experiment tracks weight norm, TD error, importance ratio, and divergence. The current evidence supports the qualitative warning that naive off-policy TD is unstable in this setting. The next step is canonical verification before using the result for a broad theoretical claim.
+The report makes one bounded claim: in the current Baird-style implementation, ordinary semi-gradient off-policy TD exhibits severe weight growth, and a TDC-style correction enlarges but does not eliminate the stable step-size region.
 
-## Research Motivation
+It does not claim that every off-policy GVF diverges, that TDC is sufficient for all off-policy prediction, that the implementation is already a canonical Baird replication, or that the diagnostic measures control performance.
 
-The Alberta Plan places value functions and GVFs at the center of agent knowledge. Many background predictions will naturally be off-policy: the agent observes behavior from one policy while asking questions about another policy, option, or continuation condition. The deadly triad means these predictions are not automatically safe.
+## 1. Proposal Template Answers
 
-This proposal is not about benchmark return. It is about whether a small value-function learner remains numerically and theoretically stable under off-policy sampling.
+Focused RL question: What stability warning does a Baird-style counterexample provide for off-policy linear value prediction learned from ordinary experience?
 
-## Research Question
+Setting/testbed: A seven-state Baird-style off-policy prediction task with linear features, zero rewards, behavior-target mismatch, bootstrapped value targets, and online updates.
 
-Where does semi-gradient off-policy TD fail, and when does a TDC-style correction stabilize the update?
+Implemented comparison: Semi-gradient off-policy TD versus a TDC-style correction over alpha values `0.005`, `0.01`, and `0.02`.
 
-Hypothesis:
+Observation or metric: Weight norm over time is the primary diagnostic, with TD error, importance ratio, and divergence flags as supporting signals.
 
-> Semi-gradient off-policy TD should show weight-norm growth in Baird-style settings, while a gradient-corrected method should enlarge the stable step-size region.
+Expected behavior: Semi-gradient off-policy TD should show weight-norm growth in this setting. A corrected method should reduce the failure over some step-size range, but the pilot does not assume it will be stable for every alpha.
 
-The current pilot supports this qualitative hypothesis but is not yet a full canonical study.
+Compute need: Small CPU-only runs with five seeds and 5000 online steps.
 
-## Alberta Plan Connection
+Fallback: If canonical Baird verification or additional correction baselines are not completed, the result remains a bounded stability warning rather than a general theorem or GVF solution.
 
-The proposal supports:
+## 2. Research Motivation / Question / Method
 
-- GVFs and predictive knowledge;
-- off-policy learning from ordinary experience;
-- stable value-function learning;
-- background prediction safety.
+The Alberta Plan emphasizes value functions, GVFs, learned models, and ordinary experience as central ingredients of long-lived agents. Many useful predictions in such agents are naturally off-policy: the agent follows one behavior policy while asking what would happen under another policy, option, or continuation condition. Learning many predictions from the same stream is attractive, but it exposes the deadly triad of bootstrapping, function approximation, and off-policy sampling.
 
-It is a diagnostic proposal. Its contribution is a stability map, not a control policy.
+The research question is: what stability warning does a Baird-style counterexample provide for off-policy value prediction with linear function approximation? The hypothesis is that semi-gradient off-policy TD will show weight-norm growth, while a gradient-corrected method will reduce this failure over a restricted step-size range.
 
-## Related Work
+The method keeps the diagnosis small and online. The environment has zero reward, so the true value function should be zero. This makes growth in value estimates or weights a direct instability signal rather than a reward-optimization result. The learners are semi-gradient off-policy TD and a TDC-style correction, both run without replay buffers or offline fitting.
 
-Baird's counterexample is the classic minimal divergence example. Gradient TD, GTD2, TDC, and emphatic TD were developed to address off-policy TD instability with linear function approximation. Horde-style GVF learning motivates why this matters in a predictive agent.
+## 3. Experimental Design
 
-Local references:
-
-- `resources/alberta_plan_related/horde_lifelong_offpolicy_1206.6262.pdf`
-- `resources/alberta_plan_related/regularized_centered_emphatic_td_2605.04100.pdf`
-
-External anchors:
-
-- Emphatic approach to off-policy TD: https://arxiv.org/abs/1503.04269
-- Emphatic TD summary: https://arxiv.org/abs/1507.01569
-
-## Environment
-
-The setting is a Baird-style seven-state counterexample with:
-
-- linear features;
-- zero rewards;
-- behavior/target mismatch;
-- bootstrapped TD targets.
-
-Because rewards are zero, divergence appears as value/weight growth rather than return differences.
-
-## Methods
-
-Compared methods:
-
-- semi-gradient off-policy TD;
-- TDC-style correction.
-
-Alpha sweep:
-
-- `0.005`;
-- `0.01`;
-- `0.02`.
-
-## Experimental Design
-
-Current main pilot:
+Main run:
 
 - Seeds: `0-4`.
 - Steps: `5000`.
+- Environment label in config: `baird_star_diagnostic`.
 - Result path: `experiments/alberta_core_rl/results/baird_offpolicy_stability/20260708T161717Z_main`.
-
-Metrics:
-
-- weight norm;
-- TD error;
-- divergence flag;
-- alpha-specific stability behavior.
+- Primary metrics: `weight_norm`, `diverged`, and `td_error`.
 
 Primary figure:
 
 ![Baird-style weight norm by algorithm and alpha.](../../../../experiments/alberta_core_rl/results/baird_offpolicy_stability/20260708T161717Z_main/figures/weight_norm_by_algorithm-alpha_curve.png)
 
-## Results
+Design logic:
 
-Off-policy TD has rapidly growing weight norms: about `1.12e4` at alpha `0.005`, `1.73e6` at alpha `0.01`, and `3.57e7` at alpha `0.02`.
+| Design element | Reason |
+|---|---|
+| Zero-reward prediction | Makes value growth a direct warning sign instead of a reward artifact. |
+| Linear features | Keeps the study in classic core RL and avoids neural-network confounds. |
+| Behavior-target mismatch | Creates the off-policy pressure needed for the diagnostic. |
+| Alpha sweep | Separates correction-method behavior from step-size sensitivity. |
+| Weight norm | Captures instability that return cannot show in a zero-reward prediction task. |
 
-TDC remains stable at alpha `0.005` and `0.01`, with weight norm near `8.79`, but also fails at alpha `0.02`. This matters: correction methods improve stability regions, but they are not immune to bad step-size choices.
+## 4. Results
 
-## Analysis
+The pilot shows the expected instability for semi-gradient off-policy TD. The seed-tail mean weight norms are approximately `1.12e4` at alpha `0.005`, `1.73e6` at alpha `0.01`, and `3.57e7` at alpha `0.02`.
 
-The result is a stability diagnostic. It should be interpreted as a warning label for off-policy background predictions. If a future GVF proposal uses off-policy demons, it should include a stability-region analysis rather than assume TD updates are safe.
+The TDC-style learner is much more stable at the two smaller alphas: its seed-tail mean weight norm is about `8.79` at alpha `0.005` and `8.79` at alpha `0.01`. At alpha `0.02`, however, the TDC-style learner also fails, with seed-tail mean weight norm about `2.07e7` and a nonzero divergence signal.
 
-The TDC result also prevents overclaiming. A correction changes the update geometry, but practical stability still depends on alpha and variance.
+The central empirical result is therefore not that the correction method solves the problem. The result is that ordinary off-policy TD is unsafe in this diagnostic, and the correction-style update improves but does not remove practical step-size sensitivity.
 
-## Threats To Validity
+## 5. Analysis
 
-The setup must be verified against the canonical Baird specification before making broad claims.
+The failure mechanism is not poor reward optimization, because all rewards are zero and the target value is zero. The instability comes from the interaction between bootstrapped targets, samples from the behavior distribution, updates aimed at a different target policy, and a feature representation whose projected update can amplify errors.
 
-Only one correction family is implemented. GTD2, ETD, and emphatic variants should be added for a complete stability paper.
+This is a useful diagnostic for GVF-style background prediction. A background prediction may look harmless because it does not directly choose actions, but unstable predictions can still contaminate state features, planning inputs, option models, or auxiliary knowledge. The result supports a conservative engineering rule: off-policy predictions should carry stability diagnostics before they are used as reliable agent knowledge.
 
-The task is a diagnostic counterexample, not a natural control problem.
+The next analysis should be an audit, not a larger environment. The strongest immediate additions would be canonical Baird verification, expected-update or MSPBE-style diagnostics, a finer alpha and secondary-step-size map, and comparison to GTD2 and emphatic TD variants.
 
-The current run length may be too short to distinguish slow divergence from convergence in some settings.
+## 6. Threats To Validity
 
-## Reviewer Critique And Revisions
+- The setup is Baird-style and still needs canonical verification before broader claims.
+- Only one correction family is currently represented.
+- A 5000-step run can miss slow divergence or delayed stabilization.
+- Weight norm is necessary but not sufficient; MSPBE-style or expected-update diagnostics would strengthen the result.
+- The task is a diagnostic counterexample, not a natural control environment.
 
-Theory reviewer:
+## 7. Reviewer Critique
 
-- Canonical details matter. A small deviation in Baird's features or policies can change the expected behavior.
+| Reviewer critique | Current response | Required next action |
+|---|---|---|
+| Canonical Baird details can change the result. | The claim is labeled as Baird-style pilot evidence. | Verify features, policies, transition probabilities, importance ratios, and expected-update behavior. |
+| A counterexample is only a warning, not a GVF solution. | The report frames the result as an off-policy stability warning. | Add a small GVF-style background prediction stream only after the canonical audit. |
+| TDC failure at high alpha complicates the story. | The failure is reported as evidence against overclaiming. | Map the stable region across alpha and correction parameters. |
+| One diagnostic should not become a broad deadly-triad theorem. | The conclusion remains bounded and empirical. | Keep the final claim diagnostic unless stronger theory checks pass. |
 
-Revision required:
+## 8. Conclusion
 
-- Add a canonical-spec verification note and expected-update comparison.
+This proposal is an independent off-policy stability study. In the current pilot, semi-gradient off-policy TD shows severe weight growth on a Baird-style zero-reward prediction task, while a TDC-style correction is stable only over part of the tested step-size range. The honest conclusion is a warning rather than a solution: off-policy value predictions can be useful for continual agents, but they need explicit stability checks before they are trusted.
 
-GVF reviewer:
+## 9. Reproduction
 
-- Connect the diagnostic to off-policy background predictions, not just a textbook example.
-
-Revision required:
-
-- Add a small off-policy GVF stream if this proposal is promoted beyond supporting status.
-
-## Conclusion
-
-Baird Off-Policy Stability is a strong supporting independent diagnostic. It demonstrates why off-policy value learning cannot be treated casually in a continual predictive agent. Before promotion to a full main study, it needs canonical verification, more correction baselines, and a GVF-style behavior-drift extension.
-
-## Proposal Template Answers
-
-Focused RL question: What off-policy stability warning does a Baird-style counterexample give for GVF learning under linear approximation? The setting is an off-policy prediction counterexample; the comparison is ordinary TD against correction-style methods. The main metrics are weight norm, divergence, and MSPBE-style diagnostics where available. Compute is small; fallback is a supporting warning until canonical Baird details and ETD/GTD baselines are added.
-
-## Independent Research Scope
-
-This report is an off-policy stability warning, not a general GVF solution. It should support future off-policy GVF proposals by documenting why ordinary TD can diverge, while staying honest that the current implementation still needs canonical verification.
-
-## Evidence Level
-
-Evidence level: supporting warning / pilot diagnostic. It is not yet a strong theory replication because the canonical feature/policy specification, expected-update audit, and emphatic/GTD comparisons still need to be checked.
-
-## Experiment Design Rationale
-
-Baird's counterexample is useful because it isolates the deadly-triad issue in the smallest possible linear setting. The next experiment should not add unrelated environments first; it should verify canonical details and add ETD, TDC/GTD2, and behavior-drift variants.
-
-## Reviewer Audit
-
-| Reviewer angle | Critique | Action taken | Remaining risk |
-|---|---|---|---|
-| Off-policy theory | Canonical Baird details matter. | Report marks canonical verification as required. | Current result remains pilot-level. |
-| GVF | A counterexample does not solve GVF stability. | Frames the study as a warning. | Needs ETD/GTD baselines. |
-| Strict instructor | Do not overgeneralize from one counterexample. | Evidence level is supporting diagnostic. | Needs expected-update comparison. |
-
-## Reproduction
+Run from the repository root:
 
 ```bash
 cd /mnt/shared-storage-user/yupeng/Core-RL
@@ -172,3 +110,5 @@ PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconf
   /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
   --config experiments/alberta_core_rl/configs/baird_offpolicy_stability/config_main.json
 ```
+
+Expected result directory: `experiments/alberta_core_rl/results/baird_offpolicy_stability/20260708T161717Z_main`.

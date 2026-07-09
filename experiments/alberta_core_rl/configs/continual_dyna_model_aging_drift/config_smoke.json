@@ -1,0 +1,7 @@
+{
+  "proposal": "continual_dyna_model_aging_drift",
+  "suite": "smoke",
+  "seeds": [0],
+  "steps": 300,
+  "notes": "Smoke test for Dyna model-aging under abrupt, gradual, and stochastic drift modes."
+}

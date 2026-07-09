@@ -1,143 +1,93 @@
 # Streaming Representation With Auxiliary Prediction
 
-Status: independent negative diagnostic; dropped as a final proposal unless redesigned.
+Status: independent negative auxiliary-prediction diagnostic. The current target should be redesigned around task-relevant predictions before any positive representation claim.
 
 ## Abstract
 
-This proposal asks whether a small auxiliary next-feature prediction objective improves streaming value prediction without replay or deep networks. The current nonstationary sensor-stream experiment finds no material improvement: auxiliary prediction and value-only learning have nearly identical late value-prediction error. The negative result is useful because it warns against a common shortcut: adding an auxiliary loss is not the same as learning a useful representation. The auxiliary question must be coupled to the downstream value problem.
+This mini-report tests a common representation-learning intuition in a small streaming RL setting: adding an auxiliary prediction objective might improve the representation used for online value prediction. The experiment compares value-only normalized TD with a value learner that also predicts next features, using a nonstationary sensor stream and no replay. The result is negative: the auxiliary next-feature target does not materially reduce the main value-prediction error.
 
+The result is useful because it shows that an auxiliary loss is not automatically a useful prediction. The auxiliary target must be relevant to the value or control question the agent is trying to answer. This proposal should therefore be read as an independent negative diagnostic and redesign target, not as evidence against auxiliary learning or GVFs in general.
 
-## Standalone Study Summary
+## 1. Proposal Template Answers
 
-This study tests whether auxiliary prediction improves a streaming representation. The RL problem is an online prediction/control stream where the agent learns a main value prediction and an auxiliary next-feature prediction. The implemented comparison adds or removes auxiliary prediction features under the same online constraints. The experiment measures main prediction error, auxiliary error, and representation-related diagnostics. The current evidence is negative: the auxiliary next-feature prediction does not materially improve the main value prediction. The proposal should remain a redesign target unless a more relevant auxiliary question is introduced.
+Focused RL question: Does an auxiliary next-feature prediction objective improve online value prediction in a streaming linear setting without replay or deep networks?
 
-## Research Motivation
+Setting/testbed: A nonstationary sensor stream with a feature-relevance switch. The learner observes features online and cannot revisit past transitions.
 
-Recent streaming RL work often uses auxiliary prediction to improve representations from single-pass data. Under the course constraints, we cannot use deep encoders or replay, but we can test the underlying idea in a linear setting: does an auxiliary next-feature target provide useful information for value prediction in a nonstationary stream?
+Implemented comparison: Value-only normalized TD versus normalized TD with an auxiliary next-feature prediction head.
 
-The answer in the current design is essentially no.
+Observation or metric: Absolute TD error is the primary downstream value metric. Auxiliary MSE, TD error, weight norm, and phase-specific summaries are diagnostic support.
 
-## Research Question
+Expected behavior: If next-feature prediction captures value-relevant structure, the auxiliary learner should reduce value-prediction error or improve recovery after the feature-relevance switch.
 
-Can a small auxiliary next-feature prediction improve streaming value prediction without replay or deep networks?
+Compute need: Small CPU-only run with five seeds and 5000 online steps.
 
-Hypothesis:
+Fallback: Treat the current result as a negative diagnostic. A stronger project should compare task-relevant, task-irrelevant, and shuffled auxiliary predictions or move to a small control task.
 
-> If the auxiliary target captures structure useful for value prediction, the auxiliary learner should reduce value TD error or improve recovery after a feature-relevance switch.
+## 2. Research Motivation / Question / Method
 
-The current result does not support this hypothesis.
+Streaming RL needs representations that can be learned online from ordinary experience. Auxiliary prediction is attractive because it can add learning signal without replay, large models, or offline pretraining. In principle, predicting aspects of the future could make the current representation more useful for value learning.
 
-## Alberta Plan Connection
+The research question is whether a simple auxiliary next-feature target improves online value prediction in this setting. The intended hypothesis was positive but conditional: next-feature prediction should help only if it captures structure needed for the value question.
 
-The proposal connects loosely to representation learning and streaming ordinary experience. However, it is weaker than the GVF and generate-and-test proposals because the auxiliary target is not clearly tied to a control-relevant question.
+The method compares two online learners under the same stream. The value-only learner runs normalized TD. The auxiliary learner adds a next-feature prediction loss. The auxiliary target is local and convenient, but it is not derived from reward, hidden state, control consequences, or a GVF-style cumulant. That distinction is the core of the diagnostic.
 
-## Related Work
+## 3. Experimental Design
 
-Streaming representation papers motivate auxiliary objectives under no-replay constraints. GVF/useful-prediction work provides a stricter lens: auxiliary predictions should be judged by downstream usefulness, not by auxiliary loss alone.
-
-Local references:
-
-- `resources/alberta_plan_related/squeezing_more_from_stream_2602.09396.pdf`
-- `resources/alberta_plan_related/streaming_deep_rl_finally_works_2410.14606.pdf`
-- `resources/alberta_plan_related/finding_useful_predictions_2111.11212.pdf`
-
-## Environment
-
-The setting is a nonstationary sensor stream with a feature-relevance switch. The learner updates online and cannot revisit past transitions.
-
-## Methods
-
-Compared methods:
-
-- value-only normalized TD;
-- value TD with auxiliary next-feature prediction.
-
-The auxiliary target is intentionally small and linear. This keeps the experiment within Core RL constraints but limits representational capacity.
-
-## Experimental Design
-
-Current main diagnostic:
+Main run:
 
 - Seeds: `0-4`.
 - Steps: `5000`.
+- Environment label in config: `nonstationary_sensor_auxiliary_prediction`.
 - Result path: `experiments/alberta_core_rl/results/streaming_representation/20260708T160958Z_main`.
-
-Metrics:
-
-- absolute TD error;
-- auxiliary MSE;
-- weight norm;
-- phase.
+- Primary metrics: `abs_td_error`, `aux_mse`, and `weight_norm`.
 
 Primary figure:
 
 ![Auxiliary representation diagnostic absolute TD error.](../../../../experiments/alberta_core_rl/results/streaming_representation/20260708T160958Z_main/figures/abs_td_error_by_algorithm-phase_curve.png)
 
-## Results
+The primary outcome is downstream value-prediction error. Auxiliary MSE is secondary because low auxiliary prediction error alone would not prove that the learned signal is useful for the value task.
 
-The auxiliary prediction objective does not materially improve value prediction. Phase-1 absolute TD error is about `0.5298` for the auxiliary method and `0.5301` for value-only.
+## 4. Results
 
-The difference is too small to support a positive claim.
+The auxiliary prediction objective does not materially improve value prediction. In phase 1, seed-tail mean absolute TD error is about `0.5298` for the auxiliary method and `0.5301` for value-only learning. In phase 0, the corresponding values are about `0.4885` for the auxiliary method and `0.4877` for value-only learning.
 
-## Analysis
+The auxiliary learner does learn its auxiliary target to a stable level: seed-tail mean auxiliary MSE is about `0.0480` in phase 0 and `0.0413` in phase 1. That does not translate into a downstream value-error improvement. Weight norms are also nearly identical in phase 1, about `3.34` for both learners.
 
-The result suggests that the auxiliary target is not sufficiently aligned with the value task. A next-feature prediction can be easy or well-optimized without improving the value learner's state.
+The result is therefore negative but informative. The correct conclusion is not that auxiliary learning fails in general. The narrower conclusion is that this next-feature target is not useful enough for the downstream value task in the current streaming diagnostic.
 
-This is closely related to the GVF Question Design result: useful representation requires useful questions. Auxiliary prediction should be selected because it helps a downstream agent, not because it is available.
+## 5. Analysis
 
-## Threats To Validity
+The likely failure mechanism is target mismatch. Next-feature prediction can optimize information that is irrelevant to reward, irrelevant to the hidden feature switch, or already available in the current feature vector. In that case, the auxiliary loss consumes learning capacity without moving the representation toward value-relevant structure.
 
-The auxiliary representation is minimal and may be too weak.
+This is aligned with the Alberta Plan lens only as a cautionary example. Useful predictions should be useful questions: they should expose state, reward-relevant structure, controllable consequences, or temporally extended knowledge that helps the agent act and learn. A generic next-feature target does not guarantee any of these properties.
 
-The auxiliary target is not explicitly tied to reward, hidden state, or control.
+The next version should redesign the auxiliary question before adding larger experiments. Reasonable follow-ups include GVF-style cumulants tied to reward, termination, hidden phase, or controllable events; ablation or freeze tests of learned auxiliary features; task-relevant versus task-irrelevant auxiliary targets; and a small control task where usefulness can be judged by policy quality or average reward.
 
-The experiment does not test deep representation learning, which is outside course scope.
+## 6. Threats To Validity
 
-The result is not a general negative claim about auxiliary learning.
+- The auxiliary architecture is intentionally small and may be too weak.
+- The auxiliary target is not tied to reward, hidden state, or control.
+- Five seeds are enough for a diagnostic but not for a broad representation-learning claim.
+- The experiment does not test deep representation learning, which is outside the current course scope.
+- Absolute TD error may miss representational effects that only appear under control or after feature freezing.
 
-## Reviewer Critique And Revisions
+## 7. Reviewer Critique
 
-Representation reviewer:
+| Reviewer critique | Current response | Required next action |
+|---|---|---|
+| The auxiliary target is arbitrary. | The report treats this as the central negative finding. | Redesign the auxiliary question around downstream usefulness. |
+| Low auxiliary MSE does not imply useful representation. | The primary metric is downstream absolute TD error, not auxiliary loss. | Add ablations showing whether auxiliary features help value prediction. |
+| The result could be architecture-specific. | The claim is limited to this small linear streaming diagnostic. | Compare target relevance before increasing model complexity. |
+| This should not be cited against GVFs broadly. | The conclusion explicitly avoids that claim. | Test GVF-style cumulants tied to reward, phase, or controllable events. |
 
-- The proposal is too vague unless the auxiliary target is tied to downstream usefulness.
+## 8. Conclusion
 
-Decision:
+This proposal is an independent negative diagnostic for streaming representation learning. The current auxiliary next-feature target is learnable but does not improve the downstream value metric. The useful lesson is methodological: auxiliary predictions should be chosen as task-relevant questions, not added merely because they are easy to define.
 
-- Drop as a final standalone proposal unless redesigned around a GVF-style useful prediction or a shared representation with measurable downstream benefit.
+## 9. Reproduction
 
-Upgrade path:
-
-- Replace next-feature prediction with task-relevant GVF cumulants and add ablation of learned features in control.
-
-## Conclusion
-
-Streaming Representation With Auxiliary Prediction is a useful negative diagnostic. It shows that auxiliary prediction alone is not a research contribution unless the auxiliary question is connected to downstream value or control. The proposal should be redesigned or merged conceptually with GVF Question Design.
-
-## Proposal Template Answers
-
-Focused RL question: Does an auxiliary next-feature prediction target improve online value prediction in a streaming linear setting? The setting is a streaming prediction task with an auxiliary head; the comparison is value-only versus value-plus-auxiliary learning. The metrics are value error, auxiliary error, and phase/switch recovery. Compute is small; fallback is a negative diagnostic for useful-auxiliary-question design.
-
-## Independent Research Scope
-
-This proposal studies one auxiliary target, not representation learning in general. It should not be used as evidence against auxiliary learning or GVFs broadly. Its role is to show that an auxiliary target must be task-relevant to improve the main prediction/control objective.
-
-## Evidence Level
-
-Evidence level: negative diagnostic / redesign target. The current auxiliary prediction does not materially improve value error. That is useful because it prevents the shallow conclusion that any extra prediction makes representation better.
-
-## Experiment Design Rationale
-
-The experiment should be judged by downstream value error, not only auxiliary MSE. A future version needs task-relevant cumulants, learned-feature ablations, and downstream control metrics. Without those, the correct conclusion is that the chosen auxiliary question is not useful enough.
-
-## Reviewer Audit
-
-| Reviewer angle | Critique | Action taken | Remaining risk |
-|---|---|---|---|
-| Representation | Auxiliary accuracy may not imply usefulness. | Evidence level is negative diagnostic. | Needs task-relevant GVF targets. |
-| Metrics | Auxiliary MSE is not the main outcome. | Value error is emphasized. | Control metric remains absent. |
-| Strict instructor | Do not call this representation learning success. | Report frames it as redesign target. | Should merge with GVF useful-question line if expanded. |
-
-## Reproduction
+Run from the repository root:
 
 ```bash
 cd /mnt/shared-storage-user/yupeng/Core-RL
@@ -146,3 +96,5 @@ PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconf
   /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
   --config experiments/alberta_core_rl/configs/streaming_representation/config_main.json
 ```
+
+Expected result directory: `experiments/alberta_core_rl/results/streaming_representation/20260708T160958Z_main`.

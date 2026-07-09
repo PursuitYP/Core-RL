@@ -1,6 +1,6 @@
 # Reward-Centered Continuing Sarsa
 
-Status: independent main proposal with completed extended reward-shift/alpha sweep.
+Status: independent main proposal with completed extended reward-shift/alpha sweep. A second-round beta/gamma/no-reset reward-origin switch experiment has been implemented, smoke-tested, and submitted as CPU task `core-rl-reward-sensitivity-extended-rerun-28457861`; its extended results are pending and are not yet used as final evidence.
 
 ## Abstract
 
@@ -9,7 +9,7 @@ This proposal studies a basic invariance requirement for continual reinforcement
 
 ## Standalone Study Summary
 
-This study tests reward-shift invariance in continuing control. The RL problem is the access-control queue: the agent observes server availability and customer priority, then accepts or rejects each customer while learning online. The implemented methods are discounted Sarsa, reward-centered Sarsa, and differential Sarsa with linear/tabular action values. The experiment varies constant reward shifts and measures unshifted reward, accept behavior, high-priority acceptance, reward baseline, TD error, and Q norm. The main evidence is now a 20-seed, 20000-step alpha sweep: ordinary discounted Sarsa develops large reward-shift-dependent value scales, while centered and differential variants keep value norms and unshifted reward more stable. The next step is beta/gamma sensitivity and a midstream reward-origin switch.
+This study tests reward-shift invariance in continuing control. The RL problem is the access-control queue: the agent observes server availability and customer priority, then accepts or rejects each customer while learning online. The implemented methods are discounted Sarsa, reward-centered Sarsa, and differential Sarsa with linear/tabular action values. The experiment varies constant reward shifts and measures unshifted reward, accept behavior, high-priority acceptance, reward baseline, TD error, and Q norm. The main evidence is now a 20-seed, 20000-step alpha sweep: ordinary discounted Sarsa develops large reward-shift-dependent value scales, while centered and differential variants keep value norms and unshifted reward more stable. The second-round experiment now tests the next weakness directly: beta/gamma sensitivity under a no-reset reward-origin switch inside one continuing stream.
 
 ## Proposal Template Answers
 
@@ -25,15 +25,21 @@ Compute need and fallback: The current extended evidence is CPU-scale and alread
 
 ## Independent Research Scope
 
-This proposal is an independent study of reward-origin invariance in continuing control. It should be read separately from Output-Controlled TD and Scale-Invariant Continuing Control: those reports study feature-scale and combined-unit effects, while this report isolates the reward side of the problem. The study deliberately does not claim to solve all continuing average-reward learning, all reward shaping, or all nonstationarity. Its scope is narrower and sharper: a constant reward translation should not force a retuned step size, distorted value scale, or changed accept/reject behavior in access-control Sarsa.
+This proposal is an independent study of reward-origin invariance in continuing control. It deliberately does not claim to solve all continuing average-reward learning, all reward shaping, or all nonstationarity. Its scope is narrower and sharper: a constant reward translation should not force a retuned step size, distorted value scale, or changed accept/reject behavior in access-control Sarsa.
 
-The proposal also has a clear boundary relative to the small Centered TD Diagnostics report. The diagnostic report explains the mechanism in a tiny prediction setting; this report supplies the control environment, policy probes, seed sweep, and main evidence. If only one reward-centering proposal is submitted, this one should be the main paper-style study and the diagnostic should be cited as supporting material.
+The study includes both mechanism-level measurements and control-level measurements. The value-scale, TD-error, reward-baseline, policy-probe, and accept-rate diagnostics form a single evidence chain for the reward-origin invariance claim.
 
 ## Evidence Level
 
-Evidence level: strong independent main-candidate evidence, with specific unfinished sensitivity tests. The completed result uses 20 seeds, 20000 online steps per condition, five reward shifts, three alphas, and three algorithms. This is substantially stronger than a pilot and is enough to support the central fixed-condition claim that ordinary discounted Sarsa is reward-origin sensitive while centered/differential variants are much less sensitive.
+Evidence level: strong independent main-candidate evidence, with one follow-up sweep pending. The completed result uses 20 seeds, 20000 online steps per condition, five reward shifts, three alphas, and three algorithms. This is substantially stronger than a pilot and is enough to support the central fixed-condition claim that ordinary discounted Sarsa is reward-origin sensitive while centered/differential variants are much less sensitive.
 
-The evidence is not yet a full continual-adaptation paper. It does not include a no-reset midstream reward-origin switch, a beta sweep for the reward baseline, or a gamma sweep for discounted variants. Those omissions do not invalidate the current fixed-condition result, but they limit the conclusion to reward-origin invariance across separate streams rather than adaptation to a changing reward sensor inside one stream.
+The evidence is not yet a full continual-adaptation paper until the new switch sweep finishes. The missing beta/gamma/no-reset experiment has now been implemented as `reward_centered_sarsa_sensitivity`, smoke-tested at `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke`, and submitted as CPU task `core-rl-reward-sensitivity-extended-rerun-28457861`. Until that job writes standard artifacts, the conservative conclusion remains fixed-condition reward-origin invariance across separate streams rather than confirmed adaptation to a changing reward sensor inside one stream.
+
+## Paper-Style Contribution And Claim Boundaries
+
+This report's contribution is a controlled invariance analysis for continuing control. It formulates reward-origin sensitivity as a Core RL question, implements the access-control queue as an interpretable continuing testbed, and separates task reward from the arbitrary reward signal observed by the learner. The most important empirical contribution is not that reward-centered Sarsa has a higher average in one table; it is that centered and differential updates keep value scale, TD-error scale, and behavior substantially more stable across reward translations.
+
+The claim boundary is equally important. The report does not prove that reward centering is always preferable to differential methods, nor that a single beta works under all nonstationarity. The academically defensible claim is narrower: in the tested continuing access-control streams, average-reward-style removal of reward offsets is necessary for practical reward-origin invariance, while ordinary discounted Sarsa encodes a large nuisance value component.
 
 ## Research Motivation
 
@@ -127,11 +133,18 @@ Primary metrics:
 
 The decision rule is: a method supports the hypothesis only if it preserves unshifted reward and policy probes while keeping Q norm and TD-error scale approximately invariant across reward shifts. A method that earns high shifted reward but changes behavior, explodes in value norm, or needs a different alpha for each shift does not count as solving the continuing reward-origin problem.
 
-Remaining sensitivity tests:
+Second-round sensitivity extension:
 
-- Beta values: `0.003`, `0.01`, `0.03`.
-- Gamma values for discounted and centered variants.
-- Nonstationary extension: switch reward origin midway through a single stream without resetting weights, then measure reward-bar lag and recovery window.
+- Proposal runner: `reward_centered_sarsa_sensitivity`.
+- Smoke result: `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke`.
+- Extended CPU task: `core-rl-reward-sensitivity-extended-rerun-28457861`.
+- Extended config: `experiments/alberta_core_rl/configs/reward_centered_sarsa_sensitivity/config_extended.json`.
+- Design: reward-origin switches occur halfway through one continuing access-control stream without resetting weights; the sweep varies beta, gamma, alpha, switch direction, and algorithm.
+- Primary additional metrics: post-switch unshifted reward, accept rate, reward-bar absolute tracking error, Q norm, divergence, and recovery window.
+
+The report-ready smoke figures below are validation artifacts, not final evidence. The extended job must finish before these plots are interpreted statistically.
+
+![Smoke beta/gamma/no-reset reward sensitivity check.](../../../../experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke/figures/report_reward_sensitivity_reward.png)
 
 The report-ready figures below use seed-tail condition summaries rather than dense learning-curve overlays. They show reward, value scale, behavior, and divergence separately, which is the right evidence for an invariance claim.
 
@@ -187,7 +200,7 @@ Experimental critique:
 
 Baseline critique:
 
-- Differential Sarsa is a serious competitor, not an appendix baseline.
+- Differential Sarsa is a serious competitor, not a weak secondary baseline.
 
 Revision already made:
 
@@ -196,21 +209,22 @@ Revision already made:
 
 Next required revision:
 
-- Add beta/gamma ablations and midstream reward-shift changes.
+- Incorporate the pending beta/gamma/no-reset extended result when `core-rl-reward-sensitivity-extended-rerun-28457861` completes.
+- Add a compact recovery-window table and paired-seed comparison between fixed-origin and switched-origin settings.
 
 Per-proposal audit matrix:
 
 | Reviewer angle | Critique | Action taken | Remaining risk |
 |---|---|---|---|
-| Alberta Plan | The study must be about continual ordinary experience, not episodic score. | Uses a continuing access-control stream and reports unshifted task reward separately from observed reward. | Midstream reward-origin switching is still missing. |
-| Average-reward RL | Discounted Sarsa is not the only relevant baseline. | Adds differential Sarsa as a serious average-reward baseline. | Gamma/beta interactions need a wider sweep. |
+| Alberta Plan | The study must be about continual ordinary experience, not episodic score. | Uses a continuing access-control stream, reports unshifted task reward separately from observed reward, and implements the midstream reward-origin switch runner. | Extended switch evidence is still pending. |
+| Average-reward RL | Discounted Sarsa is not the only relevant baseline. | Adds differential Sarsa as a serious average-reward baseline and implements the beta/gamma switch sweep. | Extended switch result is pending. |
 | Statistics | Five seeds were insufficient. | Completed a 20-seed extended sweep. | Confidence intervals are tail summaries; AUC and paired seed effects would strengthen the report. |
 | Mechanism | Reward improvements alone could hide behavior changes. | Adds Q norm, high-priority acceptance, accept rate, and divergence figures. | Full policy-distance probes over all states are not yet reported. |
-| Strict instructor | The proposal should not overclaim a universal reward-centering solution. | Conclusion is limited to reward-origin invariance in access-control Sarsa. | Larger continuing environments would be needed for a broader claim. |
+| Strict instructor | The proposal should not overclaim a universal reward-centering solution. | Conclusion is limited to reward-origin invariance in access-control Sarsa and marks switch evidence as pending. | Larger continuing environments would be needed for a broader claim. |
 
 ## Conclusion
 
-Reward centering is a strong independent proposal because it asks a clean continuing-RL question and now has extended 20-seed evidence. The result supports the claim that ordinary discounted Sarsa is reward-origin sensitive, while reward-centered and differential variants are far more stable across reward shifts and alphas. The next stage should add beta/gamma sensitivity and nonstationary reward-origin changes so the proposal tests continual adaptation, not only fixed-condition invariance.
+Reward centering is a strong independent proposal because it asks a clean continuing-RL question and now has extended 20-seed evidence. The result supports the claim that ordinary discounted Sarsa is reward-origin sensitive, while reward-centered and differential variants are far more stable across reward shifts and alphas. The second-round beta/gamma/no-reset switch experiment is now implemented and running; once complete, it will determine whether the proposal can make a stronger continual-adaptation claim rather than only a fixed-condition invariance claim.
 
 ## Reproduction
 
@@ -232,20 +246,28 @@ PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconf
   --config experiments/alberta_core_rl/configs/reward_centered_sarsa/config_extended.json
 ```
 
-Regenerate the two report figures:
+Regenerate the report figures:
 
 ```bash
 cd /mnt/shared-storage-user/yupeng/Core-RL
 
 PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
-  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_results.py \
-  --result-dir experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended \
-  --y-key avg_unshifted_reward \
-  --group-keys algorithm reward_shift alpha
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_report_figures.py \
+  --kind reward-centered \
+  --result-dir experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended
+```
+
+Second-round sensitivity smoke:
+
+```bash
+cd /mnt/shared-storage-user/yupeng/Core-RL
 
 PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
-  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_results.py \
-  --result-dir experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended \
-  --y-key q_norm \
-  --group-keys algorithm reward_shift alpha
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
+  --config experiments/alberta_core_rl/configs/reward_centered_sarsa_sensitivity/config_smoke.json
+
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_report_figures.py \
+  --kind reward-sensitivity \
+  --result-dir experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke
 ```

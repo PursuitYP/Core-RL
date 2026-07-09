@@ -1,0 +1,7 @@
+{
+  "proposal": "continual_dyna_model_aging_drift",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "notes": "Main drift sweep for Dyna model-aging with abrupt, gradual, and stochastic nonstationarity."
+}

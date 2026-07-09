@@ -1,67 +1,66 @@
 # Generate-and-Test Trace Features
 
-Status: independent negative-result proposal; redesign required before promotion.
+Status: independent negative/redesign proposal. The current experiment is not positive evidence for generate-and-test; it is evidence that the utility rule and testbed must be redesigned before promotion.
 
 ## Abstract
 
-This proposal studies whether a streaming agent with limited feature capacity can replace stale temporal traces after the relevant delay in a prediction problem changes. The generate-and-test idea is central to continual representation learning: an agent should create candidate features, test their usefulness, and discard poor ones. In the current trace-conditioning experiment, utility-based replacement often moves active trace timescales closer to the target delay, but it does not reduce prediction error relative to fixed or random baselines. The result is a useful negative finding: plausible feature parameters are not enough; feature utility must be tied to downstream prediction or control improvement.
+Continual agents need representations that can change while learning online. This proposal studies a minimal version of that problem: a prediction agent has a small budget of temporal trace features, the reward delay changes during the stream, and the agent must decide which traces to keep or replace. The intended hypothesis was that utility-based generate-and-test replacement would recover useful timescales faster than fixed trace banks or random replacement. The pilot does not support that hypothesis. Generate-and-test often moves active trace timescales closer to the new delay, but it does not reduce prediction error relative to fixed or random baselines. The result is therefore a negative redesign result: the experiment identifies a real Core RL question, but the current utility proxy is not yet aligned with downstream prediction improvement.
 
+## Study Claim And Evidence Level
 
-## Standalone Study Summary
+This is a standalone representation-learning proposal. Its claim is deliberately limited:
 
-This study tests online feature replacement under a limited feature budget. The RL problem is a streaming delay-prediction task where the useful trace timescale changes, so old features can become stale. The implemented methods compare fixed traces, random replacement, generate-and-test replacement, and an oracle-like diagnostic. The experiment measures absolute prediction error, replacement behavior, feature utility, and post-change recovery. The current evidence is negative: the implemented utility rule replaces features but does not beat simpler random or fixed baselines on prediction error. The next step is to redesign utility so it reflects downstream value or control improvement rather than only local activity.
+> In the current delay-switch trace-prediction stream, the implemented generate-and-test utility rule changes the feature set but does not improve downstream prediction error.
 
-## Research Motivation
+The evidence level is negative/redesign. The result should not be described as a successful feature-learning result, because the primary behavioral metric does not improve and the oracle trace bank is not a validated upper bound.
 
-A long-lived agent cannot keep every possible feature. Sensor statistics, reward delays, and task-relevant history lengths can change while the agent continues learning. Fixed representations either waste capacity on stale features or require human retuning. Generate-and-test is attractive because it turns representation maintenance into an online algorithmic problem: generate candidate features, estimate their utility from the stream, and replace low-utility features.
+## Research Motivation/Question/Method
 
-The hard question is utility. A feature may look structurally appropriate, such as a trace with a delay near the reward delay, but still fail to improve prediction under the current learning rule, step size, or feature budget. This proposal tests that gap directly.
+The Alberta Plan emphasizes ordinary experience, continual learning, limited computation, value functions, learned models, planning, and feature finding. A long-lived agent cannot keep every possible feature. Reward delays, sensor statistics, and task-relevant history lengths can change while the agent continues to act and predict. A fixed representation either wastes capacity on stale features or requires manual retuning by the experimenter.
 
-## Research Question
+Generate-and-test is attractive because it gives representation maintenance an online form: generate candidate features, test their utility from the data stream, and replace low-utility features. The hard part is not generating plausible features. The hard part is deciding whether a feature improves the agent's prediction or control objective. A trace with a timescale close to the reward delay may still be redundant, badly scaled, or poorly coupled to the current update rule. This proposal tests that mismatch directly.
 
-Under a fixed trace-feature budget, can utility-based generate-and-test replacement preserve useful prediction timescales after the reward delay changes?
+### Focused RL Question
 
-Hypothesis:
+The focused RL question is:
+
+> Under a fixed trace-feature budget, can utility-based generate-and-test replacement preserve or recover useful temporal traces after the reward delay changes?
+
+The operational hypothesis was:
 
 > A useful generate-and-test rule should improve post-change recovery and late prediction error compared with fixed trace banks and random replacement.
 
-The current evidence does not support this hypothesis for the implemented utility rule.
+The pilot falsifies this operational hypothesis for the implemented utility rule. It does not falsify generate-and-test in general.
 
-## Alberta Plan Connection
+### RL Setting
 
-The proposal targets Alberta Plan feature finding and continual representation adaptation. It also reflects the Oak-style idea that learned components should be evaluated and replaced based on utility. The experiment is intentionally small and linear so that feature replacement events and timescales are auditable.
+The environment is a streaming trace-conditioning prediction problem:
 
-## Related Work
-
-The Alberta Plan identifies feature finding and generate-and-test as early steps toward continual agents. Recurrent generate-and-test work studies online state-feature discovery. TIDBD and plasticity work motivate adaptive learning parameters but do not solve feature selection by themselves.
-
-Local references:
-
-- `resources/alberta_plan_related/learning_agent_state_online_2112.15236.pdf`
-- `resources/alberta_plan_related/tidbd_1804.03334.pdf`
-- `resources/alberta_plan_related/alberta_plan_2208.11173.pdf`
-
-## Environment
-
-The setting is a trace-conditioning stream:
-
-- a cue appears;
-- reward follows after a delay;
+- a cue appears in the observation stream;
+- reward appears after a delay;
 - halfway through the stream, the delay changes from `10` to `20`;
-- the learner sees the stream once, with no replay or stored dataset.
+- the learner sees the stream once, with no replay buffer and no offline training phase;
+- the feature budget is small, so the learner cannot include every plausible trace timescale.
 
-The feature budget is intentionally small. This creates pressure to choose temporal traces rather than simply include every plausible timescale.
+This setting isolates a continual representation question. The environment is intentionally smaller than a control task so that feature replacement events, trace timescales, and prediction errors can be audited directly.
 
-## Methods
+### Method
 
-Compared feature strategies:
+The compared feature strategies are:
 
-- Fixed tight trace bank.
-- Oracle trace bank.
-- Random replacement.
-- Generate-and-test replacement.
+- fixed tight trace bank;
+- oracle-style trace bank;
+- random replacement;
+- generate-and-test replacement.
 
-The current generate-and-test rule estimates feature utility online and replaces low-utility features with newly sampled traces. The oracle bank is a diagnostic, not a perfect upper bound; the current run shows that its design also needs validation.
+All methods use the same streaming prediction problem and the same limited feature budget. The generate-and-test condition estimates feature utility online and replaces low-utility traces with newly sampled traces. The random replacement condition tests whether churn alone helps. The oracle-style bank is intended as a diagnostic matched-feature condition, not as a proven upper bound; its weak performance in the pilot is one reason this proposal remains in redesign.
+
+The study separates two forms of evidence:
+
+- structural evidence: whether active trace timescales move closer to the current delay;
+- behavioral evidence: whether prediction error and recovery improve.
+
+Only the second form can support a positive representation-learning claim.
 
 ## Experimental Design
 
@@ -73,13 +72,13 @@ Current main pilot:
 - Steps: `5000`.
 - Result path: `experiments/alberta_core_rl/results/generate_test_features/20260708T154941Z_main`.
 
-Metrics:
+Primary metrics:
 
 - absolute prediction error;
-- closest distance from active trace timescales to target delay;
-- replacement count;
-- recovery-window summaries;
-- pre/post-switch phase labels.
+- late post-change absolute prediction error;
+- recovery-window summaries around the delay switch;
+- distance from active trace timescales to the current target delay;
+- replacement count and feature survival.
 
 Primary figure:
 
@@ -87,76 +86,86 @@ Primary figure:
 
 ## Results
 
-Generate-and-test often keeps trace timescales closer to the target delay than random or fixed traces. However, this structural improvement does not translate into lower prediction error. Late post-change absolute error is about `0.0518` for generate-test, compared with `0.0512` for fixed-tight, `0.0496` for random replacement, and `0.0545` for the current oracle-bank baseline.
+Generate-and-test often keeps active trace timescales closer to the target delay than fixed or random traces. That diagnostic shows that replacement is doing something interpretable. However, the improvement is structural rather than behavioral. It does not produce lower prediction error.
 
-The oracle-bank result is especially important. If an oracle-style trace bank does not clearly improve error, the testbed or feature set is not yet a fair promotion environment for generate-and-test. The study therefore exposes a design flaw rather than a successful representation-learning mechanism.
+Late post-change absolute error is approximately:
+
+| Strategy | Late post-change absolute error |
+|---|---:|
+| Random replacement | `0.0496` |
+| Fixed tight traces | `0.0512` |
+| Generate-and-test | `0.0518` |
+| Current oracle-style bank | `0.0545` |
+
+The oracle-style result is a warning sign. If the supposedly matched trace bank does not clearly beat generic baselines, the environment is not yet a clean test of feature selection. The pilot therefore exposes a design failure rather than a successful generate-and-test mechanism.
 
 ## Analysis
 
-The negative result has two interpretations:
+The negative result is informative because the feature diagnostics and the prediction metric disagree. The likely mechanisms are:
 
-1. The utility measure may be misaligned with prediction error.
-2. The environment may be too easy or poorly conditioned, so many trace banks perform similarly.
+1. Utility is misaligned with the prediction objective. The implemented score can prefer traces that look active or well timed without estimating their marginal reduction in prediction error.
+2. The feature bank may be redundant. Several trace timescales can support similar predictions, so moving closer to the nominal delay may not change the linear predictor enough to improve error.
+3. The stream may be underpowered. A single delay switch may not create enough sustained pressure for utility replacement to matter.
+4. The oracle is not validated. If the oracle-style bank is not a reliable winner, the testbed cannot distinguish a weak utility rule from an environment where trace choice barely matters.
+5. Replacement may disrupt learning. Replacing features changes the input basis while weights are still adapting, so a feature that is structurally better can temporarily hurt prediction.
 
-The result does not refute generate-and-test broadly. It refutes the stronger claim that the current utility and replacement mechanism is sufficient for this delay-switch stream.
-
-The study also warns against qualitative feature inspection. Seeing a trace timescale move toward the target delay is not enough. The feature must improve a metric that matters: prediction error, recovery time, or downstream control.
+These mechanisms keep the interpretation narrow. The study says that the current utility rule is insufficient for this stream, not that feature generation is unimportant.
 
 ## Threats To Validity
 
-The current stream has a single delay switch. A serious representation-adaptation paper should include repeated changes and varied delays.
+The pilot uses one delay switch and a small number of seeds. A stronger study should test repeated switches, multiple delay pairs, and feature-budget sweeps.
 
-The oracle baseline is not validated as a true upper bound. Before promotion, an oracle feature set must clearly outperform generic baselines.
+The oracle-style baseline is not yet a true upper bound. Before any positive claim, the testbed must include a known trace bank that reliably improves prediction error.
 
-The feature utility rule is compact and may not match stronger generate-and-test methods.
+The current utility rule is compact and should not be treated as a representative implementation of all generate-and-test methods.
 
-The task is prediction-only. A downstream control task might value traces differently.
+The task is prediction-only. A downstream control setting might value traces differently, but that would require a new experiment rather than a reinterpretation of this pilot.
 
-## Reviewer Critique And Revisions
+## Next Experiments
 
-Feature-learning reviewer:
+This proposal should move forward only as a redesign:
 
-- A feature-generation proposal must show utility, not only plausible feature parameters.
+1. Build a validation stream where a hand-specified trace bank reliably beats generic trace banks on prediction error.
+2. Add repeated nonstationary delay changes so that stale features create sustained pressure.
+3. Replace the current utility proxy with a measure tied to downstream loss, such as estimated contribution to TD-error reduction or recovery speed.
+4. Run a budget sweep to identify when trace capacity is actually scarce.
+5. Keep random replacement and fixed banks as baselines, and report both feature diagnostics and prediction metrics.
 
-Revision made:
+The promotion criterion is simple: generate-and-test must improve recovery or late prediction error under the same online, limited-budget conditions.
 
-- Added recovery-window metrics and active-timescale diagnostics.
+## Alberta Plan Connection
 
-Strict reviewer concern:
+The proposal connects to Alberta Plan feature finding, ordinary experience, continual adaptation, and limited computation. It also follows the idea that learned components should be tested by utility rather than by plausibility. The experiment remains small and linear so that the mechanism can be inspected before moving to more complex prediction or control settings.
 
-- The current oracle being worse than random makes the experiment underpowered as a test of feature utility.
+Local references:
 
-Required next revision:
+- `resources/alberta_plan_related/learning_agent_state_online_2112.15236.pdf`
+- `resources/alberta_plan_related/alberta_plan_2208.11173.pdf`
 
-- Build a validation stream where a known trace bank reliably wins, then test whether generate-and-test recovers it under repeated delay changes.
+## Reviewer Critique
 
-## Conclusion
-
-Generate-and-Test Trace Features is a valid independent negative proposal. It shows that limited-capacity feature adaptation is a meaningful Core RL question, but the current implementation does not improve prediction error. The next version needs a stronger oracle, repeated nonstationarity, and a utility metric tied directly to recovery or downstream control.
+| Reviewer angle | Critique | Revision in this report | Remaining risk |
+|---|---|---|---|
+| Representation learning | Plausible feature dynamics are not evidence of useful representation learning. | The report separates structural diagnostics from downstream prediction error. | Needs utility tied to loss reduction. |
+| Experimental design | The oracle-style bank is not a clear upper bound. | Evidence level is negative/redesign rather than positive. | Requires a validation stream where known traces win. |
+| Core RL scope | The proposal must ask a focused RL question, not only rank methods. | The question is limited-budget online feature adaptation after a delay change. | Needs repeated nonstationarity to become stronger. |
+| Strict interpretation | Do not overstate structural feature movement as positive evidence. | The report is marked independent and negative. | Future writing must preserve this evidence level. |
 
 ## Proposal Template Answers
 
-Focused RL question: Under a limited feature budget, can generate-and-test replacement discover trace features that improve a nonstationary delay prediction problem? The setting is a delay-switch trace-prediction stream; the comparison includes random replacement, utility replacement, and oracle-style trace banks. The main metrics are downstream prediction error, active trace timescale, feature survival, and post-switch recovery. Compute is small; fallback is a negative redesign result.
+Focused RL question: Under a limited feature budget, can generate-and-test replacement discover temporal trace features that improve nonstationary delay prediction?
 
-## Independent Research Scope
+Setting/testbed: A streaming trace-conditioning prediction task with a reward-delay switch from `10` to `20`.
 
-This is an independent negative representation-learning proposal. It does not show that generate-and-test succeeds; it shows that the current utility rule and testbed are insufficient. It should not be merged into Predictive State Plasticity as positive feature-selection evidence.
+Implemented comparison: fixed tight traces, oracle-style traces, random replacement, and utility-based generate-and-test replacement.
 
-## Evidence Level
+Observation or metric: absolute prediction error, recovery after the delay switch, active trace timescale, replacement behavior, and feature survival.
 
-Evidence level: negative/redesign. The current utility rule does not clearly beat random replacement, and the oracle trace bank is not strong enough to validate the environment. This is a design failure signal, not a method success.
+Compute and fallback: CPU-scale, seeds `0-4`, `5000` steps. The current fallback is a negative redesign result, not a positive feature-learning claim.
 
-## Experiment Design Rationale
+## Conclusion
 
-The task is useful only if there is a known feature bank that should win. Without that validation, a generate-and-test failure is ambiguous. The next version must first construct a stream where oracle traces reliably improve downstream error, then test whether utility replacement can recover those traces under a budget.
-
-## Reviewer Audit
-
-| Reviewer angle | Critique | Action taken | Remaining risk |
-|---|---|---|---|
-| Representation | Utility replacement does not beat random convincingly. | Evidence level is negative/redesign. | Needs validated oracle trace bank. |
-| Experimental design | Oracle is not a clear upper bound. | Report requires testbed validation first. | Current result cannot evaluate generate-and-test fairly. |
-| Strict instructor | Do not call plausible feature dynamics a success. | Success must be downstream error/control improvement. | Needs feature-budget sweep and repeated switches. |
+This is an independent proposal about limited-capacity online representation adaptation. Its contribution is the diagnosis: the current utility mechanism produces interpretable trace movement without downstream error improvement. The correct next step is not to promote the current generate-and-test rule, but to redesign the utility measure and validation stream so that a positive result would require improved recovery or lower late prediction error under the same online feature budget.
 
 ## Reproduction
 

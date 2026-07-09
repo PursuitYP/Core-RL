@@ -1,36 +1,36 @@
 # Dyna Planning Budget and Model Staleness
 
-Status: independent precursor proposal with completed 20-seed extended run; strongest use is as a diagnostic foundation for the integrated Continual Dyna Model Aging study.
+Status: independent diagnostic study with completed 20-seed extended run.
 
 ## Abstract
 
-Dyna-style planning is attractive for a continual agent because it converts ordinary experience into a compact learned model and then uses limited background computation to improve values without collecting extra data. In a changing world, however, a larger planning budget can also spend more computation on model entries that describe the previous world. This proposal asks whether a fixed per-step planning budget creates a tradeoff between pre-change sample efficiency and post-change stale computation. In a continuing gridworld that changes goal and hazard layout midstream, larger planning budgets improve pre-change reward, but keeping the old model after the change leaves a measurable stale-backup signal even when late reward eventually recovers. The result is not that flushing the model is a practical solution; it is an oracle diagnostic showing why model freshness must be studied separately from planning budget.
+Dyna-style planning is attractive for a continual agent because it converts ordinary experience into a compact learned model and then uses limited background computation to improve values without collecting extra data. In a changing world, however, a larger planning budget can also spend more computation on model entries that describe the previous world. This study asks whether a fixed per-step planning budget creates a tradeoff between pre-change sample efficiency and post-change stale computation. In a continuing gridworld that changes goal and hazard layout midstream, larger planning budgets improve pre-change reward, but keeping the old model after the change leaves a measurable stale-backup signal even when late reward eventually recovers. The result is not that flushing the model is a practical solution; it is an oracle diagnostic showing why model freshness must be studied separately from planning budget.
 
 ## Standalone Study Summary
 
-This study is deliberately narrower than the full model-aging proposal. It does not introduce a realistic freshness mechanism such as age-weighted sampling or model-error gating. Instead, it establishes the failure mode that makes those mechanisms necessary. The RL problem is a continuing gridworld with no episodic train/test split. The agent learns a tabular action-value function and a one-step transition/reward model from the stream. After each real transition, it performs a fixed number of Dyna backups sampled from the model. The experiment varies planning budget and model handling after an unannounced phase change: the ordinary agent keeps its model, while an oracle diagnostic flushes the model exactly at the change.
+This study deliberately isolates one mechanism: the interaction between fixed planning budget and stale model contents. It does not introduce a learned freshness mechanism such as age-weighted sampling or model-error gating. Instead, it establishes a measurable failure mode and the process metric needed to see it. The RL problem is a continuing gridworld with no episodic train/test split. The agent learns a tabular action-value function and a one-step transition/reward model from the stream. After each real transition, it performs a fixed number of Dyna backups sampled from the model. The experiment varies planning budget and model handling after an unannounced phase change: the ordinary agent keeps its model, while an oracle diagnostic flushes the model exactly at the change.
 
 ## Proposal Template Answers
 
-Focused RL question: In a continuing nonstationary task, does increasing a fixed Dyna planning budget create a tradeoff between pre-change sample efficiency and post-change stale computation? The proposal is about planning budget and model staleness, not about proving an oracle flush algorithm.
+Focused RL question: In a continuing nonstationary task, does increasing a fixed Dyna planning budget create a tradeoff between pre-change sample efficiency and post-change stale computation? The study is about planning budget and model staleness, not about proving an oracle flush algorithm.
 
 Setting and testbed: The testbed is a changing continuing gridworld with tabular Q-learning and a compact one-step model. It is chosen because planning is meaningful, model entries can be inspected, and stale backups can be counted after the layout changes.
 
-Implemented comparison: The comparison varies planning budget `0/1/5/20` and model handling `keep_model` versus `flush_on_change`. Flush is privileged and diagnostic; keep-model is the realistic precursor baseline.
+Implemented comparison: The comparison varies planning budget `0/1/5/20` and model handling `keep_model` versus `flush_on_change`. Flush is privileged and diagnostic; keep-model is the realistic baseline.
 
 Observation or figure that answers the question: The required evidence is a pair of reward and stale-backup figures. Reward alone cannot answer the question because a policy may recover while background computation continues to back up obsolete model entries.
 
-Compute need and fallback: The 20-seed extended result is complete. The honest fallback is to present this as a precursor diagnostic for Continual Dyna Model Aging, not as a final planning solution.
+Compute need and fallback: The 20-seed extended result is complete. The honest fallback is to present the diagnostic claim about stale computation, not a final planning solution.
 
 ## Independent Research Scope
 
-This report is an independent precursor study. It owns the question of why model freshness matters, while the integrated Continual Dyna Model Aging report owns the realistic aging and error-gating mechanisms. This distinction prevents the oracle flush condition from being misread as an algorithmic contribution.
+This report is an independent diagnostic study of why model freshness matters under a fixed planning budget. The oracle flush condition is included only to separate stale model contents from planning budget, not as an algorithmic contribution.
 
-The scope is limited to fixed planning budgets, uniform model sampling, and an abrupt gridworld change. The proposal does not study learned search control, uncertainty-aware models, or gradual drift. Those are natural next steps once the stale-backup failure mode is established.
+The scope is limited to fixed planning budgets, uniform model sampling, and an abrupt gridworld change. The study does not implement learned search control, uncertainty-aware models, or gradual drift. Those are natural next steps once the stale-backup failure mode is established.
 
 ## Evidence Level
 
-Evidence level: strong supporting/precursor evidence. The completed 20-seed, 20000-step extended run is enough to show that planning helps before the change and that keep-model planning can continue to spend computation on old-phase entries after the change.
+Evidence level: strong diagnostic evidence. The completed 20-seed, 20000-step extended run is enough to show that planning helps before the change and that keep-model planning can continue to spend computation on old-phase entries after the change.
 
 The evidence should not be promoted to a standalone positive planning algorithm. The flush condition uses privileged change information, and late reward differences are not robust enough to claim a winner. The strong claim is diagnostic: planning budget and model freshness are different variables.
 
@@ -38,7 +38,7 @@ The evidence should not be promoted to a standalone positive planning algorithm.
 
 The Alberta Plan gives learned models and background planning a central role in building long-lived agents from ordinary experience. Standard Dyna examples often emphasize sample efficiency in stationary problems: the agent learns a model, performs simulated backups, and improves faster than a model-free learner. A continual agent faces a harder question. Its model is a memory of the stream, and the stream may stop obeying old dynamics or reward consequences. If the agent samples old entries blindly, planning can become a mechanism for preserving obsolete knowledge.
 
-The important Core RL issue is therefore not simply “does planning help?” It is “when the world changes, how should a small online agent allocate limited planning computation across model entries of unequal freshness?” This precursor study isolates the allocation problem before adding more elaborate freshness rules.
+The important Core RL issue is therefore not simply “does planning help?” It is “when the world changes, how should a small online agent allocate limited planning computation across model entries of unequal freshness?” This study isolates the allocation problem before adding more elaborate freshness rules.
 
 ## Research Question
 
@@ -53,13 +53,13 @@ The concrete subquestions are:
 
 ## Alberta Plan Connection
 
-This proposal connects directly to learned models, background planning, continuing control, limited computation, ordinary experience, and temporal uniformity. The model is a learned one-step table, not a replay buffer. The agent does not store a dataset for later offline training; it updates online from each real transition and performs small model-based TD backups under a fixed computation budget.
+This study connects directly to learned models, background planning, continuing control, limited computation, ordinary experience, and temporal uniformity. The model is a learned one-step table, not a replay buffer. The agent does not store a dataset for later offline training; it updates online from each real transition and performs small model-based TD backups under a fixed computation budget.
 
 ## Related Work
 
 Dyna unifies direct RL, model learning, and planning backups. Prioritized sweeping shows that search control is itself a central design problem, because not all backups are equally useful. Continual RL reframes evaluation around adaptation and nonstationarity rather than final stationary performance. Average-reward and continuing-task work motivates reporting ongoing reward and recovery windows rather than episodic returns alone.
 
-Local references used for this proposal include `resources/alberta_plan_related/alberta_plan_2208.11173.pdf`, `resources/alberta_plan_related/average_reward_learning_planning_2006.16318.pdf`, and `resources/alberta_plan_related/rethinking_foundations_continual_rl_2504.08161.pdf`.
+Local references used for this study include `resources/alberta_plan_related/alberta_plan_2208.11173.pdf`, `resources/alberta_plan_related/average_reward_learning_planning_2006.16318.pdf`, and `resources/alberta_plan_related/rethinking_foundations_continual_rl_2504.08161.pdf`.
 
 ## Environment
 
@@ -71,7 +71,7 @@ The extended experiment uses grid size `11 x 11`, seeds `0-19`, and `20000` onli
 
 All agents use tabular Q-learning from real transitions with epsilon-greedy behavior, `alpha = 0.1`, `gamma = 0.95`, and `epsilon = 0.1`. After each real transition the agent writes the observed next state, reward, and current phase label into a learned model entry for the visited state-action pair. Then it performs `0`, `1`, `5`, or `20` sampled planning backups.
 
-The keep-model condition is the realistic baseline for this precursor: the agent receives no change signal and retains all learned entries. The flush-on-change condition is an oracle diagnostic: it clears the model exactly when the phase changes. It is not proposed as an implementable continual-learning algorithm. Its role is to reveal how much of the post-change behavior is caused by stale model entries rather than the planning budget itself.
+The keep-model condition is the realistic baseline: the agent receives no change signal and retains all learned entries. The flush-on-change condition is an oracle diagnostic: it clears the model exactly when the phase changes. It is not proposed as an implementable continual-learning algorithm. Its role is to reveal how much of the post-change behavior is caused by stale model entries rather than the planning budget itself.
 
 ## Experimental Design
 
@@ -91,7 +91,7 @@ The primary dependent variable for the research question is not only reward. Rew
 
 The design deliberately pairs reward with process diagnostics. A changing gridworld makes it possible to label whether a model backup came from the old phase, so stale-backup rate becomes a direct measure of planning relevance. Planning budgets `0`, `1`, `5`, and `20` separate no-planning behavior, low-compute planning, and high-compute planning where stale search control can dominate.
 
-The oracle flush baseline is included to diagnose the role of model contents, not to propose a realistic agent. If flush and keep-model have similar late reward but very different stale-backup rates, the conclusion is that reward can hide computation misuse. That is the motivation for the model-aging proposal.
+The oracle flush baseline is included to diagnose the role of model contents, not to propose a realistic agent. If flush and keep-model have similar late reward but very different stale-backup rates, the conclusion is that reward can hide computation misuse. That is the motivation for studying online freshness estimates and search-control rules.
 
 ## Results
 
@@ -111,7 +111,7 @@ The central insight is that reward and planning quality can separate. If one loo
 
 The experiment also shows why a larger planning budget is not automatically better. More backups increase the chance of useful model use before the change, but they also amplify the consequences of poor search control after the change. The right problem formulation is therefore not “choose a budget,” but “learn a search-control distribution that respects model freshness under a budget.”
 
-This is why the proposal should be treated as a precursor to Continual Dyna Model Aging. It supplies the empirical reason to study age-weighted sampling, prediction-error gating, or other online freshness estimates. It should not be packaged as a final claim that flush-on-change wins, because the flush condition uses privileged information and the reward advantage is not robust in the extended run.
+The practical next step is to move from the oracle diagnostic to online mechanisms such as age-weighted sampling, prediction-error gating, or other freshness estimates. The current result should not be packaged as a final claim that flush-on-change wins, because the flush condition uses privileged information and the reward advantage is not robust in the extended run.
 
 ## Threats To Validity
 
@@ -119,7 +119,7 @@ The phase change is abrupt and scheduled. The keep-model agent does not receive 
 
 The model is deterministic and tabular. This makes stale entries easy to identify because each model entry stores the phase in which it was learned. A stochastic environment would require uncertainty estimates, recency statistics, or prediction-error traces instead of a clean phase label.
 
-The environment has one change. A stronger final planning proposal should add repeated changes, gradual drift, and stochastic transition changes. Those variants would test whether a freshness mechanism is merely tuned to one switch or can operate as an ongoing computation-allocation rule.
+The environment has one change. A stronger planning study should add repeated changes, gradual drift, and stochastic transition changes. Those variants would test whether a freshness mechanism is merely tuned to one switch or can operate as an ongoing computation-allocation rule.
 
 The current run uses a fixed learning rate and simple uniform model sampling for keep/flush conditions. The next study should compare search-control mechanisms directly rather than only changing the model contents.
 
@@ -127,25 +127,25 @@ The current run uses a fixed learning rate and simple uniform model sampling for
 
 Planning reviewer: a stationary Dyna result would be too familiar and would not answer an Alberta Plan continual-learning question. Response: the environment was changed into a continuing nonstationary gridworld with explicit post-change recovery windows and stale-backup diagnostics.
 
-Continual-agent reviewer: flush-on-change is an oracle and violates the spirit of ordinary experience if treated as an algorithm. Response: the report now labels flush only as a diagnostic ceiling and avoids presenting it as a deployable solution.
+Continual-agent reviewer: flush-on-change is an oracle and violates the spirit of ordinary experience if treated as an algorithm. Response: the text labels flush only as a diagnostic ceiling and avoids presenting it as a deployable solution.
 
 Statistics reviewer: the first pilot had five seeds and a small grid, so the result could have been a noise artifact. Response: the current cited evidence is the 20-seed, 20000-step larger-grid extended run, and conclusions are limited to robust patterns: pre-change planning benefit and persistent stale-backup signal.
 
-Sutton-style reviewer: the interesting question is not whether planning scores higher, but what knowledge is being backed up and whether it is still relevant. Response: the report foregrounds stale-backup rate and model freshness rather than only average reward.
+Sutton-style reviewer: the interesting question is not whether planning scores higher, but what knowledge is being backed up and whether it is still relevant. Response: the analysis foregrounds stale-backup rate and model freshness rather than only average reward.
 
-Per-proposal audit matrix:
+Reviewer audit matrix:
 
 | Reviewer angle | Critique | Action taken | Remaining risk |
 |---|---|---|---|
 | Planning | A stationary Dyna result would be too familiar. | Uses a nonstationary continuing gridworld and stale-backup diagnostics. | Still only one abrupt change. |
-| Continual learning | Flush-on-change is not temporally uniform. | Labels flush as an oracle diagnostic only. | Needs realistic aging/search-control mechanisms, handled by the integrated proposal. |
+| Continual learning | Flush-on-change is not temporally uniform. | Labels flush as an oracle diagnostic only. | Needs realistic aging/search-control mechanisms. |
 | Statistics | A five-seed pilot was too weak. | Uses the 20-seed extended run. | More recovery-window tables would improve clarity. |
-| Computation | Reward can hide stale planning. | Reports stale-backup rate as a primary metric. | Planning utility per backup remains coarse. |
-| Strict instructor | Do not package the precursor as a final algorithm. | Conclusion states this is diagnostic foundation for model aging. | Readers may still overfocus on flush unless the evidence level is stated clearly. |
+| Computation | Reward can hide stale planning. | Uses stale-backup rate as a primary metric. | Planning utility per backup remains coarse. |
+| Strict instructor | Do not package the diagnostic as a final algorithm. | Conclusion states the claim is about model freshness and stale computation. | Readers may still overfocus on flush unless the evidence level is stated clearly. |
 
 ## Conclusion
 
-Dyna Planning Budget is a useful independent precursor because it demonstrates a Core RL failure mode: planning budget and model freshness are distinct design variables. Planning helps when the model is fresh, but keeping a model in a changing stream can continue to consume computation on obsolete entries even when late reward recovers. The strongest next step is not another flush comparison; it is a realistic online freshness mechanism, which is developed in the integrated Continual Dyna Model Aging proposal.
+Dyna Planning Budget and Model Staleness demonstrates a Core RL failure mode: planning budget and model freshness are distinct design variables. Planning helps when the model is fresh, but keeping a model in a changing stream can continue to consume computation on obsolete entries even when late reward recovers. The strongest next step is not another flush comparison; it is a realistic online freshness mechanism evaluated under the same continuing, budget-limited interaction protocol.
 
 ## Reproduction
 

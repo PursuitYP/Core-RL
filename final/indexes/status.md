@@ -35,7 +35,15 @@ It also has a completed no-reset unit-switch extension:
 
 `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
 
-The full fixed-condition extended sweep has been submitted as CPU task `core-rl-scale-invariant-extended-33723554` in namespace `ailab-safethm`. It was confirmed RUNNING at 2026-07-09 14:40 HKT on `lg-cmc-h-cpu-0058.host.h.pjlab.org.cn`. The run has created `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`, but that directory currently has no standard artifacts, so it is not evidence yet.
+The full fixed-condition extended sweep has been submitted as CPU task `core-rl-scale-invariant-extended-33723554` in namespace `ailab-safethm`. As of 2026-07-09 17:19 HKT, it is recorded as Running. The run has created `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`, but that directory currently has no standard artifacts, so it is not evidence yet.
+
+Three second-round extended sweeps were added after the latest reviewer-style critique:
+
+- Reward-centered beta/gamma/no-reset switch: smoke result `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke`; rerun CPU task `core-rl-reward-sensitivity-extended-rerun-28457861`, recorded Running at 2026-07-09 17:19 HKT; rerun directory `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended` exists but has no standard artifacts yet.
+- Output-controlled true-online fairness audit: smoke result `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`; rerun CPU task `core-rl-output-fairness-extended-rerun-29576456`, recorded Running at 2026-07-09 17:24 HKT; latest log reached condition `938/1500`, so the job is progressing; rerun directory `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended` exists but has no standard artifacts yet.
+- Dyna model-aging drift sweep: smoke result `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke`; rerun CPU task `core-rl-dyna-drift-extended-rerun-30016335`, recorded Running at 2026-07-09 17:19 HKT; rerun directory `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended` exists but has no standard artifacts yet.
+
+The first submissions for these three sweeps failed immediately because the command used the host-only Python path `/data/yupeng/conda_envs/core-rl/bin/python`, which does not exist inside the rjob container. Failed job IDs `21581151`, `20998802`, and `18940577` are audit-only records and must not be mixed into current evidence. They were resubmitted with container `python`; the rerun tasks listed above are the active ones.
 
 Continual Dyna Model Aging has a completed extended half-life/budget sweep:
 
@@ -44,6 +52,11 @@ Continual Dyna Model Aging has a completed extended half-life/budget sweep:
 Predictive State Plasticity has a completed extended first-gate negative run:
 
 `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`
+
+It also has a completed cue-decodability analysis:
+
+- `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/cue_decodability_summary.csv`
+- `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_cue_decodability_by_length.png`
 
 ## Current Result Index
 
@@ -65,6 +78,12 @@ Important current result directories:
 - Unit-Switching Continuing Control: `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
 - Continual Dyna Model Aging: `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`
 - Predictive State Plasticity: `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`
+- Reward-Centered Sensitivity smoke: `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke`
+- Reward-Centered Sensitivity pending extended directory: `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended` (no standard artifacts; not evidence)
+- Output TD Fairness smoke: `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`
+- Output TD Fairness pending extended directory: `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended` (no standard artifacts; not evidence)
+- Dyna Drift smoke: `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke`
+- Dyna Drift pending extended directory: `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended` (no standard artifacts; not evidence)
 
 ## Evidence Quality Summary
 
@@ -104,7 +123,8 @@ Code remains modular:
 
 Environment:
 
-- Python executable: `/data/yupeng/conda_envs/core-rl/bin/python`
+- Local Python executable: `/data/yupeng/conda_envs/core-rl/bin/python`
+- CPU-task container command: use `python`, not `/data/yupeng/conda_envs/core-rl/bin/python`, because the rjob container only mounts the project storage path.
 - Use `PYTHONNOUSERSITE=1`
 - Use `MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig`
 
@@ -117,10 +137,11 @@ Recent verification is mixed:
 
 ## Next Research Iteration
 
-1. Monitor CPU task `core-rl-scale-invariant-extended-33723554`; if it succeeds, incorporate the new Scale-Invariant Continuing Control extended sweep into reports, figures, PDFs, and indexes.
+1. Monitor CPU task `core-rl-scale-invariant-extended-33723554`; if it succeeds and writes all standard artifacts, incorporate the new Scale-Invariant Continuing Control extended sweep into reports, figures, PDFs, and indexes.
 2. Deepen the newly added Proposal Template, evidence-level, and reviewer-audit sections where they affect project decisions.
-3. Extend Dyna aging to gradual drift, repeated changes, and planning-utility analysis.
-4. Redesign GVF predictive-state questions with cue-decodability probes.
-5. Add fixed-goal sanity experiments for the Options proposal.
-6. Add canonical TIDBD or AutoStep for the plasticity proposal.
-7. Keep negative proposals independent and honest; do not promote weak evidence.
+3. Monitor the reward-sensitivity, output-fairness, and Dyna-drift rerun CPU tasks; if they finish, generate figures and incorporate only completed standard artifacts into the relevant reports.
+4. Extend Dyna aging beyond the current drift runner with repeated changes and planning-utility analysis.
+5. Redesign GVF predictive-state questions using the completed cue-decodability probe.
+6. Add fixed-goal sanity experiments for the Options proposal.
+7. Add canonical TIDBD or AutoStep for the plasticity proposal.
+8. Keep negative proposals independent and honest; do not promote weak evidence.

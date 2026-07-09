@@ -1,97 +1,209 @@
 # TIDBD-Lite Plasticity 中文报告
 
-状态：独立支持性机制研究；当前不是正向性能 proposal。
+状态：独立 mechanism diagnostic；当前证据不是正向性能 proposal。
 
 ## 摘要
 
-本 proposal 研究 per-feature step-size adaptation 是否能作为 streaming TD prediction 的轻量级 plasticity mechanism。在 nonstationary sensor stream 中，feature relevance 在 phase switch 后改变。TIDBD-style learner 理想上应提高新相关 features 的 step sizes，同时让 distractors 保持低 plasticity。当前 main pilot 显示了这种机制信号：switch 后 new-feature step size 上升，distractor step size 保持较低。但 normalized TD 的 late prediction error 仍低于当前 TIDBD-lite implementation。因此本 proposal 的当前定位是机制诊断，而不是性能胜利。
+本 proposal 研究 per-feature step-size adaptation 是否可以作为 streaming TD prediction 中的 plasticity mechanism。环境是一个 nonstationary sensor stream，相关 feature group 会在 phase switch 后改变。理想情况下，TIDBD-style learner 应提高 newly relevant features 的 step sizes，保持 distractor step sizes 较低，并在变化后恢复 prediction accuracy。
 
-## 研究动机
+当前 pilot 只支持这个故事中的机制部分。TIDBD-lite 在 switch 后展示了可解释的 feature-wise alpha dynamics，但 normalized TD 的 late prediction error 略低。因此本 proposal 是 mechanism diagnostic，不是 performance victory。它的价值在于区分“learner 以合理方式改变 internal learning rates”和“learner 改善 prediction objective”。
 
-持续学习 agent 会遇到 changing feature relevance。一个固定 global step size 是折中：太大可能让 irrelevant/noisy features 破坏稳定性，太小又会让新相关 features 学得太慢。Per-feature step-size adaptation 提供更局部的 plasticity：每个 feature 可以根据自己与 TD error 的历史关系调整学习速度。
+## Claim 边界
 
-Alberta Plan 把 step-size adaptation 和 feature utility 看作长期 agent 的早期 building blocks。本 proposal 问的是：一个小型在线 TD learner 能否仅从 stream 中识别 feature relevance 的改变，并产生可解释的 per-feature plasticity dynamics。
+本报告只提出一个受限 claim：
 
-## 研究问题
+> 在当前 nonstationary stream 中，TIDBD-lite 显示出可见 per-feature step-size adaptation，但这种 adaptation 尚未带来相对 normalized TD 的 prediction-error advantage。
 
-主问题：per-feature step-size adaptation 能否在 streaming TD 中跟踪 changing feature relevance？
+本报告刻意不声称：
 
-更具体地说，switch 后 TIDBD-style learner 是否会提高 newly relevant features 的 step sizes、保持 distractor step sizes 较低，并比 fixed-alpha TD 更快恢复 prediction accuracy？当前结果支持前两个机制性 claim，但不支持强 prediction-error claim。
+- TIDBD-lite 是 canonical TIDBD reproduction；
+- per-feature adaptation 已经提升 performance；
+- alpha movement alone 证明 useful plasticity；
+- alpha dynamics alone 足以支持任何更广泛的 plasticity conclusion。
 
-## Alberta Plan 关联
+## Research Motivation/Question/Method / 研究动机/问题/方法
 
-这个 proposal 连接 meta-learning of step sizes、online prediction、continual adaptation、feature relevance tracking 和 limited computation with linear function approximation。它不是 deep plasticity study，也不使用 replay buffer。研究价值在于让 feature-wise learning-rate dynamics 可观察、可解释、可批评。
+Continual agents 在 feature relevance 会变化的 streams 中运行。固定 global step size 是一种折中：太大会让 irrelevant 或 noisy features 破坏 learning，太小又会让 newly relevant features 适应太慢。Per-feature step-size adaptation 提供局部 plasticity mechanism：每个 feature 可以根据它最近对 prediction updates 的贡献调整自己的 learning rate。
 
-## 环境设计
+Alberta Plan 把 step-size adaptation 和 feature utility 看作长期 agent 的早期 building blocks。本 proposal 问的是：在宣称任何大型 control benefit 前，一个轻量 adaptive TD learner 能否仅从 stream 中检测 relevance change。
 
-环境是 nonstationary sensor prediction stream。一个 feature group 在 switch 前 relevant，另一个 feature group 在 switch 后 relevant，distractor features 始终基本无关。Learner 在线更新，没有 replay。这个环境是机制环境，故意制造可测的 feature-relevance change，用来检查 step-size adaptation 是否朝正确 feature group 移动。
+### Focused RL Question / 聚焦 RL 问题
 
-## 方法
+主问题：
 
-比较方法包括 fixed TD with alphas `0.01/0.03/0.1`、normalized TD 和 TIDBD-lite。TIDBD-lite 为每个 feature 维护可调 step size，并使用简化的 meta-gradient-like signal 调整 alpha。报告明确使用 “TIDBD-lite” 名称，不把它当作完整 canonical TIDBD reproduction。
+> Per-feature step-size adaptation 能否在 online TD prediction 中追踪 changing feature relevance？
 
-## 实验设计
+子问题：
 
-当前 main pilot 使用 seeds `0-4`，steps `5000`，switch 发生在 stream 中点。结果路径是 `experiments/alberta_core_rl/results/tidbd_plasticity/20260708T154941Z_main`。主要指标包括 absolute TD error、old-relevant feature step sizes、new-relevant feature step sizes、distractor step sizes 和 recovery windows。
+- Newly relevant features 的 step sizes 是否在 switch 后上升？
+- Distractor features 是否保持相对安静？
+- 该机制是否相对 fixed 和 normalized TD baselines 改善 recovery speed 或 late prediction error？
 
-![TIDBD-lite 与 TD baselines 的 absolute TD error。](../../../../experiments/alberta_core_rl/results/tidbd_plasticity/20260708T154941Z_main/figures/abs_td_error_by_algorithm_curve.png)
+假设：
 
-## 结果
+> Relevance switch 后，TIDBD-style learner 应提高 newly relevant features 的 step sizes，保持 distractors 的 step sizes 较低，并比 fixed-alpha TD 更快恢复 prediction accuracy。
 
-TIDBD-lite 展示了预期的 feature-wise plasticity signal。New-feature step size 从 switch 前约 `0.0068` 上升到 late post-change window 的约 `0.0093`；distractor step size 仍接近 `0.0068`。这说明机制确实能对 feature groups 产生不同学习速度。
+当前结果支持前两个机制性 claim，但不支持更强 performance claim。
 
-但 normalized TD 仍是更强 prediction-error baseline。Late post-change absolute TD error 对 normalized TD 约 `0.4419 +/- 0.0085`，对 TIDBD-lite 约 `0.4493 +/- 0.0119`，对 fixed alpha `0.01` 约 `0.4881 +/- 0.0122`。因此当前结果只能说 TIDBD-lite 有可见 plasticity，不能说它在预测性能上胜过 output-normalized update。
+### Core RL Connection / 与 Core RL 的关联
 
-## 分析
+这是 core RL proposal，因为它研究 online TD prediction、step-size adaptation 和 linear function approximation 下的 feature utility。它连接：
 
-本 proposal 的价值在于分离两个经常被混在一起的 claim。第一，learner 是否以合理方向改变 feature-specific step sizes；第二，这种 adaptation 是否改善 prediction objective。当前第一点有证据，第二点没有。
+- meta-learning of step sizes；
+- stream 中的 online prediction；
+- nonstationarity 下的 continual adaptation；
+- feature relevance tracking；
+- 无 replay 的 limited computation。
 
-这对后续研究很重要。一个 method 的 internal dynamics 看起来符合直觉，并不自动说明它解决了 continual learning。Normalized TD 是强 baseline，因为它直接控制 update magnitude；per-feature adaptation 若要成为主线，必须证明它在 repeated relevance shifts、不同 feature scales 或 downstream control 中提供额外收益。
+该 proposal 刻意不是 deep plasticity benchmark。它是一个用于检查 feature-wise learning-rate dynamics 的小型工具。
 
-## 有效性威胁
+### Related Work / 相关工作
 
-当前 implementation 是 TIDBD-lite，不是 canonical TIDBD。环境只有一次 switch，可能不足以展示 plasticity 优势。Meta step-size 与 normalization baseline 的公平比较还不充分。当前 metrics 主要看 group-wise alpha 和 error，还缺少 feature correlation、utility contribution 和 recovery AUC 等更细指标。
+TIDBD 把 incremental delta-bar-delta ideas 扩展到具有 feature-wise step sizes 的 TD learning。Alberta Plan 讨论 per-weight step-size adaptation，把它作为早期 continual-learning machinery 的一部分。更广泛的 plasticity work 关注 nonstationarity 后的 recovery，但其中许多工作使用 deep networks 或 replay settings，超出本项目偏好的范围。
 
-## 审稿式批评与回应
+本地参考：
 
-Plasticity reviewer 会说：mean step size 不足以证明 feature plasticity。回应是：报告记录 old/new/distractor group-wise step-size trajectories 和 recovery windows。
+- `resources/alberta_plan_related/tidbd_1804.03334.pdf`
+- `resources/alberta_plan_related/alberta_plan_2208.11173.pdf`
 
-Strict reviewer 会说：不能把本地简化算法叫作 TIDBD。回应是：报告使用 TIDBD-lite，并明确需要 canonical TIDBD 或 AutoStep 才能升级结论。
+### Method / 环境与方法
 
-Performance reviewer 会说：normalized TD 已经更好，为什么保留这个 proposal？回应是：它作为 mechanism diagnostic 有价值，因为它展示 per-feature plasticity 的可观察信号；但最终主线应诚实承认当前不是 performance win。
+环境是 nonstationary sensor prediction stream：
 
-## 结论
+- 一个 feature group 在 switch 前 relevant；
+- 另一个 feature group 在 switch 后变为 relevant；
+- distractor features 始终基本无关；
+- updates 在线进行，不使用 replay buffer 或 offline refitting。
 
-TIDBD-Lite Plasticity 是有效的独立机制 proposal，但不是正向性能故事。它显示 relevance switch 后 per-feature step sizes 会朝合理方向变化，同时 normalized TD 在 prediction error 上更强。下一版应实现 canonical TIDBD/AutoStep，加入 repeated switches，并报告 recovery AUC，而不是只看 late error 或 mean alpha。
+这是机制环境。它故意制造可直接测量的 feature-relevance changes。
+
+比较方法：
+
+- fixed TD with alphas `0.01`、`0.03` 和 `0.1`；
+- normalized TD；
+- TIDBD-lite。
+
+本地 adaptive method 被有意称为 TIDBD-lite。它使用简化的 per-feature meta-gradient-like update；在完整算法实现和核对之前，不应把它写成 canonical TIDBD。
+
+## Experimental Design / 实验设计
+
+当前 main pilot：
+
+- Seeds：`0-4`。
+- Steps：`5000`。
+- Switch：发生在 stream 中点。
+- Result path：`experiments/alberta_core_rl/results/tidbd_plasticity/20260708T154941Z_main`。
+
+主要测量：
+
+- absolute TD error；
+- old-relevant feature step sizes；
+- new-relevant feature step sizes；
+- distractor step sizes；
+- post-switch recovery windows。
+
+主图：
+
+![Absolute TD error for TIDBD-lite and TD baselines.](../../../../experiments/alberta_core_rl/results/tidbd_plasticity/20260708T154941Z_main/figures/abs_td_error_by_algorithm_curve.png)
+
+设计逻辑：
+
+| 设计元素 | 为什么需要 |
+|---|---|
+| Feature relevance switch | 制造已知 plasticity challenge。 |
+| Group-wise alpha logs | 测试 adaptation 是否朝 newly relevant features 移动。 |
+| Distractor group | 检测 indiscriminate alpha growth。 |
+| Normalized TD baseline | 测试更简单的 update scaling 是否已解释收益。 |
+| Recovery windows | 区分 immediate adaptation 和 late steady-state error。 |
+
+## Results / 结果
+
+TIDBD-lite 展示了预期的 feature-wise mechanism：
+
+- New-feature step size 从 switch 前约 `0.0068` 上升到 late post-change window 的约 `0.0093`。
+- Distractor step size 保持在约 `0.0068`。
+
+但 normalized TD 仍是更强 prediction-error baseline：
+
+- normalized TD 的 late post-change absolute TD error 约为 `0.4419`；
+- TIDBD-lite 的 late post-change absolute TD error 约为 `0.4493`。
+
+这说明 internal mechanism 可见，但 external prediction objective 尚未改善到足以支持 performance claim。
+
+Late post-change error comparison 如下：
+
+| Strategy | Late post-change absolute TD error |
+|---|---:|
+| Normalized TD | `0.4419` |
+| TIDBD-lite | `0.4493` |
+| Fixed TD, alpha `0.01` | `0.4881` |
+| Fixed TD, alpha `0.03` | `0.6279` |
+| Fixed TD, alpha `0.1` | `0.6591` |
+
+## Analysis / 分析
+
+当前结果暗示几种可能失败机制：
+
+- Meta-update lag：alpha 确实变化，但在单次 switch 后不够快，无法改善 recovery。
+- Scale competition：normalized TD 可能已经解决了 TIDBD-lite 想解决的大部分 update-magnitude problem。
+- Weak utility signal：简化 meta-gradient 可能无法足够强地区分 useful features 和 correlated distractors。
+- One-switch environment：单次变化可能太有限，不足以暴露累积 plasticity benefits。
+- Algorithm gap：TIDBD-lite 可能缺少 canonical TIDBD 或 AutoStep 的重要细节。
+
+这些机制解释了为什么本报告把 alpha dynamics 当作 mechanism behavior 的证据，而不是 better learner 的证据。
+
+## Next Experiments / 下一步实验
+
+下一步实验应分别测试 mechanism 和 performance：
+
+1. Canonical algorithm check：实现 full TIDBD 或 AutoStep，并根据参考核对 update equations。
+2. Repeated switches：使用多次 relevance changes，测试 per-feature adaptation 是否相对 fixed 或 normalized TD 累积优势。
+3. Recovery AUC：报告每次 switch 后的 error area，而不只看 late-window mean error。
+4. Alpha-utility correlation：测量 alpha 上升的 features 是否也对 prediction improvement 贡献更多。
+5. Normalization ablation：比较带和不带 output/update normalization 的 per-feature adaptation。
+6. Control transfer only after success：只有在 diagnostic stream 中 prediction recovery 改善后，才测试小型 control task。
+
+## 局限与有效性威胁
+
+- 当前 implementation 是 TIDBD-lite，不是 canonical TIDBD。
+- 环境只有一次 switch。
+- Normalized TD 是强 baseline，可能解释了大部分 observed adaptation need。
+- 当前 metrics 还没有 feature correlation、utility contribution 或 recovery AUC。
+- Mean group alpha 可能隐藏每个 group 内部的 feature-level variance。
+
+## Reviewer Critique / 审稿批评
+
+| 审查角度 | 可能批评 | 报告回应 | 必要下一步 |
+|---|---|---|---|
+| Algorithm reviewer | TIDBD-lite 不是 canonical TIDBD。 | 报告全程使用 TIDBD-lite terminology。 | 实现 canonical TIDBD 或 AutoStep。 |
+| Plasticity reviewer | Alpha movement alone 不是 utility evidence。 | 报告区分 mechanism dynamics 与 prediction improvement。 | 加入 alpha-utility correlation 和 recovery AUC。 |
+| Baseline reviewer | Normalized TD 在 error 上已经更好。 | 报告把这视为限制，而不是干扰项。 | 加入 normalization ablations 和 repeated switches。 |
+| Strict instructor | 不要把 mechanism 写成 performance win。 | Claim 明确是 diagnostic。 | 除非 performance metrics 改善，否则 final framing 保持 mechanism study。 |
 
 ## Proposal Template Answers / 提案模板回答
 
-Focused RL question：per-feature step-size adaptation 能否在 streaming prediction/control setting 中追踪 changing feature relevance？当前 setting 是 TIDBD-lite diagnostic，不是 canonical TIDBD。比较 TIDBD-lite 与 fixed/normalized TD-style baselines；指标是 prediction error、alpha trajectories、relevance switches 和 recovery。compute 中等；fallback 是 mechanism diagnostic，直到实现 canonical TIDBD 或 AutoStep。
+Focused RL question：Per-feature step-size adaptation 能否在 streaming TD prediction 中追踪 changing feature relevance？
 
-## 独立研究范围
+Setting/testbed：一个 nonstationary sensor prediction stream，包含 old-relevant group、new-relevant group 和 distractors。
 
-本报告研究 feature-wise plasticity signals，不是完成的 performance method。它不应被并入 Predictive State Plasticity 当作已完成正向证据。它的角色是说明 alpha dynamics 是否响应 relevance changes，以及还缺什么。
+Implemented comparison：TIDBD-lite 对比 fixed-alpha TD 和 normalized TD baselines。
 
-## 证据等级
+Observation/metric：Prediction error、group-wise alpha trajectories、recovery windows，以及计划加入的 recovery AUC 和 alpha-utility correlation。
 
-证据等级：supporting mechanism diagnostic。当前 TIDBD-lite implementation 展示了可解释 alpha dynamics，但 normalized TD 在部分条件下 error 更好。因此报告不能声称 TIDBD-lite 提高性能。
+Compute need：小型 CPU-only runs。
 
-## 实验设计依据
+Fallback：在 canonical TIDBD 或 AutoStep 以及更强 recovery metrics 完成前，把本报告保持为 mechanism diagnostic。
 
-实验只有在区分“alpha visibly changes”和“learning improves”时才有价值。下一步应实现 canonical TIDBD/AutoStep，加入 repeated relevance switches，并报告 recovery AUC，而不只是 final error。
+## Conclusion / 结论
 
-## 审查矩阵
+本 proposal 是关于 streaming TD prediction 中 plasticity mechanism 的独立研究。当前证据支持一个窄结论：TIDBD-lite 的 feature-wise step sizes 朝可解释方向适应，但 normalized TD 的 late prediction error 仍略低。因此该项目应被报告为 diagnostic evidence 和 redesign target；任何更强的 plasticity claim 都应推迟到 canonical adaptive step-size algorithms 与 recovery-focused metrics 显示 behavioral advantage 之后。
 
-| 审查角度 | 批评 | 已处理 | 剩余风险 |
-|---|---|---|---|
-| Algorithm | TIDBD-lite 不是 canonical TIDBD。 | 证据等级写成 diagnostic。 | 需要 canonical TIDBD/AutoStep。 |
-| Performance | alpha adaptation 不一定改善 error。 | 区分 alpha dynamics 和 prediction gain。 | normalized TD 可能仍更强。 |
-| 严格老师 | 没有 utility evidence 不应过度使用 plasticity 语言。 | 下一步指标包含 recovery AUC 和 repeated switches。 | 当前结果只能 supporting。 |
-
-## 复现
+## Reproduction / 复现
 
 ```bash
 cd /mnt/shared-storage-user/yupeng/Core-RL
 
-PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/tidbd_plasticity/config_main.json
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
+  --config experiments/alberta_core_rl/configs/tidbd_plasticity/config_main.json
 ```

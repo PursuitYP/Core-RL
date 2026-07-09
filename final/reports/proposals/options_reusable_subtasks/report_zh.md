@@ -1,91 +1,131 @@
-# Doorway Options for Reusable Subtasks 中文报告
+# Doorway Options for Reusable Subtasks
 
-状态：独立负结果 proposal；在固定目标 sanity case 通过前保持 quarantined。
+状态：quarantined negative-result study。本报告是一个独立 proposal，研究 doorway options 在 Four Rooms 中是否真的表现为 reusable subtasks。当前证据不支持 transfer claim；它说明在提出任何正向 reusable options 结论前，必须先通过 fixed-goal sanity checks，并显式验证 SMDP accounting。
 
 ## 摘要
 
-Options 常被用来说明 reusable temporally extended actions 可以改善 exploration 和 transfer。本 proposal 在 Four Rooms 中测试一个最小版本：hand-coded doorway options 与真实 environment-step accounting。当前 main pilot 发现 primitive actions 略优于 short 和 long doorway options。Options 确实被使用，但在测试设置下没有产生正向 transfer 或 sample-efficiency 结果。因此本 proposal 是一个 honest temporal-abstraction failure analysis：options 必须为 commitment cost 付费；未来 option study 必须先证明 fixed-goal sanity win，再讨论 transfer。
-
-## 研究动机
-
-Alberta Plan 的 STOMP/Oak 方向把 subtasks、options、option models 和 planning 看作 long-lived agent 的组件。但 temporal abstraction 不是免费的。Option 会让 agent 承诺执行多步真实环境动作；如果 option policy 与当前 goal 不匹配，或实验只按 decision count 而不是 environment step 计数，options 会看起来高效但实际浪费交互。
-
-本 proposal 的实际问题是：当我们诚实计算真实 environment steps 时，hand-coded doorway options 是否仍然有 utility？
-
-## 研究问题
-
-主问题：doorway options 在 changing-goal Four Rooms 中何时帮助 transfer，何时因为 commitment cost 伤害 per-real-step performance？
-
-当前实验更清楚地回答了第二部分：在测试设置下，real-step accounting 下 option commitment 没有帮助。
-
-## Alberta Plan 关联
-
-该 proposal 关联 temporal abstraction、reusable subtasks、continuing control、interaction cost 和 learned component utility evaluation。尽管 options 是 hand-coded 而非 learned，实验仍有价值，因为它测试 proposed abstraction 是否真正有可测 utility。
-
-## 环境与方法
-
-环境是 Four Rooms navigation。Agent 在房间之间通过 doorways 移动，goal 会变化以测试 doorway options 是否 transfer。动作包括 primitive movements、short doorway options 和 long doorway options。关键 accounting rule 是 performance 按真实 environment step 衡量，而不是按 option decision 数衡量，以避免 long option 因隐藏多个 primitive steps 而被虚假奖励。
-
-比较 controllers 包括 primitive action controller、short-option SMDP controller 和 long-option SMDP controller。Option usage、duration 和 success 都被记录，用于解释负结果。
-
-## 实验设计
-
-当前 main pilot 使用 larger Four Rooms setting、alternating goals、seeds `0-4`、steps `5000`。结果路径是 `experiments/alberta_core_rl/results/options_reusable_subtasks/20260708T161717Z_main`。主要指标包括 reward per environment step、option usage、option duration、option success 和 goal-change recovery。
-
-![Reward per environment step with primitive actions and options.](../../../../experiments/alberta_core_rl/results/options_reusable_subtasks/20260708T161717Z_main/figures/reward_per_env_step_by_algorithm_curve.png)
-
-## 结果
-
-Primitive control 略优于 option variants。Primitive reward per environment step 约 `-0.00919`；short options 约 `-0.00935`；long options 约 `-0.00995`。差异不大，但方向不是 positive options result。定性上更重要的是：options 被选择了，但没有帮助。这说明 option availability 本身不够，option policy、initiation/termination structure 和 learning budget 必须与任务匹配。
-
-## 分析
-
-这个负结果纠正了 options 实验中常见的报告错误。如果只按 decision steps 计数，options 可能显得更快，因为一次 option decision 包含多个 primitive actions。按 real environment steps 计数后，这个 artifact 被移除。
-
-结果不说明 options 一般无用。它说明当前 option set、goal schedule 和 learning budget 下，doorway options 没有证明自己值得付出 commitment cost。
-
-## 有效性威胁
-
-当前实验还缺 fixed-goal sanity case。如果 doorway options 在固定目标任务中都不能稳定帮助，那么 transfer failure 很难解释。Options 是 hand-coded，因此测试的是 option utility，不是 option discovery。Learning budget 可能太短，goal-change schedule 也可能过度惩罚 commitment。
-
-## 审稿式批评与回应
-
-Temporal-abstraction reviewer 会要求按真实 environment steps 评估，而不是 option decisions。回应是：当前指标已经使用 environment-step accounting 和 SMDP-style updates。
-
-Strict reviewer 会指出：没有 fixed-goal sanity win 就谈 transfer 太早。回应是：报告把 proposal quarantined，并要求先做 fixed-goal Four Rooms。
-
-## 结论
-
-Doorway Options 是独立负结果。它贡献的教训是：options 必须按真实 interaction cost 评估，不能因为它们编码了合理 subtask 就假设有用。下一版需要 fixed-goal sanity win、duration caps 和更干净的 transfer protocol。
+Options 常被用来说明 temporally extended actions 可以改善 exploration、planning 和 transfer。本研究在一个有意保持小型的 Four Rooms navigation task 中，用 hand-coded doorway options 测试这个想法。核心方法规则是真实 environment-step accounting：option 可能把多个 primitive moves 压缩成一个 high-level decision，但它仍然消耗同样的 interaction steps。在当前 changing-goal pilot 中，如果按 reward per real environment step 衡量，primitive control 略优于 short 和 long doorway-option controllers。Options 会被选择，也有时能到达局部 doorway target，但它们的 commitment cost 没有换来更好的 goal recovery 或 final reward。因此当前结果应作为 quarantined negative pilot，而不是 reusable-subtask transfer 的证据。
 
 ## Proposal Template Answers / 提案模板回答
 
-Focused RL question：hand-coded doorway options 在 changing Four Rooms task 中，按真实 environment-step accounting 是否提供 reusable subtasks？setting 是 changing-goal Four Rooms；比较 primitive control 和 option-augmented control。主指标是 reward per real environment step、option duration、option success 和 goal-switch recovery。compute 小；fallback 是 fixed-goal sanity 通过前 quarantine。
+Focused RL question：在 Four Rooms 中，如果 performance 和 learning 都按真实 environment-step 和 SMDP duration accounting 评价，hand-coded doorway options 是否提供 reusable subtasks？
 
-## 独立研究范围
+Setting/testbed：一个 larger Four Rooms navigation task，包含 primitive movement actions、连接房间的 doorways，以及 alternating goals。Agent 在线交互学习；main pilot 使用 seeds `0-4`，共 `5000` environment steps。
 
-本报告研究 hand-coded option utility 和 accounting，不研究 option discovery。它是独立课题，但当前 quarantined，因为 primitive baseline 没有被击败，而且 fixed-goal sanity check 缺失。
+Implemented comparison：primitive control 与两个 option-augmented SMDP controllers 比较：primitive actions 加 short doorway options，以及 primitive actions 加 long doorway options。
 
-## 证据等级
+Observation or metric：主指标是 reward per real environment step。诊断指标包括 option usage rate、option duration、option success、steps since goal switch，以及 goal changes 后的 recovery。
 
-证据等级：quarantined negative result。当前证据主要用于防止 overclaim：options 在 decision-step accounting 下可能看起来更好，但在真实 environment-step accounting 下可能更差或无优势。
+Compute need and fallback：实验是 CPU-scale，并可用 Reproduction 章节中的命令复现。Fallback 是在 fixed-goal sanity case 和 SMDP backup audit 通过前，将本研究保持为 quarantined negative accounting result。
 
-## 实验设计依据
+## Research Motivation/Question/Method / 研究动机、问题与方法
 
-下一步必须从 fixed-goal sanity case 开始。如果 doorway options 在 stationary Four Rooms goal 下按 real-step accounting 都不能帮忙或至少行为正确，那么 goal-transfer result 无法解释。重新作为正向 temporal-abstraction proposal 前，必须补 SMDP duration accounting 和 option termination diagnostics。
+Alberta Plan 的 STOMP/Oak 方向把 subtasks、options、option models 和 planning 看作 long-lived agents 的潜在组件。这个动机与本研究相关，但它并不意味着一个 option 只要在人看来 subgoal 自然就一定有用。Doorway 在 Four Rooms 中是 plausible subtask，但选择 doorway option 会让 agent 承诺执行多个真实 environment steps。如果 option 朝错误 doorway 移动、terminate 在无用状态，或者只按 decision count 评价，它可能看起来高效，但实际损失真实交互时间。
 
-## 审查矩阵
+研究问题是：在真实 SMDP duration accounting 下，hand-coded doorway options 是否在 Four Rooms 中提供 reusable subtasks？
 
-| 审查角度 | 批评 | 已处理 | 剩余风险 |
+原始正向假设是：doorway options 会改善 navigation efficiency 和 goal changes 后的 recovery，因为移动到 doorways 是可复用 navigation subproblem。当前 pilot 不支持这个假设。它更保守地说明：如果按 real environment step 评价，option commitment 可能没有帮助，甚至会伤害表现。
+
+方法是 Four Rooms 中的 online control。Primitive controller 选择四个 movement actions 之一。Option controllers 从 primitive actions 加 doorway-directed options 中选择。一个 option 会执行朝目标 doorway 移动的 primitive moves，直到 terminate 或达到 duration cap；随后 high-level learner 接收 accumulated option transition，并记录 duration。本报告的主张依赖这些 logged real-step metrics，但不声称所有 SMDP edge cases 已经完全验证。
+
+正向未来版本的 accounting standard 必须比好看的曲线更严格：option duration `k` 必须进入 backup；option 执行期间的 cumulative reward 必须归入该 option transition；performance 必须按 environment step 报告；terminal 或 goal-change cases 不能隐藏额外 primitive steps。
+
+## Experimental Design / 实验设计
+
+当前 main pilot 是本报告使用的唯一结果。
+
+| Item | Value |
+|---|---|
+| Environment | `larger_four_rooms` |
+| Goal regime | Alternating goals |
+| Algorithms | `primitive`, `short_options`, `long_options` |
+| Seeds | `0-4` |
+| Steps | `5000` |
+| Result path | `experiments/alberta_core_rl/results/options_reusable_subtasks/20260708T161717Z_main` |
+
+Independent variable 是 online learner 可用的 action set：只用 primitive actions、primitive actions 加 short doorway options，或 primitive actions 加 long doorway options。Primary dependent variable 是 reward per real environment step。Option usage、duration 和 success 是诊断变量，用来解释 option controller 为什么有用或无用。
+
+主图：
+
+![Reward per environment step with primitive actions and options.](../../../../experiments/alberta_core_rl/results/options_reusable_subtasks/20260708T161717Z_main/figures/reward_per_env_step_by_algorithm_curve.png)
+
+## Results / 结果
+
+最终 seed-tail summaries 没有显示正向 option result。按 reward per real environment step 衡量，primitive control 仍然略优于 option variants。
+
+| Controller | Reward per environment step | Diagnostic interpretation |
+|---|---:|---|
+| Primitive actions | `-0.00919` | 在已测试 controllers 中 final mean 最好。 |
+| Short doorway options | `-0.00935` | Options 可用且被使用，但没有改善主指标。 |
+| Long doorway options | `-0.00995` | 在 real-step accounting 下，较长 commitment 的成本最大。 |
+
+Option diagnostics 说明负结果不只是因为 options 不可用。在 tail summaries 中，short options 的 decision 使用率约为 `0.222`，mean duration 约为 `1.576`，success 约为 `0.209`；long options 的 decision 使用率约为 `0.176`，mean duration 约为 `2.054`，success 约为 `0.438`。这些数字说明 options 确实参与了行为，但局部 option execution 没有转化为更好的 task reward。
+
+这个结果应被理解为 unsupported transfer claim，而不是反对 options 的一般定理。当前 pilot 中的 option definitions、goal schedule、budget 和 accounting 没有产生相对 primitive control 的提升。
+
+## Analysis / 分析
+
+主要教训是：option availability 不等于 reusable-subtask evidence。Doorway option 也许解决了一个局部有意义的问题，但任务目标是在真实 interaction budget 下最大化 cumulative reward。如果 controller 花多个 steps 移动到一个对当前 goal 没用的 doorway，这个 abstraction 可能减少 decision count，却降低 reward per environment step。
+
+有几个机制可以解释当前 pilot。第一，commitment cost 可能占主导：option 会花多个真实 steps 跟随一个可能与当前 goal 不一致的 subpolicy。第二，changing-goal regime 可能让先前合理的 doorway 在局部变 stale。第三，更大的 top-level action set 可能拖慢 value learning，特别是 option values 没有足够快学到时。第四，long options 可能在 decision-step plots 中看起来更好，因为它们减少 high-level choices，但 environment-step accounting 会暴露真实 interaction cost。
+
+决定性限制是缺少 fixed-goal sanity case。Changing-goal transfer experiment 很难解释；除非相同 option definitions 先在 stationary setting 中有效，而在该 setting 里 doorway travel 本应有用。因此当前正确解释是 quarantined negative pilot：当前 setup 不支持 reusable-subtask transfer，而且 implementation/evaluation pipeline 仍需要一个更简单的 sanity win。
+
+Fixed-goal sanity gate 应要求：固定 start-goal distribution；使用同一组 short 和 long doorway options；报告 reward per real environment step、steps to goal、option duration、option termination locations；并显式审计 SMDP backup 是否使用 duration 和 accumulated reward。如果 options 在该 setting 中都不能 match 或 beat primitive control，本研究就应继续作为 negative accounting result，而不是 transfer study。
+
+## 局限与有效性威胁
+
+当前 pilot 缺少 fixed-goal sanity case，因此无法区分失败来自 transfer 难度，还是 option implementation 本身普遍无用。
+
+Options 是 hand-coded，因此本研究测试的是 option utility 和 accounting，不是 option discovery。
+
+Learning budget 较小，可能不足以可靠估计 option values。
+
+Goal-change schedule 可能比 stationary navigation task 更惩罚 commitment。
+
+结果只使用五个 seeds 和一个 Four Rooms configuration，因此方向对诊断有用，但不足以支撑 general option claim。
+
+当前报告强调 real-step performance 和 logged diagnostics，但任何正向未来版本都应更完整地审计 SMDP backup equations、discounting、accumulated reward，以及 terminal 或 goal-switch handling。
+
+## Reviewer Critique / 审稿式批评
+
+| Reviewer angle | Critique | Current treatment | Remaining risk |
 |---|---|---|---|
-| Options | 没有 fixed-goal sanity check。 | 证据等级为 quarantined。 | transfer claim 前必须通过 sanity。 |
-| Accounting | decision-step metrics 会虚假偏向 options。 | 强调 real environment-step reward。 | SMDP duration 仍需更完整报告。 |
-| 严格老师 | 不要把失败 options 结果写成 reusable-subtask evidence。 | 报告定位为 negative/quarantine。 | 需要新实验才能恢复。 |
+| Research question | 题目容易变成“options 分数更高”，而不是 focused RL question。 | 报告明确为 real-step SMDP accounting 下 reusable subtasks 的窄问题。 | 正向版本仍需要更干净的 sanity experiment。 |
+| Temporal abstraction | Doorway options 很 plausible，但 plausibility 不是 utility。 | 证据等级写成 quarantined negative。 | Transfer language 前需要 fixed-goal sanity win。 |
+| Accounting | Decision-step metrics 会虚假偏向 options。 | Reward per real environment step 是主指标。 | 正向 claim 前需要 backup details 和 edge-case audit。 |
+| Transfer | 没有 stationary success 时 changing-goal results 太早。 | Transfer 在 fixed-goal sanity 前被显式阻断。 | Sanity 后可能仍需重设 goal schedule。 |
+| Interpretation | Negative pilot 可能被过度解释为“options 不工作”。 | 结论限制在当前 tested setup。 | 一般结论需要更多 environments 和 option definitions。 |
 
-## 复现
+## Alberta Plan Connection / Alberta Plan 关联
+
+本研究关联 temporal abstraction、reusable subtasks、option models、planning，以及 learned components 的 utility evaluation。它遵循 Alberta Plan 的纪律：组件应根据它们在 limited computation 和真实 interaction cost 下对 agent objective 的贡献来评价。当前结果有价值，因为它防止 overclaim：plausible subtask 不会自动成为 useful abstraction。
+
+本地参考：
+
+- `resources/alberta_plan_related/average_reward_options_2110.13855.pdf`
+- `resources/alberta_plan_related/alberta_plan_2208.11173.pdf`
+
+## Conclusion / 结论
+
+独立结论是保守的：在已测试的 changing-goal Four Rooms pilot 中，hand-coded doorway options 没有在 reward per real environment step 上优于 primitive control。当前 transfer claim 不受支持，应保持 quarantined。下一步不应扩大比较范围，而应先做 fixed-goal sanity experiment，并显式完成 SMDP accounting audit。只有相同 options 在干净 stationary 条件下确实有帮助后，才应重新打开 changing-goal transfer claim。
+
+## Reproduction / 复现
+
+现有结果路径：
+
+```text
+experiments/alberta_core_rl/results/options_reusable_subtasks/20260708T161717Z_main
+```
+
+复现命令：
 
 ```bash
 cd /mnt/shared-storage-user/yupeng/Core-RL
 
-PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/options_reusable_subtasks/config_main.json
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
+  --config experiments/alberta_core_rl/configs/options_reusable_subtasks/config_main.json
 ```
+
+该命令会在 `experiments/alberta_core_rl/results/options_reusable_subtasks/` 下写入新的 timestamped directory。可将新的 `condition_summary.json`、`summary.json`、`metrics.csv` 和 reward curve 与上方现有 result path 对比。

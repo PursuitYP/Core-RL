@@ -21,12 +21,14 @@ from .studies.feature_plasticity import (
 from .studies.planning_offpolicy import (
     proposal_baird_offpolicy_stability,
     proposal_continual_dyna_model_aging,
+    proposal_continual_dyna_model_aging_drift,
     proposal_dyna_planning_budget,
 )
-from .studies.prediction_scale import proposal_output_controlled_td
+from .studies.prediction_scale import proposal_output_controlled_td, proposal_output_controlled_td_fairness
 from .studies.predictive_state import proposal_predictive_state_plasticity, proposal_useful_gvfs_state
 from .studies.reward_centering import (
     proposal_reward_centered_sarsa,
+    proposal_reward_centered_sarsa_sensitivity,
     proposal_scale_invariant_control,
     proposal_unit_switching_control,
 )
@@ -41,7 +43,9 @@ DEFAULT_STEPS = {
 
 RUNNERS: dict[str, Callable[[list[int], str, int], tuple[list[dict], dict]]] = {
     "output_controlled_td": proposal_output_controlled_td,
+    "output_controlled_td_fairness_audit": proposal_output_controlled_td_fairness,
     "reward_centered_sarsa": proposal_reward_centered_sarsa,
+    "reward_centered_sarsa_sensitivity": proposal_reward_centered_sarsa_sensitivity,
     "scale_invariant_continuing_control": proposal_scale_invariant_control,
     "unit_switching_continuing_control": proposal_unit_switching_control,
     "useful_gvfs_state": proposal_useful_gvfs_state,
@@ -57,6 +61,7 @@ RUNNERS: dict[str, Callable[[list[int], str, int], tuple[list[dict], dict]]] = {
     "baird_offpolicy_stability": proposal_baird_offpolicy_stability,
     "dyna_planning_budget": proposal_dyna_planning_budget,
     "continual_dyna_model_aging": proposal_continual_dyna_model_aging,
+    "continual_dyna_model_aging_drift": proposal_continual_dyna_model_aging_drift,
 }
 
 
@@ -133,6 +138,7 @@ def summarize_by_condition(rows: list[dict]) -> list[dict]:
         "scale",
         "representation",
         "alpha",
+        "beta",
         "lambda",
         "gamma",
         "reward_shift",
@@ -146,6 +152,7 @@ def summarize_by_condition(rows: list[dict]) -> list[dict]:
         "model_mode",
         "half_life",
         "switch_type",
+        "drift_mode",
     ]
     present = [key for key in condition_keys if any(key in row for row in rows)]
     grouped: dict[tuple, list[dict]] = defaultdict(list)

@@ -1,0 +1,7 @@
+{
+  "proposal": "reward_centered_sarsa_sensitivity",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4],
+  "steps": 5000,
+  "notes": "Main beta/gamma sensitivity sweep for continuing access-control Sarsa after no-reset reward-origin switches."
+}

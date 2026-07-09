@@ -18,7 +18,7 @@ What will we look at? The main evidence is a set of heatmaps and tables for RMSE
 
 ## Independent Research Scope
 
-This proposal is an independent study of update units in streaming value prediction. It isolates the feature-scale side of the broader unit-invariance problem: the underlying random-walk prediction problem is kept conceptually fixed while the feature vector is rescaled. Reward-origin effects, control behavior, and model-based planning are intentionally outside this report's scope and are handled by separate proposals.
+This proposal is an independent study of update units in streaming value prediction. It isolates a feature-scale invariance problem: the underlying random-walk prediction problem is kept conceptually fixed while the feature vector is rescaled. Reward-origin effects, control behavior, and model-based planning are intentionally outside this report's scope, so the claims here are limited to streaming prediction with linear function approximation.
 
 The proposal should also not be read as a general rejection of true-online TD(lambda). The current true-online condition is a raw-alpha trace baseline in a feature-scale stress test. Its divergence is evidence that raw parameter-space alpha is unfair under feature rescaling, not evidence that true-online TD(lambda) is intrinsically unstable when tuned or normalized appropriately.
 
@@ -26,7 +26,13 @@ The proposal should also not be read as a general rejection of true-online TD(la
 
 Evidence level: strong independent main-candidate evidence for the prediction-side mechanism, with a fairness caveat for trace baselines. The completed CPU run uses 20 seeds, 20000 steps, five feature-scale patterns, four alphas, and four algorithms. The key result is seed-level rather than row-level: normalized and trace-normalized TD have zero divergent seed-conditions across the full grid, while fixed TD and the raw-alpha true-online baseline diverge in 141 of 400 seed-conditions each.
 
-The evidence is not yet a full control result and not yet a complete true-online TD(lambda) audit. The next experiment should add max-stable-alpha tables, normalized true-online TD(lambda), and a no-reset feature-scale switch in a single stream. Those follow-ups are needed before the report can claim that output-controlled updates solve feature-unit drift in control agents.
+The evidence is not yet a full control result and not yet a complete true-online TD(lambda) audit. A fairness follow-up has now been implemented as `output_controlled_td_fairness_audit`, smoke-tested at `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`, and submitted as CPU task `core-rl-output-fairness-extended-rerun-29576456`. Until that extended sweep finishes, the report should not claim that output-controlled updates solve feature-unit drift in control agents.
+
+## Paper-Style Contribution And Claim Boundaries
+
+The contribution is an update-unit study for streaming TD with linear function approximation. The report turns feature scaling from a nuisance hyperparameter issue into a measurable stability question: does alpha specify a raw parameter displacement or an intended prediction change? The extended result contributes a seed-level stability atlas and shows that trace normalization and feature normalization can prevent entire classes of scale-induced divergence.
+
+The claim boundary is that this is a prediction-side mechanism result. It does not yet establish a control improvement, and it does not fairly rank true-online TD(lambda) as an algorithm family. The current true-online condition is a raw-alpha baseline; the responsible conclusion is that raw alpha is not a comparable unit under feature-scale stress, not that true-online TD(lambda) is weak.
 
 ## Research Motivation
 
@@ -46,7 +52,7 @@ This study connects to the value-functions component of the Alberta Plan base ag
 
 ## Related Work
 
-The closest recent motivation is Intentional Updates for Streaming Reinforcement Learning, which argues that parameter-space step sizes can produce unpredictable output changes in batch-size-one learning and proposes specifying the intended outcome of an update first. Reward Centering motivates a parallel invariance question on the reward side: arbitrary reward offsets should not change continuing-control behavior. Streaming Deep RL Finally Works and Squeezing More from the Stream define the broader no-replay streaming regime, though this project intentionally stays with linear Core RL. True Online TD(lambda) is included as an important online trace baseline; the current raw-alpha implementation must be interpreted carefully because true-online methods were designed to be strong and stable when step sizes are used appropriately.
+The closest recent motivation is Intentional Updates for Streaming Reinforcement Learning, which argues that parameter-space step sizes can produce unpredictable output changes in batch-size-one learning and proposes specifying the intended outcome of an update first. Normalized least-mean-squares methods provide an older prediction-learning precedent for scale-aware updates. Streaming Deep RL Finally Works and Squeezing More from the Stream define the broader no-replay streaming regime, though this project intentionally stays with linear Core RL. True Online TD(lambda) is included as an important online trace baseline; the current raw-alpha implementation must be interpreted carefully because true-online methods were designed to be strong and stable when step sizes are used appropriately.
 
 ## Environment
 
@@ -103,11 +109,23 @@ Normalized TD has no seed-level divergence across the full grid. At scale `hundr
 
 The raw-alpha true-online TD(lambda) baseline should be read carefully. It diverges in the same number of seed-conditions as fixed TD, including all `hundred` conditions, yet its non-diverged RMSE is low because the surviving conditions are the easier scale settings. This makes it a warning about fair step-size comparison, not a claim that true-online TD(lambda) is generally poor.
 
+### Second-Round Fairness Audit Status
+
+The fairness audit is a separate experiment inside this same research question. It adds a normalized true-online TD(lambda) variant and a broader alpha/scale grid so that the raw-alpha trace baseline is not treated as the final word on true-online TD(lambda). The smoke run is only a runner and plotting validation, but it already checks that fixed, normalized, trace-normalized, true-online, and normalized true-online variants are logged under the same schema.
+
+Smoke result path: `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`
+
+Pending extended result path: `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended`
+
+CPU task: `core-rl-output-fairness-extended-rerun-29576456`, running as of 2026-07-09 17:02 HKT. This pending run is not yet evidence because the standard artifacts have not been written.
+
+![Smoke fairness-audit RMSE heatmap.](../../../../experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke/figures/report_log_rmse_heatmap.png)
+
 ## Analysis
 
 The heatmaps support the central mechanism: fixed alpha is a poor unit for streaming prediction progress when feature scale changes. Under large or uneven scales, the same TD error can create a much larger output change simply because the feature vector is larger. Normalized TD changes the denominator of the update so the effective step size contracts when the feature direction is large. Trace-normalized TD applies the same idea to the accumulated eligibility trace.
 
-The result also clarifies why a one-alpha leaderboard would be misleading. True-online TD(lambda) has strong theory and prior empirical support, but a raw-alpha comparison against normalized methods is not fair when the experimental manipulation is feature magnitude. The next version should include a max-stable-alpha audit and a normalized true-online variant before using true-online TD(lambda) as a negative baseline.
+The result also clarifies why a one-alpha leaderboard would be misleading. True-online TD(lambda) has strong theory and prior empirical support, but a raw-alpha comparison against normalized methods is not fair when the experimental manipulation is feature magnitude. The implemented fairness audit adds a normalized true-online variant and a wider alpha grid; its extended result will determine whether the raw-alpha failure should be interpreted as a unit mismatch or as a deeper trace-learning issue in this testbed.
 
 ## Threats To Validity
 
@@ -137,7 +155,7 @@ Per-proposal audit matrix:
 
 ## Conclusion
 
-The extended evidence supports the proposal's main claim: streaming TD should control update consequences in prediction space, not only raw parameter movement. Normalized TD and trace-normalized TD(lambda) remain stable across all tested feature scales and alphas, while fixed TD is fragile under scale stress. The proposal is strong as an independent Core RL study and also motivates the broader Scale-Invariant Continuing Control proposal.
+The extended evidence supports the proposal's main claim: streaming TD should control update consequences in prediction space, not only raw parameter movement. Normalized TD and trace-normalized TD(lambda) remain stable across all tested feature scales and alphas, while fixed TD is fragile under scale stress. The independent remaining question is fairness for true-online TD(lambda), now addressed by a pending normalized true-online sweep.
 
 ## Reproduction
 
@@ -168,4 +186,12 @@ PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconf
   --kind output-td \
   --result-dir experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended \
   --figure-dir final/reports/proposals/output_controlled_td/figures
+```
+
+Fairness audit smoke command:
+
+```bash
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
+  --config experiments/alberta_core_rl/configs/output_controlled_td_fairness_audit/config_smoke.json
 ```

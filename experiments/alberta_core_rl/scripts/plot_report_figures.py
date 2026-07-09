@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from alberta_core_rl.report_figures_core import (
     plot_dyna_aging,
+    plot_dyna_drift,
     plot_dyna_budget,
     plot_predictive_state,
     plot_scale_invariant,
@@ -17,6 +18,7 @@ from alberta_core_rl.report_figures_heatmaps import (
     plot_onpolicy_atlas,
     plot_output_td,
     plot_reward_centered,
+    plot_reward_centered_sensitivity,
     plot_unit_switching,
 )
 
@@ -30,10 +32,12 @@ def main() -> None:
         choices=[
             "scale",
             "dyna-aging",
+            "dyna-drift",
             "dyna-budget",
             "predictive-state",
             "output-td",
             "reward-centered",
+            "reward-sensitivity",
             "onpolicy-atlas",
             "unit-switching",
         ],
@@ -45,6 +49,8 @@ def main() -> None:
         outputs = plot_scale_invariant(result_dir)
     elif args.kind == "dyna-aging":
         outputs = plot_dyna_aging(result_dir)
+    elif args.kind == "dyna-drift":
+        outputs = plot_dyna_drift(result_dir)
     elif args.kind == "dyna-budget":
         outputs = plot_dyna_budget(result_dir)
     elif args.kind == "predictive-state":
@@ -53,6 +59,8 @@ def main() -> None:
         outputs = plot_output_td(result_dir, Path(args.figure_dir) if args.figure_dir else None)
     elif args.kind == "reward-centered":
         outputs = plot_reward_centered(result_dir)
+    elif args.kind == "reward-sensitivity":
+        outputs = plot_reward_centered_sensitivity(result_dir)
     elif args.kind == "onpolicy-atlas":
         outputs = plot_onpolicy_atlas(result_dir)
     else:

@@ -1,0 +1,7 @@
+{
+  "proposal": "output_controlled_td_fairness_audit",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "steps": 20000,
+  "notes": "Extended CPU-task sweep for true-online fairness audit with 10 seeds and a wider stable-alpha grid."
+}

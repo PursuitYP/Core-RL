@@ -1,89 +1,210 @@
 # GVF Question Design 中文报告
 
-状态：独立 GVF 设计诊断；服务 GVF Predictive State 和 Predictive State Plasticity 的 redesign。
+状态：独立 useful-prediction design diagnostic；当前证据用于 redesign，不是完成的 GVF control claim。
 
 ## 摘要
 
-本 proposal 研究 GVFs 能成为 agent state 之前的一个更基础问题：哪些 predictive questions 值得学习？在 T-maze stream 中，我们为不同 cumulants 和 discounts 训练 linear GVF predictors。当前 run 显示有些问题很容易预测但不一定有用，例如 bias prediction；cue 和 junction questions 则揭示 prediction accuracy 与 downstream state relevance 之间的差异。本 study 不是最终 control result，而是一个用于设计 useful predictive state 的诊断。
+本 proposal 研究一个先于“把 GVFs 当作 agent state”出现的设计问题：哪些 predictive questions 值得学习？一个 GVF 可以有很低 prediction error，但如果它预测的是常数、局部可见信号，或与 control 所需 hidden information 无关的变量，它仍然没用。本文的中心信息是：
 
-## 研究动机
+> prediction error != usefulness。
 
-GVFs 常被描述为 predictive knowledge，但 prediction 对 agent 有用的前提是它能回答 decision-relevant question。低误差 GVF 可能只是预测常数、局部可见信号或与 hidden variable 无关的量。这样的预测即使稳定，也不能帮助 control。
+当前 diagnostic 使用 T-maze stream，并为不同 cumulants 和 discount horizons 训练 linear GVF predictors。Bias predictions 容易但无用；cue 和 junction questions 暴露出必须根据 hidden cue information 与 downstream junction action 来评价 prediction。本报告的贡献是 useful-prediction design diagnostic，而不是证明 GVF state 已经提升 control 的最终结果。
 
-GVF Predictive State 的失败让这个设计问题变得具体：T-maze 可以由 trace memory 解决，但当前 recurrent GVF 没有解决。于是问题变成：在把 GVF output 插入 control state 前，我们应该如何选择和评价 GVF questions？
+## Claim 边界
 
-## 研究问题
+本报告只提出一个受限 claim：
 
-主问题：哪些 GVF cumulant/discount questions 容易预测，哪些看起来可能对 T-maze state construction 有用？
+> 在当前 T-maze question-design diagnostic 中，低 GVF prediction error 不足以识别 useful state features；GVF questions 需要 explicit usefulness probes，例如 cue decodability 和 downstream control ablations。
 
-核心假设是：prediction error alone 不能识别 useful GVF questions。Useful questions 必须通过它们与 hidden cue information 或 downstream control 的关系来评价。
+本报告刻意不声称：
 
-## Alberta Plan 关联
+- 测试的 GVFs 已经解决 T-maze control；
+- 某个 cumulant/discount pair 普遍最好；
+- TD error 是主要成功指标；
+- 在没有 downstream probes 的情况下，GVF predictive state 已经被验证。
 
-该 proposal 直接对应 GVFs、predictive knowledge、agent-state construction、question discovery/evaluation 和 useful prediction。它是独立 study，因为 question design 是任何 GVF-based state proposal 的前置条件。
+## Research Motivation/Question/Method / 研究动机/问题/方法
 
-## 环境与方法
+Alberta Plan 把 GVFs 看作通向丰富 predictive knowledge 的路径。这个路线不仅需要学习答案，也需要选择问题。如果 agent 学会成千上万个准确但无关的 predictions，得到的 state 可能更大、更慢，却对 decision-making 没有帮助。
 
-环境是 T-maze stream，包含 left cue、right cue、junction 和 bias 等信号。Hidden control-relevant variable 是决定 junction action 的 cue。方法是在不同 cumulant identity 和 discount horizon 下训练 linear TD predictors，记录 prediction errors、value profiles 和 weight norms，然后从 usefulness 的角度解释它们。
+T-maze 让这个问题具体化。这个任务可以通过 trace-like cue memory 解决，但 recurrent GVF design 如果没有提出能保留相关信息的问题，仍然可能失败。这不应只被解释为 algorithmic bug，也可能是 question-design failure：学到的 predictions 没有在 junction 保留 control-relevant hidden cue。
 
-## 实验设计
+### Focused RL Question / 聚焦 RL 问题
 
-当前 main diagnostic 使用 cumulants `left_cue/right_cue/junction/bias`，discounts `0/0.5/0.9/0.98`，seeds `0-4`，steps `5000`。结果路径为 `experiments/alberta_core_rl/results/gvf_question_design/20260708T160958Z_main`。主要指标包括 absolute TD error、prediction value 和 weight norm。
+主问题：
+
+> 哪些 GVF cumulant 和 discount questions 只是 learnable，哪些才是 partially observable T-maze 中 useful predictive state 的合理候选？
+
+子问题：
+
+- 哪些 GVFs 有低 TD error？
+- 哪些 GVFs 在 junction 保留 hidden cue 信息？
+- 哪些 GVF feature sets 会改善、不影响或损害 downstream junction action？
+
+假设：
+
+> Prediction error alone 不能识别 useful GVF questions。Useful question 必须通过它与 hidden state information 或 downstream control 的关系来评价。
+
+### Core RL Connection / 与 Core RL 的关联
+
+这是 core RL proposal，因为它研究 partial observability 下的 prediction questions 和 state construction。它连接：
+
+- GVFs 和 predictive knowledge；
+- online agent-state construction；
+- question discovery and evaluation；
+- useful prediction 而不是 raw prediction accuracy；
+- control-scale experiments 之前的小型可解释诊断。
+
+该 proposal 是独立的，因为它回答一个 standalone design question：GVF-based state learner 应该预测什么？
+
+### Related Work / 相关工作
+
+Horde 和 GVF work 说明为什么要从 stream 中学习许多 predictions。Useful-prediction work 询问哪些 predictions 会改善 learning 或 behavior。Online agent-state work 则把 predictions 作为 partial observability 下的 state features。
+
+本地参考：
+
+- `resources/alberta_plan_related/finding_useful_predictions_2111.11212.pdf`
+- `resources/alberta_plan_related/horde_lifelong_offpolicy_1206.6262.pdf`
+- `resources/alberta_plan_related/learning_agent_state_online_2112.15236.pdf`
+
+### Method / 环境与方法
+
+环境是 T-maze stream，包含可观察 signals：
+
+- left cue；
+- right cue；
+- junction；
+- bias。
+
+Hidden control-relevant variable 是早先出现、并应决定 junction action 的 cue。这使得该任务适合区分 easy prediction 和 useful memory。
+
+方法是在每个 cumulant 和 discount combination 下训练 linear TD predictors。变化的设计因素是：
+
+- cumulant identity；
+- discount horizon。
+
+当前 cumulants：
+
+- `left_cue`；
+- `right_cue`；
+- `junction`；
+- `bias`。
+
+当前 discounts：
+
+- `0`；
+- `0.5`；
+- `0.9`；
+- `0.98`。
+
+当前 learner 记录 prediction behavior。下一版必须加入 explicit usefulness tests。
+
+## Experimental Design / 实验设计
+
+当前 main diagnostic：
+
+- Seeds：`0-4`。
+- Steps：`5000`。
+- Result path：`experiments/alberta_core_rl/results/gvf_question_design/20260708T160958Z_main`。
+
+当前测量：
+
+- absolute TD error；
+- prediction value；
+- weight norm。
+
+主图：
 
 ![GVF TD error by cumulant and discount.](../../../../experiments/alberta_core_rl/results/gvf_question_design/20260708T160958Z_main/figures/abs_td_error_by_cumulant-gamma_curve.png)
 
-## 结果
+设计逻辑：
 
-Bias GVFs 非常容易学习，误差很低，但它们不携带 hidden cue，因此不是有用 state。Cue GVFs 有更非平凡的 error 和 discount-dependent predictions，可能更接近 state-construction 需求。Junction predictions 可预测，但它们本身不能直接解决 cue memory。结果支持一个重要区分：easy prediction 与 useful prediction 是不同类别。
+| 设计元素 | 为什么需要 |
+|---|---|
+| Multiple cumulants | 区分 trivial signals、cue-related signals 和 decision-location signals。 |
+| Multiple discounts | 测试 horizon choice 是否改变保留的信息。 |
+| T-maze stream | 提供有已知 hidden cue 的简单 partial-observability problem。 |
+| TD error | 测量 learnability，但不测量 usefulness。 |
+| Planned cue probe | 测量 prediction 是否帮助恢复 hidden variable。 |
+| Planned control ablation | 测量 prediction 是否影响 decision quality。 |
 
-## 分析
+## Results / 结果
 
-这个 diagnostic 解释了为什么当前 GVF predictive-state design 失败。如果因为某个 GVF 容易学或稳定就把它加入 state，可能得到对 control 无用的 feature。对 T-maze control 来说，正确诊断不是只看 TD error，而是看 prediction 是否帮助在 junction 解码 cue。
+当前 run 显示三个定性类别：
 
-下一版应为每个 cumulant/discount group 增加 explicit cue-decodability metric 和 downstream junction-action ablation。只有同时在 prediction 和 control-usefulness 两边通过的 GVF question，才值得进入 predictive-state proposal。
+- Bias GVFs trivial 且 accurate，但对 cue memory 无用。
+- Cue GVFs 有更非平凡的 errors 和 discount-dependent value profiles，因此是 state features 的可能候选。
+- Junction predictions 是 learnable 的，但它们本身不能解决 memory problem，因为 junction signal 到达的是 decision point，而不是保留 earlier cue。
 
-## 有效性威胁
+结果支持核心诊断结论：learnability 和 usefulness 是不同性质。
 
-当前 study 主要推断 usefulness，还没有把每个 GVF feature set 直接放进 control 中测试。它也缺少 hidden cue 的 linear probe。Cumulant set 较小且由人工设计。结果只能作为诊断，不能当作最终 GVF state-construction claim。
+当前 result summary 也以数字形式体现了这种模式。Gamma 为 `0`、`0.5` 和 `0.9` 的 bias predictions 有接近零的 tail absolute TD error，而 long-horizon bias GVF 在 gamma `0.98` 时 tail absolute TD error 约为 `0.1002`。Cue GVFs 在测试的 discounts 上 tail absolute TD error 约为 `0.0960-0.1666`，junction GVFs 约为 `0.1706-0.2563`。这些数字适合审计 learnability，但不能回答 predictions 是否在 decision point 保留 hidden cue。
 
-## 审稿式批评与回应
+## Analysis / 分析
 
-Useful-prediction reviewer 会说：accuracy 和 usefulness 必须分开。回应是：报告明确把 bias GVFs 标为 easy but not useful。
+早先 GVF predictive-state design 的可能失败机制不只是 high prediction error。至少有几类可能：
 
-Strict reviewer 会说：question-design study 需要 downstream usefulness metric。回应是：下一步明确要求 cue-decodability 和 downstream control ablations。
+- Trivial-prediction failure：bias 或局部 signal 被准确预测，但不携带 hidden cue information。
+- Horizon mismatch：discount 让 prediction 过于 myopic 或过于 diffuse，无法把 cue 保留到 junction。
+- Location mismatch：junction prediction 标记了 decision point，但不识别正确 action。
+- Representation bottleneck：GVF answer 被学到，但没有以 controller 可用的方式编码。
+- Objective mismatch：最小化 TD error 可能奖励 predictability，而不是 decision relevance。
 
-## 结论
+这些机制解释了为什么“低 TD error”不应被当作成功。Useful-prediction proposal 必须问“useful for what?”，并用 measured probe 回答。
 
-GVF Question Design 是有价值的独立诊断。它提醒我们，在把 predictions 当作 state 前必须问“这个 prediction 用来做什么”。该 study 应直接反馈到 redesigned GVF Predictive State proposal 中，并用 usefulness metrics 选择 GVF questions。
+## Next Experiments / 下一步实验
+
+下一步实验应把 usefulness 操作化：
+
+1. Cue-decodability probe：从 GVF outputs 到 junction 处 hidden cue 训练一个小 linear probe。
+2. Downstream control ablation：比较 raw observations only、observations plus each GVF group，以及 observations plus trace-memory baseline 的 controllers。
+3. Question-set ablation：测试 cue-only、junction-only、bias-only 和 mixed GVF feature sets。
+4. Horizon audit：测量 discount 如何改变 decision point 的 cue preservation，而不只看 TD error。
+5. Negative controls：shuffle cue labels 或使用 bias-only features，确认 probe 不会意外报告 usefulness。
+
+在至少一个 usefulness metric 实现前，本 proposal 应保持为 design diagnostic。
+
+## 局限与有效性威胁
+
+- 当前 usefulness 是推断的，还没有直接测量。
+- 还没有 hidden-cue linear probe。
+- 还没有 downstream control ablation。
+- Cumulant set 小且由人工设计。
+- 因为 usefulness metrics 仍是 planned，当前图可能过度强调 TD error。
+
+## Reviewer Critique / 审稿批评
+
+| 审查角度 | 可能批评 | 报告回应 | 必要下一步 |
+|---|---|---|---|
+| Useful prediction | Accuracy 与 usefulness 被混淆。 | 报告明确写出 prediction error != usefulness。 | 加入 cue-decodability 和 control-usefulness metrics。 |
+| GVF reviewer | Question set 是人工设计且很小。 | Study 被定位为 diagnostic，不是 automatic question discovery。 | 加入 ablations 和 principled question-selection table。 |
+| Control reviewer | 还没有 downstream decision test。 | 证据等级只是 redesign guidance。 | 为每个 GVF feature set 运行 junction-action ablations。 |
+| Strict instructor | 没有 state utility 就不要推销 GVF state。 | Claim 限定在 question-design diagnosis。 | 除非 usefulness probes 通过，否则 final conclusion 保持 diagnostic。 |
 
 ## Proposal Template Answers / 提案模板回答
 
-Focused RL question：哪些 GVF questions 更可能成为 useful state，而不只是 easy predictions？setting 是 controlled GVF question-design diagnostic；比较不同 cumulants/discounts，并检查 prediction behavior。必要指标是 prediction error 加 downstream usefulness probes，例如 cue decodability 和 control ablation。compute 中等偏小；fallback 是作为 GVF Predictive State 的 redesign guide。
+Focused RL question：哪些 GVF questions 更可能成为 useful state，而不只是 easy predictions？
 
-## 独立研究范围
+Setting/testbed：一个 controlled T-maze prediction stream，包含 cue、junction 和 bias signals。
 
-本报告是 GVF design diagnostic。它不应被写成 GVF state 已经帮助 control 的证据，因为当前证据主要是 prediction behavior。它的角色是筛选哪些 GVF questions 值得进入 downstream control evaluation。
+Implemented comparison：在不同 cumulant 和 discount choices 下训练 linear GVF predictors。
 
-## 证据等级
+Observation/metric：当前指标是 TD error、prediction value 和 weight norm；必要下一步指标是 cue decodability 和 downstream control ablation。
 
-证据等级：supporting redesign tool。报告有价值，因为它区分 easy-to-predict cumulants 和 potentially useful cumulants。但在加入 cue-decodability 或 control-ablation metrics 之前，它不是正向 useful-state evidence。
+Compute need：小型 CPU-only runs。
 
-## 实验设计依据
+Fallback：如果 downstream usefulness tests 来不及完成，就把本研究保持为 question-design diagnostic。
 
-prediction error 单独不够，因为容易预测的信号可能与控制无关。下一步应把每个 cumulant/discount 与 hidden-cue probe 和 downstream-control ablation 配对。这样实验回答的是“对什么有用”，而不仅是“学得多好”。
+## Conclusion / 结论
 
-## 审查矩阵
+本 proposal 是关于 GVF question design 的独立 mini-study。当前结果有价值，因为它避免一个常见错误：在没有测量 predictions 对 control 保留了什么信息时，就把准确 predictions 当作 useful state。本研究应保持为 redesign target，直到加入 cue decodability 和 downstream action ablations；只有那时才能声称某个 GVF question set 改善了 state construction，而不只是产生了 learnable predictions。
 
-| 审查角度 | 批评 | 已处理 | 剩余风险 |
-|---|---|---|---|
-| GVF | easy prediction 不等于 useful prediction。 | 报告定位为 design diagnostic。 | 需要 cue decodability。 |
-| Control | 还没有 downstream ablation。 | 证据等级为 supporting/redesign。 | 不能声称 useful state。 |
-| 严格老师 | 不要把 TD error 当主要成功指标。 | 下一步指标包括 control relevance。 | 当前图仍可能过度强调 prediction error。 |
-
-## 复现
+## Reproduction / 复现
 
 ```bash
 cd /mnt/shared-storage-user/yupeng/Core-RL
 
-PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/gvf_question_design/config_main.json
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
+  --config experiments/alberta_core_rl/configs/gvf_question_design/config_main.json
 ```

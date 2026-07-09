@@ -1,89 +1,100 @@
-# Streaming Representation With Auxiliary Prediction 中文报告
+# Streaming Representation With Auxiliary Prediction
 
-状态：独立负结果诊断；除非重新设计 auxiliary question，否则不作为最终 proposal。
+状态：独立的 negative auxiliary-prediction diagnostic。当前 target 需要围绕 task-relevant predictions 重设计后，才能提出正向 representation claim。
 
 ## 摘要
 
-本 proposal 问一个小型 auxiliary next-feature prediction objective 是否能在无 replay、无 deep network 的 streaming setting 中改善 value prediction。当前 nonstationary sensor-stream experiment 没有发现实质改善：auxiliary prediction 与 value-only learning 的 late value-prediction error 几乎相同。这个负结果有用，因为它警告一个常见捷径：加一个 auxiliary loss 不等于学到 useful representation。Auxiliary question 必须与 downstream value problem 绑定。
+这篇 mini-report 在一个小型 streaming RL setting 中检验一个常见 representation-learning 直觉：加入 auxiliary prediction objective 可能改善 online value prediction 所用的 representation。实验在 nonstationary sensor stream 中比较 value-only normalized TD 与同时预测 next features 的 value learner，并且不使用 replay。结果是负面的：auxiliary next-feature target 没有实质降低主 value-prediction error。
 
-## 研究动机
+这个结果有用，因为它说明 auxiliary loss 不会自动成为 useful prediction。Auxiliary target 必须与 agent 要回答的 value 或 control question 相关。因此，这个 proposal 应被读作独立 negative diagnostic 和 redesign target，而不是反对 auxiliary learning 或 GVFs 的一般证据。
 
-很多 streaming RL 和 representation learning 工作使用 auxiliary prediction 来改善 single-pass data 下的表示学习。在本课程约束下，我们不能使用 deep encoders 或 replay，但可以在线性 setting 中检验底层想法：一个 auxiliary next-feature target 是否真的为 nonstationary stream 中的 value prediction 提供有用信息？
+## 1. Proposal Template Answers / 提案模板回答
 
-当前设计的答案基本是否定的。这并不否定 auxiliary learning 一般有用，而是说明 auxiliary target 的选择必须严肃设计。
+Focused RL question：在没有 replay 或 deep networks 的 streaming linear setting 中，auxiliary next-feature prediction objective 是否能改善 online value prediction？
 
-## 研究问题
+Setting/testbed：一个包含 feature-relevance switch 的 nonstationary sensor stream。Learner 在线观察 features，不能回放过去 transitions。
 
-主问题：一个小型 auxiliary next-feature prediction 能否在不使用 replay 或 deep networks 的情况下改善 streaming value prediction？
+Implemented comparison：Value-only normalized TD 与带 auxiliary next-feature prediction head 的 normalized TD。
 
-假设是：如果 auxiliary target 捕获了对 value prediction 有用的结构，那么 auxiliary learner 应降低 value TD error 或改善 feature-relevance switch 后的 recovery。当前结果不支持该假设。
+Observation or metric：Absolute TD error 是主要 downstream value metric。Auxiliary MSE、TD error、weight norm 和 phase-specific summaries 作为辅助诊断。
 
-## Alberta Plan 关联
+Expected behavior：如果 next-feature prediction 捕获 value-relevant structure，auxiliary learner 应降低 value-prediction error，或改善 feature-relevance switch 后的 recovery。
 
-该 proposal 与 representation learning 和 ordinary streaming experience 有一定关系，但弱于 GVF 和 generate-and-test proposals，因为 auxiliary target 没有明确绑定 control-relevant question。它适合保留为 negative diagnostic，提醒后续 predictive representation 研究必须定义 usefulness。
+Compute need：小型 CPU-only run，五个 seeds，5000 online steps。
 
-## 环境与方法
+Fallback：把当前结果视为 negative diagnostic。更强项目应比较 task-relevant、task-irrelevant 和 shuffled auxiliary predictions，或转向小型 control task。
 
-环境是 nonstationary sensor stream，包含 feature-relevance switch。Learner 在线更新，不能回放过去 transitions。比较方法包括 value-only normalized TD 和带 auxiliary next-feature prediction 的 value TD。Auxiliary target 是小型线性 target，符合 Core RL 约束，但 representation capacity 有限。
+## 2. Research Motivation / Question / Method / 研究动机、问题与方法
 
-## 实验设计
+Streaming RL 需要能从 ordinary experience 中在线学习的 representations。Auxiliary prediction 很有吸引力，因为它能在不使用 replay、大模型或 offline pretraining 的情况下增加 learning signal。原则上，预测未来某些方面可能让当前 representation 对 value learning 更有用。
 
-当前 main diagnostic 使用 seeds `0-4`、steps `5000`，结果路径是 `experiments/alberta_core_rl/results/streaming_representation/20260708T160958Z_main`。主要指标包括 absolute TD error、auxiliary MSE、weight norm 和 phase。
+研究问题是：简单的 auxiliary next-feature target 是否能在这个 setting 中改善 online value prediction。原本假设是正向但有条件的：next-feature prediction 只有在捕获 value question 所需结构时才应有帮助。
+
+方法比较同一 stream 下的两个 online learners。Value-only learner 运行 normalized TD。Auxiliary learner 增加 next-feature prediction loss。Auxiliary target 是局部且方便定义的，但它不是从 reward、hidden state、control consequences 或 GVF-style cumulant 推导出来的。这个区别是 diagnostic 的核心。
+
+## 3. Experimental Design / 实验设计
+
+Main run：
+
+- Seeds：`0-4`。
+- Steps：`5000`。
+- Config 中的 environment label：`nonstationary_sensor_auxiliary_prediction`。
+- Result path：`experiments/alberta_core_rl/results/streaming_representation/20260708T160958Z_main`。
+- Primary metrics：`abs_td_error`、`aux_mse` 和 `weight_norm`。
+
+主图：
 
 ![Auxiliary representation diagnostic absolute TD error.](../../../../experiments/alberta_core_rl/results/streaming_representation/20260708T160958Z_main/figures/abs_td_error_by_algorithm-phase_curve.png)
 
-## 结果
+Primary outcome 是 downstream value-prediction error。Auxiliary MSE 是 secondary，因为低 auxiliary prediction error 本身不能证明 learned signal 对 value task 有用。
 
-Auxiliary prediction objective 没有实质改善 value prediction。Phase-1 absolute TD error 对 auxiliary method 约 `0.5298`，对 value-only method 约 `0.5301`。差异太小，不能支持正向结论。
+## 4. Results / 结果
 
-## 分析
+Auxiliary prediction objective 没有实质改善 value prediction。Phase 1 中，auxiliary method 的 seed-tail mean absolute TD error 约为 `0.5298`，value-only learning 约为 `0.5301`。Phase 0 中，对应数值约为 auxiliary method `0.4885`，value-only learning `0.4877`。
 
-结果表明 auxiliary target 与 value task 不够对齐。Next-feature prediction 可以容易学习，也可以优化自己的 auxiliary error，但这并不意味着它改善 value learner 的 state。这与 GVF Question Design 的结论一致：useful representation 需要 useful questions，而不是“能预测什么就预测什么”。
+Auxiliary learner 确实把辅助目标学到了稳定水平：seed-tail mean auxiliary MSE 在 phase 0 约为 `0.0480`，在 phase 1 约为 `0.0413`。但这没有转化为 downstream value-error improvement。Phase 1 的 weight norms 也几乎相同，两个 learners 都约为 `3.34`。
 
-如果要升级这个 proposal，应把 next-feature prediction 换成 task-relevant GVF cumulants，或者加入 control ablation，直接检查 learned auxiliary features 是否改善 downstream behavior。
+因此结果是负面的，但有信息量。正确结论不是 auxiliary learning 一般失败，而是更窄地说：当前 next-feature target 对该 streaming diagnostic 中的 downstream value task 不够有用。
 
-## 有效性威胁
+## 5. Analysis / 分析
 
-Auxiliary representation 很小，可能太弱。Auxiliary target 没有显式绑定 reward、hidden state 或 control。实验不测试 deep representation learning，因为这超出课程范围。结果不能作为 auxiliary learning 的一般负面结论。
+最可能的失败机制是 target mismatch。Next-feature prediction 可能优化的是与 reward 无关、与 hidden feature switch 无关，或已经存在于当前 feature vector 中的信息。在这种情况下，auxiliary loss 消耗 learning capacity，却没有把 representation 推向 value-relevant structure。
 
-## 审稿式批评与回应
+从 Alberta Plan 视角看，这更像一个 cautionary example。Useful predictions 应是 useful questions：它们应揭示 state、reward-relevant structure、controllable consequences，或帮助 agent 行动和学习的 temporally extended knowledge。Generic next-feature target 不保证这些性质。
 
-Representation reviewer 会说：除非 auxiliary target 与 downstream usefulness 绑定，否则 proposal 太模糊。回应是：报告将其降级为 negative diagnostic，并建议与 GVF Question Design 合并。
+下一版应先重设计 auxiliary question，而不是先扩大实验。合理后续包括：与 reward、termination、hidden phase 或 controllable events 绑定的 GVF-style cumulants；learned auxiliary features 的 ablation 或 freeze tests；task-relevant 与 task-irrelevant auxiliary targets 比较；以及用 policy quality 或 average reward 判断 usefulness 的小型 control task。
 
-Upgrade path 是把 next-feature prediction 替换为 task-relevant GVF cumulants，并在 control 中 ablate learned features。
+## 6. 局限与有效性威胁
 
-## 结论
+- Auxiliary architecture 被刻意做得很小，可能过弱。
+- Auxiliary target 没有绑定 reward、hidden state 或 control。
+- 五个 seeds 足以做 diagnostic，但不足以支持广泛 representation-learning claim。
+- 实验不测试 deep representation learning，因为这超出当前课程范围。
+- Absolute TD error 可能遗漏只在 control 或 feature freezing 后才出现的 representational effects。
 
-Streaming Representation With Auxiliary Prediction 是有用的负结果诊断。它说明 auxiliary prediction 本身不是研究贡献，除非 auxiliary question 与 downstream value/control 明确相关。该 proposal 应被重新设计，或概念上并入 GVF Question Design。
+## 7. Reviewer Critique / 审稿批评
 
-## Proposal Template Answers / 提案模板回答
+| Reviewer critique | 当前回应 | 必要下一步 |
+|---|---|---|
+| Auxiliary target 很任意。 | 报告把这点作为核心 negative finding。 | 围绕 downstream usefulness 重设计 auxiliary question。 |
+| 低 auxiliary MSE 不代表 useful representation。 | Primary metric 是 downstream absolute TD error，而不是 auxiliary loss。 | 加入 ablations，说明 auxiliary features 是否帮助 value prediction。 |
+| 结果可能是 architecture-specific。 | Claim 限定在这个小型 linear streaming diagnostic。 | 在增加模型复杂度前，先比较 target relevance。 |
+| 不能把它引用为反对 GVFs 的一般证据。 | 结论明确避免这个 claim。 | 测试与 reward、phase 或 controllable events 绑定的 GVF-style cumulants。 |
 
-Focused RL question：auxiliary next-feature prediction target 是否能改善 streaming linear setting 中的 online value prediction？setting 是带 auxiliary head 的 streaming prediction task；比较 value-only 和 value-plus-auxiliary learning。指标是 value error、auxiliary error 和 phase/switch recovery。compute 小；fallback 是 useful-auxiliary-question design 的 negative diagnostic。
+## 8. Conclusion / 结论
 
-## 独立研究范围
+这个 proposal 是 streaming representation learning 的独立 negative diagnostic。当前 auxiliary next-feature target 可被学习，但没有改善 downstream value metric。有用 lesson 是方法论上的：auxiliary predictions 应被选为 task-relevant questions，而不是仅因为容易定义就加入。
 
-本 proposal 只研究一个 auxiliary target，不研究 representation learning 的全部。它不能作为反对 auxiliary learning 或 GVFs 的广泛证据。它的角色是说明 auxiliary target 必须 task-relevant 才能改善 main prediction/control objective。
+## 9. Reproduction / 复现
 
-## 证据等级
-
-证据等级：negative diagnostic / redesign target。当前 auxiliary prediction 没有显著改善 value error。这有价值，因为它防止“多一个 prediction 就能改善 representation”的浅结论。
-
-## 实验设计依据
-
-实验应按 downstream value error 判断，而不是只看 auxiliary MSE。未来版本需要 task-relevant cumulants、learned-feature ablations 和 downstream control metrics。没有这些时，正确结论是当前 auxiliary question 不够有用。
-
-## 审查矩阵
-
-| 审查角度 | 批评 | 已处理 | 剩余风险 |
-|---|---|---|---|
-| Representation | auxiliary accuracy 不代表 usefulness。 | 证据等级为 negative diagnostic。 | 需要 task-relevant GVF targets。 |
-| Metrics | auxiliary MSE 不是主结果。 | 强调 value error。 | 仍缺 control metric。 |
-| 严格老师 | 不要称为 representation learning success。 | 报告定位为 redesign target。 | 若扩展，应并入 GVF useful-question 线。 |
-
-## 复现
+从仓库根目录运行：
 
 ```bash
 cd /mnt/shared-storage-user/yupeng/Core-RL
 
-PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/streaming_representation/config_main.json
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
+  --config experiments/alberta_core_rl/configs/streaming_representation/config_main.json
 ```
+
+预期 result directory：`experiments/alberta_core_rl/results/streaming_representation/20260708T160958Z_main`。

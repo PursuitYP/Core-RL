@@ -20,7 +20,7 @@ def plot_output_td(result_dir: Path, figure_dir: Path | None = None) -> list[Pat
     rows = _load_condition_summary(result_dir)
     fig_dir = figure_dir or result_dir / "figures"
     fig_dir.mkdir(parents=True, exist_ok=True)
-    algorithms = ["fixed", "normalized", "trace_normalized", "true_online"]
+    algorithms = ["fixed", "normalized", "trace_normalized", "true_online", "true_online_normalized"]
     scales = ["one", "ten", "hundred", "uneven", "lognormal"]
     scales = [scale for scale in scales if any(_condition(row, "scale") == scale for row in rows)]
     alphas = _sorted_unique([_condition(row, "alpha") for row in rows])
@@ -99,7 +99,9 @@ def plot_reward_centered(result_dir: Path) -> list[Path]:
     ]
     outputs: list[Path] = []
     for metric, ylabel, log_y in metrics:
-        fig, axes_arr = plt.subplots(1, len(alphas), figsize=(4.5 * len(alphas), 3.8), sharey=not log_y)
+        ncols = min(2, len(alphas))
+        nrows = math.ceil(len(alphas) / ncols)
+        fig, axes_arr = plt.subplots(nrows, ncols, figsize=(4.8 * ncols, 3.7 * nrows), sharey=not log_y)
         axes = list(axes_arr.flat) if hasattr(axes_arr, "flat") else [axes_arr]
         for ax, alpha in zip(axes, alphas):
             for alg in algorithms:
@@ -130,6 +132,8 @@ def plot_reward_centered(result_dir: Path) -> list[Path]:
             ax.grid(True, alpha=0.25)
             if log_y:
                 ax.set_yscale("symlog", linthresh=1.0)
+        for ax in axes[len(alphas) :]:
+            ax.axis("off")
         axes[0].set_ylabel(ylabel)
         handles, labels = axes[0].get_legend_handles_labels()
         fig.legend(handles, labels, loc="lower center", ncol=3, fontsize=8, frameon=False)
@@ -138,6 +142,64 @@ def plot_reward_centered(result_dir: Path) -> list[Path]:
         fig.savefig(out, dpi=180)
         plt.close(fig)
         outputs.append(out)
+    return outputs
+
+
+def plot_reward_centered_sensitivity(result_dir: Path) -> list[Path]:
+    all_rows = _load_condition_summary(result_dir)
+    rows = [
+        row
+        for row in all_rows
+        if _condition(row, "recovery_window") == "post_late" and int(float(_condition(row, "phase"))) == 1
+    ]
+    if not rows:
+        rows = [row for row in all_rows if int(float(_condition(row, "phase"))) == 1]
+    fig_dir = result_dir / "figures"
+    fig_dir.mkdir(parents=True, exist_ok=True)
+    alphas = [float(alpha) for alpha in _sorted_unique([_condition(row, "alpha") for row in rows])]
+    target_alpha = min(alphas, key=lambda value: abs(value - 0.05)) if alphas else math.nan
+    rows = [row for row in rows if math.isclose(float(_condition(row, "alpha")), target_alpha)]
+    algorithms = ["discounted_sarsa", "reward_centered_sarsa", "differential_sarsa"]
+    betas = _sorted_unique([_condition(row, "beta") for row in rows])
+    gammas = _sorted_unique([_condition(row, "gamma") for row in rows])
+    switch_types = _sorted_unique([_condition(row, "switch_type") for row in rows])
+    row_keys = [(algorithm, beta) for algorithm in algorithms for beta in betas]
+    columns = [(switch_type, gamma) for switch_type in switch_types for gamma in gammas]
+    col_labels = [f"{str(switch_type).replace('_', ' ')}\ng={float(gamma):g}" for switch_type, gamma in columns]
+    outputs: list[Path] = []
+    for metric, title, cmap, log10, name, reducer in [
+        ("avg_unshifted_reward", f"Post-late reward sensitivity at alpha={target_alpha:g}", "viridis", False, "report_reward_sensitivity_reward.png", "mean"),
+        ("reward_bar_abs_error_ema", f"Reward-rate tracking error at alpha={target_alpha:g}", "magma", True, "report_reward_sensitivity_bar_error.png", "mean"),
+        ("q_norm", f"Post-late Q norm sensitivity at alpha={target_alpha:g}", "magma", True, "report_reward_sensitivity_q_norm.png", "mean"),
+        ("diverged", f"Divergence sensitivity at alpha={target_alpha:g}", "Reds", False, "report_reward_sensitivity_divergence.png", "max"),
+    ]:
+        matrix: list[list[float]] = []
+        for algorithm, beta in row_keys:
+            values = []
+            for switch_type, gamma in columns:
+                matches = [
+                    row
+                    for row in rows
+                    if _condition(row, "algorithm") == algorithm
+                    and math.isclose(float(_condition(row, "beta")), float(beta))
+                    and math.isclose(float(_condition(row, "gamma")), float(gamma))
+                    and _condition(row, "switch_type") == switch_type
+                ]
+                values.append(_mean_over(matches, metric, reducer=reducer))
+            matrix.append(values)
+        row_labels = [f"{_short_label(algorithm)} b={float(beta):g}" for algorithm, beta in row_keys]
+        outputs.append(
+            _save_heatmap(
+                matrix,
+                row_labels,
+                col_labels,
+                title,
+                fig_dir / name,
+                cmap=cmap,
+                log10=log10,
+                value_format=".2f",
+            )
+        )
     return outputs
 
 
@@ -248,4 +310,3 @@ def plot_unit_switching(result_dir: Path) -> list[Path]:
             )
         )
     return outputs
-

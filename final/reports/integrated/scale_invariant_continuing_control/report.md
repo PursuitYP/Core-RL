@@ -23,21 +23,27 @@ Compute need and fallback: The main pilot and unit-switching extension are compl
 
 ## Independent Research Scope
 
-This is a larger integrated proposal, but it remains an independent study. It is not a forced merger of Reward-Centered Sarsa and Output-Controlled TD; it asks a new question about whether two separately justified invariance mechanisms compose inside one continuing control learner. The reward-only and prediction-only reports are supporting evidence for the components. This report owns the combined control problem, the interaction between reward and feature units, and the no-reset unit-change failure mode.
+This is a larger independent study of unit sensitivity in continuing control. It asks whether a single online control learner can remain stable when two arbitrary measurement conventions change: reward origin and feature scale. The study contains its own environment, methods, metrics, fixed-condition experiment, and no-reset unit-switching experiment.
 
 The report does not claim that unit invariance is solved in general. Its current scope is linear access-control Sarsa under synthetic but controlled unit manipulations. The fixed-condition pilot supports compositional stability, while the no-reset extension shows that abrupt feature-unit changes still damage long-run reward even when catastrophic divergence is avoided.
 
 ## Evidence Level
 
-Evidence level: strong integrated-candidate evidence, but not final full-grid evidence. The completed fixed-condition pilot demonstrates the interaction between reward centering and update normalization. The completed 20-seed unit-switching run is stronger for continual-learning relevance because it changes units inside the same stream without resetting weights. The running `20260709T063128Z_extended` fixed-condition sweep has no artifacts yet and must not be cited as evidence.
+Evidence level: strong independent evidence, but not final full-grid evidence. The completed fixed-condition pilot demonstrates the interaction between reward centering and update normalization. The completed 20-seed unit-switching run is stronger for continual-learning relevance because it changes units inside the same stream without resetting weights. The running `20260709T063128Z_extended` fixed-condition sweep has no artifacts yet and must not be cited as evidence.
 
 The current claim should be deliberately narrow: combined centering/normalization is necessary for stable unit changes, and it prevents severe numerical instability under no-reset switches, but it does not fully solve recovery after abrupt feature-scale changes. A mature final paper would add the running extended grid, gradual scale drift, beta sensitivity, and policy-distance probes.
+
+## Paper-Style Contribution And Claim Boundaries
+
+The contribution is to turn two local invariance mechanisms into a single continuing-control question: can an agent remain stable when both reward and feature units are arbitrary? The fixed-condition experiment tests compositionality, while the no-reset switch experiment tests whether the same mechanisms survive a more continual interpretation. This gives the proposal a stronger narrative than simply combining two methods.
+
+The claim boundary is that the current evidence supports stability under tested unit changes, not solved invariance. Combined centering and normalization prevent the most severe numerical failures in this access-control setting, but abrupt feature-scale switches still reduce long-run reward. The open scientific problem is therefore recalibration and recovery after unit change, not just preventing divergence.
 
 ## Research Motivation
 
 The Alberta Plan treats intelligence as temporally uniform learning from ordinary experience. This makes unit sensitivity a central problem rather than a cosmetic one. A continual agent does not get a clean retuning phase whenever a sensor is rescaled or a reward baseline shifts. If reward origin and feature scale can change the effective learning problem, then the agent's competence depends on arbitrary conventions outside the task.
 
-The existing Reward-Centered Sarsa proposal gives evidence for reward-shift robustness in an access-control queue. The existing Output-Controlled TD proposal gives evidence for feature-scale robustness in tile-coded prediction. This integrated proposal tests whether the two invariances interact cleanly inside a single continuing control loop.
+The research motivation is therefore internal to the control problem: an access-control agent should learn accept/reject behavior from reward differences and state-action evidence, not from arbitrary choices about the zero of reward or the magnitude of one-hot features. The combined stress test is useful because reward translation and feature scaling can interact through TD-error magnitude, action-value scale, and effective step size.
 
 ## Research Question
 
@@ -110,7 +116,7 @@ Important failure modes:
 - Centering may stabilize values but hurt adaptation if the average-reward estimator lags.
 - Normalization may over-dampen sparse but important updates.
 - Differential Sarsa may be more invariant but more sensitive to step-size coupling.
-- Simultaneous reward and scale changes may reveal interaction effects hidden in separate experiments.
+- Simultaneous reward and scale changes may reveal interaction effects that are not visible when only one unit convention is perturbed.
 
 ## Interpretation Standard
 
@@ -118,7 +124,7 @@ A result is meaningful only if it shows invariance across equivalent description
 
 ## Results
 
-Existing Reward-Centered Sarsa results show stable Q norms around `20-22` across reward shifts, while ordinary discounted Sarsa grows from about `60` to about `345`. Existing Output-Controlled TD results show zero divergence for normalized variants across large feature-scale changes where fixed TD often diverges. These are separate experiments; the integrated proposal adds a combined continuing-control pilot:
+The first completed experiment for this report is a combined continuing-control pilot:
 
 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`
 
@@ -129,7 +135,7 @@ The combined run crosses reward shifts `-4, 0, 8` with feature scales `one, ten,
 - Normalized reward-centered Sarsa keeps tail unshifted reward near `2.41-2.51` across all tested shifts and scales with zero divergence.
 - Normalized differential Sarsa shows a similar robust pattern.
 
-This is stronger than a portfolio synthesis: each single mechanism fails outside its own invariance dimension, while the combined mechanisms compose in the current pilot.
+The important pattern is interaction-specific: each single mechanism fails outside its own invariance dimension, while the combined mechanisms compose in the current pilot.
 
 A stricter no-reset unit-switching experiment was then added:
 
@@ -153,6 +159,12 @@ Main figures below use seed-tail condition summaries with 95% confidence interva
 
 ![Tail output-change magnitude by algorithm, reward shift, and feature scale.](../../../../experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main/figures/report_prediction_change_by_scale.png)
 
+## Analysis
+
+The main insight is that reward-origin correction and feature-scale correction address different parts of the TD learning loop. Reward centering removes the constant component of the return that is irrelevant for average-reward control, but it does not prevent a large feature vector from producing an oversized parameter update. Output normalization controls the update direction's scale, but it does not remove the nuisance value offset created by shifted rewards. The fixed-condition pilot shows that the two mechanisms can compose: when both arbitrary units are stressed, the combined variants remain much more stable than either single correction.
+
+The no-reset unit-switching result is the more important continual-learning test because it removes the hidden retuning assumption of fixed-condition sweeps. A stable method must continue from its current weights after the measurement convention changes. The result is mixed in a useful way: combined variants avoid the catastrophic Q-norm blow-up of fixed discounted Sarsa, but abrupt `hundred`-scale feature switches still reduce late unshifted reward. The open problem is therefore not whether unit correction matters; it is how an online control learner should recalibrate after a large unit change without replay, reset, or a special calibration phase.
+
 ## Reviewer Critique And Revisions
 
 Strict reviewer challenge: "You are just combining two tricks." Response: the scientific object is not the trick but invariance under arbitrary problem units. The combined experiment is valuable if it reveals whether independently plausible normalizations compose or interfere.
@@ -164,7 +176,7 @@ Per-proposal audit matrix:
 | Reviewer angle | Critique | Action taken | Remaining risk |
 |---|---|---|---|
 | Alberta Plan | Unit invariance must matter for continual agents, not only for synthetic stress tests. | Adds a no-reset unit-switching stream and frames the problem as temporal-uniform learning under changing measurement conventions. | Natural sensor drift is not yet modeled. |
-| Core RL | The integrated proposal could be a loose combination of two tricks. | The report defines a single combined invariance question and tests interaction failures. | Needs the running full-grid extended sweep for stronger coverage. |
+| Core RL | The study could be mistaken for a loose combination of two tricks. | The report defines a single combined invariance question and tests interaction failures inside one control setting. | Needs the running full-grid extended sweep for stronger coverage. |
 | Stability | Avoiding divergence may not imply good control. | Reports unshifted reward, Q norm, output change, and divergence. | Policy-distance probes and recovery AUC remain missing. |
 | Statistics | Fixed-condition pilot is weaker than the unit-switch extension. | Separates pilot evidence from completed 20-seed unit-switch evidence. | The currently running extended fixed grid has no artifacts yet. |
 | Strict instructor | Do not claim unit invariance is solved. | Conclusion states that abrupt feature-scale recovery remains open. | Gradual drift and beta/gamma sensitivity are still needed. |
@@ -175,7 +187,7 @@ The current evidence is stronger than the first pilot but still not a finished e
 
 ## Conclusion
 
-This proposal remains a strong integrated Core-RL candidate because it has a clear invariance question, an interpretable continuing-control environment, and a nontrivial interaction: reward centering and output normalization solve different failure modes and compose in the fixed-condition pilot. The stricter unit-switching extension prevents the conclusion from becoming too strong. Combined variants prevent the catastrophic numerical instability seen in fixed discounted Sarsa, but abrupt no-reset feature-scale changes can still reduce long-run unshifted reward. The current claim is therefore: centering plus normalization is necessary for stable unit changes, but recovery after abrupt feature-unit changes is still an open Core RL problem. The next step is the full `scale_invariant_continuing_control/config_extended.json` grid plus gradual feature-scale drift, not a claim that unit invariance is solved.
+This proposal remains a strong independent Core-RL candidate because it has a clear invariance question, an interpretable continuing-control environment, and a nontrivial interaction: reward centering and output normalization solve different failure modes and compose in the fixed-condition pilot. The stricter unit-switching extension prevents the conclusion from becoming too strong. Combined variants prevent the catastrophic numerical instability seen in fixed discounted Sarsa, but abrupt no-reset feature-scale changes can still reduce long-run unshifted reward. The current claim is therefore: centering plus normalization is necessary for stable unit changes, but recovery after abrupt feature-unit changes is still an open Core RL problem. The next step is the full `scale_invariant_continuing_control/config_extended.json` grid plus gradual feature-scale drift, not a claim that unit invariance is solved.
 
 ## Reproduction
 

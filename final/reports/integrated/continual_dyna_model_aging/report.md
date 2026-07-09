@@ -7,7 +7,7 @@ Dyna-style planning is attractive for a continual agent because it reuses a lear
 
 ## Standalone Study Summary
 
-This study asks when a continual Dyna agent should trust its learned model after the world changes. The RL problem is a continuing gridworld whose layout changes midstream; the agent keeps acting and learning without reset. The implemented methods compare no planning, random keep-model planning, oracle model flushing, recency-weighted model aging, and recency/error-gated model aging. The extended experiment varies planning budgets `0, 1, 5, 20`, model-handling rules, and aging half-lives `250, 750, 1500, 4000`; the main metrics are average reward, stale-backup rate, model error, planning TD magnitude, and post-change recovery window. The current result shows that freshness-aware sampling sharply reduces stale backups. Reward improvement is real in some high-budget settings but depends on the half-life and budget, so the final claim should be about search-control freshness rather than universal reward superiority.
+This study asks when a continual Dyna agent should trust its learned model after the world changes. The RL problem is a continuing gridworld whose layout changes midstream; the agent keeps acting and learning without reset. The implemented methods compare no planning, random keep-model planning, oracle model flushing, recency-weighted model aging, and recency/error-gated model aging. The extended experiment varies planning budgets `0, 1, 5, 20`, model-handling rules, and aging half-lives `250, 750, 1500, 4000`; the main metrics are average reward, stale-backup rate, model error, planning TD magnitude, and post-change recovery window. The current result shows that freshness-aware sampling sharply reduces stale backups. Reward improvement is real in some high-budget settings but depends on the half-life and budget, so the final claim should be about search-control freshness rather than universal reward superiority. A second drift experiment with abrupt, gradual, and stochastic nonstationarity has been implemented, smoke-tested, and submitted as CPU task `core-rl-dyna-drift-extended-rerun-30016335`; its extended result is pending.
 
 ## Proposal Template Answers
 
@@ -19,25 +19,31 @@ Implemented comparison: The implemented comparison includes no planning, keep-mo
 
 Observation or figure that answers the question: The main evidence is the relationship among late reward, stale-backup rate, model error, planning budget, and half-life. A useful result can be a tradeoff curve rather than one winner: the question is how model freshness changes the value of computation.
 
-Compute need and fallback: The 20-seed extended grid is complete. If no additional environment is run, the honest fallback is to submit this as an abrupt-change model-freshness study and explicitly reserve gradual/stochastic drift for future work.
+Compute need and fallback: The 20-seed abrupt-change grid is complete. The gradual/stochastic drift extension is now implemented and running on CPU; until it finishes, the honest fallback is to submit this as an abrupt-change model-freshness study and explicitly reserve drift generalization as pending evidence.
 
 ## Independent Research Scope
 
-This integrated proposal is an independent planning study. It should not be collapsed into the Dyna Planning Budget proposal. The budget proposal asks how much planning helps or hurts around a change; this report asks how a continual agent should decide which parts of a learned model deserve planning after knowledge becomes stale. The core object is search control under model aging.
+This is an independent planning study about search control under model aging. It asks how a continual agent should decide which parts of a learned model deserve planning after knowledge becomes stale. The core object is not total planning budget alone, but the freshness and trustworthiness of the model entries selected for simulated backups.
 
 The report does not study replay buffers or offline model learning. The model is compact, updated online, and queried for planning backups. This distinction is central to the course constraints: old experience is not stored and replayed; instead, the agent maintains a learned model whose entries may become obsolete.
 
 ## Evidence Level
 
-Evidence level: strong integrated-candidate evidence for abrupt nonstationarity and model-freshness diagnostics. The completed result uses 20 seeds, four planning budgets, multiple model-handling rules, and four aging half-lives. It directly measures stale-backup rates and model error, so the evidence supports a mechanism claim rather than only a reward claim.
+Evidence level: strong evidence for abrupt nonstationarity and model-freshness diagnostics. The completed result uses 20 seeds, four planning budgets, multiple model-handling rules, and four aging half-lives. It directly measures stale-backup rates and model error, so the evidence supports a mechanism claim rather than only a reward claim.
 
-The evidence is not yet broad enough for a general nonstationary planning claim. The environment change is abrupt and deterministic, and stale entries are relatively easy to define. A fuller study should add gradual drift, repeated changes, and a stochastic transition environment. Until then, the conclusion should emphasize "freshness-aware search control reduces stale backups in an abrupt changing gridworld" rather than "model aging solves continual planning."
+The evidence is not yet broad enough for a general nonstationary planning claim. The environment change in the completed run is abrupt and deterministic, and stale entries are relatively easy to define. A fuller study should add gradual drift, repeated changes, and a stochastic transition environment. The first version of that drift extension is now implemented and queued as `continual_dyna_model_aging_drift`; until its extended artifacts are available, the conclusion should emphasize "freshness-aware search control reduces stale backups in an abrupt changing gridworld" rather than "model aging solves continual planning."
+
+## Paper-Style Contribution And Claim Boundaries
+
+The contribution is a planning-computation analysis rather than another Dyna reward curve. The report treats model freshness as a variable that controls which simulated backups receive scarce computation, and it measures stale-backup rate alongside reward and model error. This directly addresses the Alberta Plan problem of how a long-lived agent manages learned models under ordinary experience.
+
+The claim boundary is that the current result is strongest for abrupt, inspectable nonstationarity. It shows that recency and recency/error search control can reduce stale computation without an oracle change signal, but it does not prove that one half-life or aging rule is universally optimal. A paper-quality next step is to ask whether the same freshness tradeoff appears under gradual or stochastic drift.
 
 ## Research Motivation
 
 The Alberta Plan gives learned models and planning a central role in a long-lived agent. The hard version of planning is not stationary gridworld acceleration; it is deciding which learned predictions still deserve computation. A replay-buffer framing would store old experience and sample it later, but this project instead uses a compact learned model whose entries are updated online. That distinction matters: the question is not how to train from old data, but how a streaming agent should allocate background computation when its model may be wrong.
 
-The current Dyna Planning Budget study already shows a tradeoff: planning helps before a change, but keeping the old model produces high stale-backup rates afterward. The integrated proposal turns that diagnostic into a stronger research problem by testing model aging, recency weighting, and search-control rules.
+The central difficulty is that planning can be useful before a change and harmful after a change for the same reason: it amplifies whatever the model currently believes. The study therefore treats freshness as part of search control. A stale model entry is not just inaccurate data; it is a claim on scarce computation that may push value estimates in the wrong direction.
 
 ## Research Question
 
@@ -92,9 +98,17 @@ Primary environment:
 - Aging half-lives `250, 750, 1500, 4000` steps in the extended code path.
 - Seeds `0-19` for the current extended result.
 
-Secondary environment:
+Second-round drift extension:
 
-- Planned, not yet implemented: a small stochastic queue or random-walk model where transition probabilities drift gradually instead of changing abruptly. This prevents the result from depending only on a single blocked-maze event.
+- Runner: `continual_dyna_model_aging_drift`.
+- Smoke result: `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke`.
+- Extended CPU task: `core-rl-dyna-drift-extended-rerun-30016335`.
+- Drift modes: abrupt switch, gradual phase mixing, and stochastic phase changes.
+- Purpose: test whether model aging still helps when nonstationarity is not a single clean change point.
+
+The smoke figures below are validation artifacts only. They confirm that the drift runner and plotting path work; statistical interpretation must wait for the extended CPU result.
+
+![Smoke drift reward heatmap.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke/figures/report_drift_reward_heatmap.png)
 
 Metrics:
 
@@ -141,7 +155,15 @@ Main result:
 - At planning budget `5`, keep-model and oracle flush have strong late reward around `0.096-0.097`, while aggressive aging half-lives `250` and `750` reduce stale backups but also hurt late reward. This shows that freshness control is not automatically better; it must match the planning budget and environmental time scale.
 - At planning budget `1`, stale-backup reduction is visible but reward remains weak for all methods. There may not be enough planning computation for search-control improvements to translate into behavior.
 
-Main figures below use late post-change seed-tail condition summaries with 95% confidence intervals. For recency-based methods, the figure legend explicitly separates half-lives `250`, `750`, `1500`, and `4000`; this prevents the plot from hiding sensitivity to the aging time scale. This is more readable than the earlier many-series learning curves and focuses the plot on the research question: whether fresh model selection reduces stale planning after change.
+Main figures below use late post-change seed-tail condition summaries. The heatmaps are now the primary result view because they avoid the compressed legends that made the earlier many-series plots hard to read. Rows encode planning budget and model handling, columns encode aging half-life or non-aged controls, and color encodes the measured outcome. This layout makes the central tradeoff visible: freshness-aware planning strongly changes stale-backup rate, while reward depends jointly on budget and half-life.
+
+![Late average reward heatmap by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_dyna_aging_reward_heatmap.png)
+
+![Late stale-backup rate heatmap by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_dyna_aging_stale_heatmap.png)
+
+![Late model-error heatmap by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_dyna_aging_model_error_heatmap.png)
+
+The bar-summary figures remain useful secondary checks because they show seed uncertainty directly. They should be read after the heatmaps: the heatmaps identify which regimes matter, and the confidence-interval figures confirm whether the differences are robust across seeds.
 
 ![Late average reward by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_avg_reward_post_late_by_budget.png)
 
@@ -171,7 +193,7 @@ The current environment uses an abrupt gridworld layout change, which makes stal
 
 ## Conclusion
 
-This proposal turns Dyna from a generic "more planning helps" story into a sharper Core-RL question about when a continual agent should trust its learned model. The extended run supports the idea that model freshness is a first-class planning variable: recency and recency/error gating sharply reduce stale backups without oracle change detection. The reward story is more conditional than the pilot suggested; the best freshness setting depends on planning budget and half-life. The next step is a second nonstationary environment with gradual or stochastic drift.
+This proposal turns Dyna from a generic "more planning helps" story into a sharper Core-RL question about when a continual agent should trust its learned model. The extended run supports the idea that model freshness is a first-class planning variable: recency and recency/error gating sharply reduce stale backups without oracle change detection. The reward story is more conditional than the pilot suggested; the best freshness setting depends on planning budget and half-life. The drift extension is implemented and running; its result will determine how much of the abrupt-change conclusion survives gradual and stochastic nonstationarity.
 
 ## Reproduction
 

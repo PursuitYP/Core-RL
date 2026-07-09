@@ -113,3 +113,58 @@ def proposal_output_controlled_td(seeds: list[int], suite: str, steps: int) -> t
         "n_rows": len(rows),
     }
     return rows, summary
+
+
+def proposal_output_controlled_td_fairness(seeds: list[int], suite: str, steps: int) -> tuple[list[dict], dict]:
+    """Audit true-online TD against output-controlled variants over the same scale/alpha grid."""
+    scales = ["one", "ten"] if suite == "smoke" else ["one", "ten", "hundred", "uneven", "lognormal"]
+    methods = ["fixed", "normalized", "trace_normalized", "true_online", "true_online_normalized"]
+    alphas = [0.03, 0.1] if suite == "smoke" else [0.003, 0.01, 0.03, 0.1, 0.3]
+    representation = "tile"
+    if suite == "main" and steps >= 20000:
+        alphas = [0.001, 0.003, 0.01, 0.03, 0.1, 0.3]
+    rows: list[dict] = []
+    total = len(seeds) * len(scales) * len(methods) * len(alphas)
+    condition_index = 0
+    for seed in seeds:
+        for scale in scales:
+            for method in methods:
+                lam = 0.8 if "trace" in method or "true_online" in method else 0.0
+                for alpha in alphas:
+                    condition_index += 1
+                    start = time.perf_counter()
+                    print(
+                        "[output_controlled_td_fairness] "
+                        f"start {condition_index}/{total} seed={seed} scale={scale} "
+                        f"method={method} alpha={alpha} lambda={lam} steps={steps}",
+                        flush=True,
+                    )
+                    condition_rows = run_random_walk_td(
+                        seed,
+                        steps,
+                        scale,
+                        method,
+                        alpha=alpha,
+                        lam=lam,
+                        representation=representation,
+                    )
+                    for row in condition_rows:
+                        row["environment"] = "tile_random_walk_true_online_fairness"
+                        row["fairness_audit"] = 1.0
+                    rows.extend(condition_rows)
+                    elapsed = time.perf_counter() - start
+                    tail = condition_rows[-1] if condition_rows else {}
+                    print(
+                        "[output_controlled_td_fairness] "
+                        f"done {condition_index}/{total} seed={seed} scale={scale} "
+                        f"method={method} alpha={alpha} lambda={lam} "
+                        f"rows={len(condition_rows)} last_step={tail.get('step')} "
+                        f"rmse={tail.get('rmse')} diverged={tail.get('diverged')} "
+                        f"elapsed_sec={elapsed:.2f}",
+                        flush=True,
+                    )
+    return rows, {
+        "question": "Is true-online TD's apparent scale sensitivity an algorithmic issue or an unfair fixed-step-size comparison?",
+        "main_metric": "rmse",
+        "n_rows": len(rows),
+    }

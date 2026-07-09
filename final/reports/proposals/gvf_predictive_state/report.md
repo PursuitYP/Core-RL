@@ -21,19 +21,19 @@ Implemented comparison: The pilot compares raw observation, short history, trace
 
 Observation or figure that answers the question: The main evidence is trial-end accuracy, supported by position-level GVF/trace trajectories. A GVF feature must approach trace memory or at least improve over raw observation; lower GVF TD error alone would not count.
 
-Compute need and fallback: The current standalone result is a five-seed pilot. The fallback is to report it as a negative redesign target and use the integrated Predictive State Plasticity extended run for stronger evidence.
+Compute need and fallback: The current result is a five-seed pilot. The fallback is to report it as a negative redesign target and require stronger evidence from additional seeds, corridor lengths, and cue-decodability probes.
 
 ## Independent Research Scope
 
-This proposal is the smaller standalone precursor to the integrated Predictive State Plasticity study. It owns one narrow question: does the initial recurrent GVF design become useful state in a T-maze? It does not evaluate generate-and-test, TIDBD, feature replacement, or a full predictive-state program.
+This proposal owns one narrow question: does the current recurrent GVF design become useful state in a T-maze? It does not evaluate broader representation-learning machinery beyond this GVF-state mechanism.
 
 The scope is intentionally limited because the result is negative. It should not be used to claim that GVFs cannot construct state. It should be used to motivate better GVF question design, direct cue-decodability probes, and a stricter useful-prediction evaluation.
 
 ## Evidence Level
 
-Evidence level: negative pilot/redesign target. The result is convincing enough to show that the current recurrent-GVF pilot should not be submitted as a positive GVF-state result. It is not as strong as the integrated 20-seed Predictive State Plasticity run, which supersedes it for final evidence.
+Evidence level: negative pilot/redesign target. The result is convincing enough to show that the current recurrent-GVF pilot should not be submitted as a positive GVF-state result. It remains limited by five seeds and one maze length.
 
-The report should therefore cite this pilot as a failure mechanism: cheap trace memory solves the task; recurrent GVF does not. Any final claim about predictive state should rely on the extended integrated run or on new cue-decodability experiments.
+The central failure mechanism is clear: cheap trace memory solves the task, while the current recurrent GVF does not. Any stronger claim about predictive state should require larger runs and direct cue-decodability evidence.
 
 ## Research Motivation
 
@@ -65,7 +65,7 @@ It is highly aligned with the Alberta Plan, but the current result is negative a
 
 ## Related Work
 
-GVF and Horde work motivates learning many predictive questions from experience. Work on useful predictions asks which predictions actually help an agent. Online agent-state and generate-and-test work motivates recurrent trace-like state construction. Recent streaming partial-observability papers show that no-replay, batch-size-one memory remains an active problem, though those papers often use deep recurrent architectures outside this course project's constraints.
+GVF and Horde work motivates learning many predictive questions from experience. Work on useful predictions asks which predictions actually help an agent. Online agent-state work motivates recurrent trace-like state construction. Recent streaming partial-observability papers show that no-replay, batch-size-one memory remains an active problem, though those papers often use deep recurrent architectures outside this course project's constraints.
 
 Local references:
 
@@ -168,15 +168,15 @@ Revision required:
 
 - Add cue-decodability probes, hidden-cue correlation plots, and redesigned cumulants tied to future cue-relevant events.
 
-Per-proposal audit matrix:
+Reviewer audit matrix:
 
 | Reviewer angle | Critique | Action taken | Remaining risk |
 |---|---|---|---|
 | GVF | Prediction accuracy is not the same as useful state. | Reports trial accuracy and trace/oracle baselines. | Direct cue-decodability is still missing. |
 | Baseline | If trace memory solves the task, GVF must approach it. | Trace and oracle are included as strong baselines. | GVF remains near chance. |
-| Evidence | Five seeds and one maze length are limited. | Report is framed as a negative pilot. | Extended evidence belongs to Predictive State Plasticity. |
+| Evidence | Five seeds and one maze length are limited. | Report is framed as a negative pilot. | Needs more seeds, maze lengths, and direct cue probes. |
 | Alberta Plan | GVFs are important, so negative evidence must be precise. | Conclusion limits the claim to the current GVF design. | Better GVF questions may succeed. |
-| Strict instructor | Do not present this as a positive proposal. | Status and conclusion call it a redesign target. | Needs synchronization with integrated report if used in final materials. |
+| Strict instructor | Do not present this as a positive proposal. | Status and conclusion call it a redesign target. | Final materials must preserve the negative evidence level. |
 
 ## Conclusion
 
