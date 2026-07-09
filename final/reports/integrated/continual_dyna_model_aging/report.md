@@ -9,6 +9,30 @@ Dyna-style planning is attractive for a continual agent because it reuses a lear
 
 This study asks when a continual Dyna agent should trust its learned model after the world changes. The RL problem is a continuing gridworld whose layout changes midstream; the agent keeps acting and learning without reset. The implemented methods compare no planning, random keep-model planning, oracle model flushing, recency-weighted model aging, and recency/error-gated model aging. The extended experiment varies planning budgets `0, 1, 5, 20`, model-handling rules, and aging half-lives `250, 750, 1500, 4000`; the main metrics are average reward, stale-backup rate, model error, planning TD magnitude, and post-change recovery window. The current result shows that freshness-aware sampling sharply reduces stale backups. Reward improvement is real in some high-budget settings but depends on the half-life and budget, so the final claim should be about search-control freshness rather than universal reward superiority.
 
+## Proposal Template Answers
+
+Focused RL question: In a continual Dyna agent, when should learned model entries stop receiving planning computation after the environment changes? The proposal studies planning trust and search-control freshness, not simply whether "more planning" improves reward.
+
+Setting and testbed: The main testbed is a continuing gridworld with a midstream layout change and no agent reset. It is large enough for planning to matter and small enough to label stale model entries, which makes model-freshness diagnostics possible. A second stochastic or gradual-drift environment is planned to test whether the finding survives outside an abrupt maze change.
+
+Implemented comparison: The implemented comparison includes no planning, keep-model Dyna, oracle model flushing, recency aging, and recency/error gating across planning budgets and aging half-lives. The oracle flush condition is explicitly diagnostic; it is not a realistic algorithm.
+
+Observation or figure that answers the question: The main evidence is the relationship among late reward, stale-backup rate, model error, planning budget, and half-life. A useful result can be a tradeoff curve rather than one winner: the question is how model freshness changes the value of computation.
+
+Compute need and fallback: The 20-seed extended grid is complete. If no additional environment is run, the honest fallback is to submit this as an abrupt-change model-freshness study and explicitly reserve gradual/stochastic drift for future work.
+
+## Independent Research Scope
+
+This integrated proposal is an independent planning study. It should not be collapsed into the Dyna Planning Budget proposal. The budget proposal asks how much planning helps or hurts around a change; this report asks how a continual agent should decide which parts of a learned model deserve planning after knowledge becomes stale. The core object is search control under model aging.
+
+The report does not study replay buffers or offline model learning. The model is compact, updated online, and queried for planning backups. This distinction is central to the course constraints: old experience is not stored and replayed; instead, the agent maintains a learned model whose entries may become obsolete.
+
+## Evidence Level
+
+Evidence level: strong integrated-candidate evidence for abrupt nonstationarity and model-freshness diagnostics. The completed result uses 20 seeds, four planning budgets, multiple model-handling rules, and four aging half-lives. It directly measures stale-backup rates and model error, so the evidence supports a mechanism claim rather than only a reward claim.
+
+The evidence is not yet broad enough for a general nonstationary planning claim. The environment change is abrupt and deterministic, and stale entries are relatively easy to define. A fuller study should add gradual drift, repeated changes, and a stochastic transition environment. Until then, the conclusion should emphasize "freshness-aware search control reduces stale backups in an abrupt changing gridworld" rather than "model aging solves continual planning."
+
 ## Research Motivation
 
 The Alberta Plan gives learned models and planning a central role in a long-lived agent. The hard version of planning is not stationary gridworld acceleration; it is deciding which learned predictions still deserve computation. A replay-buffer framing would store old experience and sample it later, but this project instead uses a compact learned model whose entries are updated online. That distinction matters: the question is not how to train from old data, but how a streaming agent should allocate background computation when its model may be wrong.
@@ -53,7 +77,8 @@ Planning variants:
 - Flush-on-change oracle diagnostic.
 - Recency-aged Dyna: planning priority decays with time since real observation.
 - Error-gated Dyna: entries with recent high model error are temporarily suppressed.
-- Stale-error-prioritized Dyna: backups are chosen by a mixture of TD priority and model freshness.
+
+A stale-error-prioritized variant, where backups are chosen by a mixture of TD priority and model freshness, is a planned extension rather than part of the current result. The completed extended evidence uses `keep_model`, `no_planning`, `oracle_flush`, `recency_aging`, and `recency_error_gate`.
 
 The flush-on-change variant is not realistic; it is an upper-bound diagnostic showing what would happen if the agent had a perfect change detector.
 
@@ -80,6 +105,12 @@ Metrics:
 - Model one-step prediction error.
 - Planning utility: improvement in TD target or value estimate per backup.
 - Fraction of planning spent on entries not observed recently.
+
+## Experiment Design Rationale
+
+The experiment uses a changing gridworld because stale model entries can be identified and counted. That diagnostic visibility is necessary for the research question: a reward curve alone cannot tell whether planning helps because the model is useful or hurts because the model is obsolete. Planning budgets `0, 1, 5, 20` separate the no-planning baseline, low-compute regime, and high-compute regime where stale backups can dominate.
+
+The half-life sweep is the main scientific control. A very short half-life should distrust old knowledge quickly and may throw away still-useful structure; a long half-life should preserve more knowledge but risk stale backups. The correct outcome is therefore not necessarily one best half-life, but a map of when freshness helps and when it merely reduces planning.
 
 ## Expected Results And Failure Modes
 
@@ -123,6 +154,16 @@ Main figures below use late post-change seed-tail condition summaries with 95% c
 Strict reviewer challenge: "This is just Dyna-Q with a changing maze." Response: the proposal must report model-freshness diagnostics and planning utility, not only reward.
 
 Strict reviewer challenge: "Flush-on-change is unrealistic." Response: it is retained only as an oracle diagnostic; realistic variants must use recency or prediction error computed from the stream.
+
+Per-proposal audit matrix:
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Alberta Plan | Planning should be about learned models in ordinary experience, not offline replay. | Uses an online learned model with planning backups and no replay buffer. | The environment is still compact and synthetic. |
+| Planning reviewer | Reward alone cannot diagnose stale planning. | Reports stale-backup rate, model error, planning budget, and half-life. | Planning utility per backup needs a fuller table. |
+| Nonstationarity reviewer | Abrupt change may make aging look too easy. | Conclusion is limited to abrupt changing gridworlds. | Needs gradual/stochastic drift and repeated changes. |
+| Statistics | Half-life sensitivity can be hidden by one curve. | Current report figures separate half-life in the legend and report numerical examples. | A compact Pareto table would improve readability. |
+| Strict instructor | Do not claim universal reward superiority. | Report emphasizes stale-backup reduction and tradeoffs. | Some reward comparisons remain budget-dependent. |
 
 ## Threats To Validity
 

@@ -1,0 +1,59 @@
+# Report Section Audit
+
+Date: 2026-07-09
+
+This audit checks whether the 16 final-facing reports visibly contain the sections required by the latest revision plan. It is a heading/content-presence audit, not a claim that every section is already paper-perfect. Current result: all 16 English reports and all 16 Chinese reports now contain the required structural signals after the first repair pass.
+
+## English Reports
+
+| Report | Required-section status |
+|---|---|
+| `final/reports/integrated/continual_dyna_model_aging/report.md` | OK after first repair pass |
+| `final/reports/integrated/predictive_state_plasticity/report.md` | OK after first repair pass |
+| `final/reports/integrated/scale_invariant_continuing_control/report.md` | OK after first repair pass |
+| `final/reports/proposals/baird_offpolicy_stability/report.md` | OK after first repair pass |
+| `final/reports/proposals/centered_td_diagnostics/report.md` | OK after first repair pass |
+| `final/reports/proposals/dyna_planning_budget/report.md` | OK after first repair pass |
+| `final/reports/proposals/generate_test_features/report.md` | OK after first repair pass |
+| `final/reports/proposals/gvf_predictive_state/report.md` | OK after first repair pass |
+| `final/reports/proposals/gvf_question_design/report.md` | OK after first repair pass |
+| `final/reports/proposals/nonstationary_bandit/report.md` | OK after first repair pass |
+| `final/reports/proposals/onpolicy_stability_atlas/report.md` | OK after first repair pass |
+| `final/reports/proposals/options_reusable_subtasks/report.md` | OK after first repair pass |
+| `final/reports/proposals/output_controlled_td/report.md` | OK after first repair pass |
+| `final/reports/proposals/reward_centered_sarsa/report.md` | OK after first repair pass |
+| `final/reports/proposals/streaming_representation/report.md` | OK after first repair pass |
+| `final/reports/proposals/tidbd_plasticity/report.md` | OK after first repair pass |
+
+## Chinese Reports
+
+| Report | Required-section status |
+|---|---|
+| `final/reports/integrated/continual_dyna_model_aging/report_zh.md` | OK after first repair pass |
+| `final/reports/integrated/predictive_state_plasticity/report_zh.md` | OK after first repair pass |
+| `final/reports/integrated/scale_invariant_continuing_control/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/baird_offpolicy_stability/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/centered_td_diagnostics/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/dyna_planning_budget/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/generate_test_features/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/gvf_predictive_state/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/gvf_question_design/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/nonstationary_bandit/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/onpolicy_stability_atlas/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/options_reusable_subtasks/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/output_controlled_td/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/reward_centered_sarsa/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/streaming_representation/report_zh.md` | OK after first repair pass |
+| `final/reports/proposals/tidbd_plasticity/report_zh.md` | OK after first repair pass |
+
+## What This Does And Does Not Mean
+
+The first repair pass fixes a real structural problem: every report now visibly states proposal-template answers, independent scope, evidence level, experiment-design rationale, and a reviewer-audit style critique record. This makes the reports independently reviewable.
+
+It does not mean every proposal is equally strong. Reward-Centered Sarsa, Output-Controlled TD, Scale-Invariant Continuing Control, and Continual Dyna Model Aging remain the strongest candidates. Predictive State Plasticity is a high-value negative gate. Dyna Planning Budget and several others are supporting diagnostics. Generate-and-Test, Options, Streaming Representation, and Nonstationary Bandit remain negative, quarantined, or dropped unless redesigned.
+
+## Verification
+
+- Structural audit: no required-section signal missing across the 16 English and 16 Chinese reports.
+- Image audit: no missing report image links under `final/reports`.
+- PDF export: all 16 English `report.pdf` files regenerated with `missing_images=0`.

@@ -16,7 +16,10 @@
 - `final/indexes/reproduction.md` 和 `final/indexes/reproduction_zh.md`
 - `final/indexes/status.md` 和 `final/indexes/status_zh.md`
 - `final/indexes/requirements_audit.md` 和 `final/indexes/requirements_audit_zh.md`
+- `final/indexes/report_section_audit.md` 和 `final/indexes/report_section_audit_zh.md`
 - `final/indexes/project_plan.md` 和 `final/indexes/project_plan_zh.md`
+- `final/indexes/revise_plan_20260709.md` 和 `final/indexes/revise_plan_20260709_zh.md`
+- `final/indexes/reviewer_audit.md` 和 `final/indexes/reviewer_audit_zh.md`
 - `final/presentation/poster_outline.md` 和 `final/presentation/poster_outline_zh.md`
 
 ## 归档材料
@@ -31,5 +34,4 @@ Archive 不是主阅读路径，因此不逐篇翻译所有历史碎片。重要
 
 ## 一致性规则
 
-英文 `report.md` 是正式引用 canonical 版本，中文 `_zh.md` 是内容对应的快速审阅版本。后续如果更新结果、状态、图表或结论，应同时更新英文和中文。若发现冲突，先以当前英文 report 和 `final/indexes/results.md` 为准，再立即修正中文对应文件。
-
+中英文版本应承载相同实质内容。后续如果更新结果、状态、图表或结论，应同时更新英文和中文。若发现冲突，先以当前 final-facing report 和 `final/indexes/results.md` 的证据为准，再立即修正不一致的语言版本。

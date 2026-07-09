@@ -106,6 +106,30 @@ Upgrade path:
 
 The Nonstationary Bandit proposal is a useful sanity diagnostic for plasticity, but it should not be promoted as a major final Core RL study. Its role is to motivate why continual learners need persistent adaptation.
 
+## Proposal Template Answers
+
+Focused RL question: As a minimal sanity check, does a simple online agent adapt to nonstationary reward probabilities without replay? The setting is a nonstationary bandit, the comparison is lightweight exploration/adaptation rules, and the metrics are regret and best-action rate. Compute is trivial; fallback is to keep it as an introductory sanity check only.
+
+## Independent Research Scope
+
+This is not a full Core RL proposal. It lacks state, bootstrapping, value functions over time, planning, GVFs, and control dynamics. Its independent role is to sanity-check plasticity language and to provide a simple introductory example, not to serve as a final research topic.
+
+## Evidence Level
+
+Evidence level: dropped sanity diagnostic. The result may be useful pedagogically, but it is too shallow for the course project's main Core RL standard.
+
+## Experiment Design Rationale
+
+The bandit is useful only because it is simple enough to expose adaptation speed and exploration tradeoffs. It should not be expanded by adding more arms or seeds alone. If revived, it should become a contextual bandit or continuing control task with value-function learning.
+
+## Reviewer Audit
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Core RL | No bootstrapping or state. | Evidence level is dropped sanity. | Not submission-grade. |
+| Continual learning | Adaptation is present but shallow. | Report limits scope to sanity check. | Needs richer environment to matter. |
+| Strict instructor | Do not count this as one of the strong proposals. | Marked as diagnostic only. | Should be appendix/intro if used. |
+
 ## Reproduction
 
 ```bash

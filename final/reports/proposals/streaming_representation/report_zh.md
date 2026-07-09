@@ -56,6 +56,30 @@ Upgrade path 是把 next-feature prediction 替换为 task-relevant GVF cumulant
 
 Streaming Representation With Auxiliary Prediction 是有用的负结果诊断。它说明 auxiliary prediction 本身不是研究贡献，除非 auxiliary question 与 downstream value/control 明确相关。该 proposal 应被重新设计，或概念上并入 GVF Question Design。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：auxiliary next-feature prediction target 是否能改善 streaming linear setting 中的 online value prediction？setting 是带 auxiliary head 的 streaming prediction task；比较 value-only 和 value-plus-auxiliary learning。指标是 value error、auxiliary error 和 phase/switch recovery。compute 小；fallback 是 useful-auxiliary-question design 的 negative diagnostic。
+
+## 独立研究范围
+
+本 proposal 只研究一个 auxiliary target，不研究 representation learning 的全部。它不能作为反对 auxiliary learning 或 GVFs 的广泛证据。它的角色是说明 auxiliary target 必须 task-relevant 才能改善 main prediction/control objective。
+
+## 证据等级
+
+证据等级：negative diagnostic / redesign target。当前 auxiliary prediction 没有显著改善 value error。这有价值，因为它防止“多一个 prediction 就能改善 representation”的浅结论。
+
+## 实验设计依据
+
+实验应按 downstream value error 判断，而不是只看 auxiliary MSE。未来版本需要 task-relevant cumulants、learned-feature ablations 和 downstream control metrics。没有这些时，正确结论是当前 auxiliary question 不够有用。
+
+## 审查矩阵
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Representation | auxiliary accuracy 不代表 usefulness。 | 证据等级为 negative diagnostic。 | 需要 task-relevant GVF targets。 |
+| Metrics | auxiliary MSE 不是主结果。 | 强调 value error。 | 仍缺 control metric。 |
+| 严格老师 | 不要称为 representation learning success。 | 报告定位为 redesign target。 | 若扩展，应并入 GVF useful-question 线。 |
+
 ## 复现
 
 ```bash

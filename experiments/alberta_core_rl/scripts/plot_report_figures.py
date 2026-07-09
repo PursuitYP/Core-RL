@@ -24,6 +24,7 @@ from alberta_core_rl.report_figures_heatmaps import (
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build report-ready summary figures from condition summaries.")
     parser.add_argument("--result-dir", required=True)
+    parser.add_argument("--figure-dir", default=None, help="Optional output directory for report figures.")
     parser.add_argument(
         "--kind",
         choices=[
@@ -49,7 +50,7 @@ def main() -> None:
     elif args.kind == "predictive-state":
         outputs = plot_predictive_state(result_dir)
     elif args.kind == "output-td":
-        outputs = plot_output_td(result_dir)
+        outputs = plot_output_td(result_dir, Path(args.figure_dir) if args.figure_dir else None)
     elif args.kind == "reward-centered":
         outputs = plot_reward_centered(result_dir)
     elif args.kind == "onpolicy-atlas":

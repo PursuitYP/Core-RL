@@ -49,7 +49,7 @@ Nonstationary Bandit 是最小 sanity-check 环境。它没有 state bootstrappi
 
 3. Reward-Centered Continuing Sarsa：这是最清楚的独立主 proposal 之一，问题简洁但不 shallow：continuing control 中 reward origin 不应改变 policy preference，但 ordinary discounted Sarsa 会产生 value-scale inflation。当前 access-control 结果很有说服力，reward-centered/differential variants 在 reward shifts 下保持更稳定 Q norm 和 unshifted reward。优化建议是补 alpha/beta/gamma sweep 与 midstream reward-origin switch，这会把它从强机制实验提升为更完整的 continual adaptation 研究。
 
-4. Output-Controlled TD：这是 prediction/function approximation 方向最清楚的主 proposal。它把 step size 的单位从 parameter displacement 转到 prediction-output change，直接回应 streaming TD 在 feature scale 改变下的脆弱性。当前可引用证据仍是 main pilot，显示 normalized variants 的稳定区域明显更大；20-seed CPU-task extended run 正在运行且目标目录目前不完整，不能提前引用。优化建议是在 extended artifacts 完成后再写入报告，同时审计 true-online TD(lambda) baseline、补 max-stable-alpha table，并加入同一 stream 中途 feature-scale shift 的无重置实验。
+4. Output-Controlled TD：这是 prediction/function approximation 方向最清楚的主 proposal。它把 step size 的单位从 parameter displacement 转到 prediction-output change，直接回应 streaming TD 在 feature scale 改变下的脆弱性。当前可引用证据已经切换为 20 seeds extended CPU-task run：`experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`。Seed-level divergence 统计显示 normalized TD 和 trace-normalized TD 都是 `0/400` seed-conditions 发散，而 fixed TD 和当前 raw-alpha true-online baseline 都是 `141/400` seed-conditions 发散。优化建议是继续审计 true-online TD(lambda) baseline、补 max-stable-alpha table，并加入同一 stream 中途 feature-scale shift 的无重置实验。
 
 5. Dyna Planning Budget and Model Staleness：如果需要保留一个普通 proposal 作为 planning 方向的独立材料，它是最值得保留的。它的研究问题比很多支持性诊断更接近完整 RL 课题：planning budget 有 pre-change benefit，但 stale model backups 会损害 post-change recovery。优化建议是不要和 Continual Dyna Model Aging 重复提交；更合理的方式是把它作为 model-aging 大课题的前置实验或第一节 mechanism diagnosis。
 
@@ -161,7 +161,7 @@ Doorway Options 当前被 quarantine。Options 是重要 Core-RL topic，但当�
 
 实验与指标：跨 feature scales `one, ten, hundred, uneven` 和 alphas `0.03, 0.1, 0.3`，评估 RMSE、divergence、weight norm、prediction_change、effective step size。主配置在 `experiments/alberta_core_rl/configs/output_controlled_td/config_main.json`。
 
-结果与分析：当前主结果 `experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main` 显示 normalized variants 在大多数 scale 下保持稳定，而 fixed TD 和当前 true-online TD baseline 在高 scale 或高 alpha 条件下会发散或误差明显变差。该课题是主线候选，但需要进一步审计 true-online baseline 实现和更长 sweep。
+结果与分析：当前主结果 `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended` 使用 20 seeds、20000 steps、5 个 feature scales 和 4 个 alpha。Seed-level divergence 结果显示 normalized variants 在完整 stress grid 下没有发散，而 fixed TD 和当前 raw-alpha true-online baseline 在 high scale/high alpha 条件下大量发散。该课题是主线候选，但仍需要进一步审计 true-online baseline，实现 max-stable-alpha comparison，并加入 no-reset feature-scale switch。
 
 ### 3. GVF Predictive State
 
@@ -397,7 +397,7 @@ Agent 与算法：比较 fixed TD、normalized TD、trace-normalized TD 和 true
 
 主要指标：`rmse` 衡量预测质量；`diverged` 和 `weight_norm` 衡量数值稳定；`prediction_change` 衡量单步输出扰动；`step_size` 记录 normalized update 的有效步长。
 
-当前证据：结果目录 `experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main`。normalized 和 trace-normalized TD 在大 scale 下更稳；fixed TD 和当前 true-online baseline 在部分高 scale/high alpha 条件下发散或误差变坏。
+当前证据：结果目录 `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`。normalized 和 trace-normalized TD 在 400 个 seed-conditions 中均没有发散；fixed TD 和当前 raw-alpha true-online baseline 各有 141/400 个 seed-conditions 发散。由于结果目录由 rjob 容器用户创建，正式报告图存放在 `final/reports/proposals/output_controlled_td/figures/`。
 
 主要风险：true-online baseline 实现需要继续审计，避免把实现问题当成算法问题；需要 extended sweep 和更清楚的 alpha-normalization fairness。
 
@@ -587,8 +587,8 @@ Options、Nonstationary Bandit、Streaming Representation 当前不适合作为�
 
 ## 下一步建议
 
-1. 当前真正未完成的重点是 `output_controlled_td/config_extended.json` CPU-task run 和 `scale_invariant_continuing_control/config_extended.json` full fixed-condition grid。`reward_centered_sarsa`、`continual_dyna_model_aging`、`dyna_planning_budget`、`predictive_state_plasticity` 和 `unit_switching_continuing_control` 已有 20-seed extended evidence，后续重点是分析深化和图表/报告一致性，而不是重复写成“待跑完”。
+1. 当前真正未完成的重点不再是 Output-Controlled TD extended run；它已经完成并纳入 evidence。接下来需要处理的是 `scale_invariant_continuing_control/config_extended.json` full fixed-condition grid，以及 Output-Controlled TD 的 true-online audit / no-reset feature-scale switch。`reward_centered_sarsa`、`output_controlled_td`、`continual_dyna_model_aging`、`dyna_planning_budget`、`predictive_state_plasticity` 和 `unit_switching_continuing_control` 已有 20-seed extended evidence，后续重点是分析深化和图表/报告一致性。
 2. 对 report 继续做中文/英文双语梳理，确保每个 report 单独打开就能看懂环境、agent、指标、结果和结论。
 3. 对 Predictive State Plasticity 先做 stronger oracle-prediction control 和 cue information metric，再决定是否接入 generate-and-test/TIDBD。
 4. 对 Options 先修 fixed-goal sanity case；如果 fixed-goal 都不成立，不继续讨论 transfer。
-5. CPU task 通道已经重新验证：旧的 `core-rl-infra-smoke-968081` 和 `core-rl-output-extended-131257-78853482` 使用过强节点约束，已停止；修正后的 `core-rl-cpu-smoke-fixed-50275254` 在 `ailab-safethm/safethm_cpu_task` 成功跑完整个 smoke suite。新的 Output-Controlled TD extended run 是 `core-rl-output-extended-fixed-46602102`，目标结果目录为 `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`；在 summary 和 figures 生成前仍应标为 running。
+5. CPU task 通道已经重新验证：旧的 `core-rl-infra-smoke-968081` 和 `core-rl-output-extended-131257-78853482` 使用过强节点约束，已停止；修正后的 `core-rl-cpu-smoke-fixed-50275254` 在 `ailab-safethm/safethm_cpu_task` 成功跑完整个 smoke suite。Output-Controlled TD extended run `core-rl-output-extended-fixed-46602102` 已成功完成，目标结果目录 `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended` 已写出标准 artifacts；由于目录不可写，report figures 放在正式报告目录。

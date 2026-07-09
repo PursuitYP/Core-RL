@@ -6,7 +6,9 @@ These files summarize the current state of the project without replacing the sta
 - `reproduction.md`: exact local and CPU-task run commands.
 - `status.md`: current project shape and major gaps.
 - `requirements_audit.md`: coverage of the original user and course requirements.
+- `report_section_audit.md`: mechanical audit of missing required report sections across all 16 formal reports.
 - `project_plan.md`: saved planning snapshot.
+- `revise_plan_20260709.md`: current full-revision plan with literature update and original user requirements.
 - `bilingual_coverage.md`: English/Chinese document pairing contract.
 - `reviewer_audit.md`: multi-reviewer critique points and action status.
 

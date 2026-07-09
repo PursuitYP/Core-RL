@@ -139,6 +139,30 @@ Revision required:
 
 Baird Off-Policy Stability is a strong supporting independent diagnostic. It demonstrates why off-policy value learning cannot be treated casually in a continual predictive agent. Before promotion to a full main study, it needs canonical verification, more correction baselines, and a GVF-style behavior-drift extension.
 
+## Proposal Template Answers
+
+Focused RL question: What off-policy stability warning does a Baird-style counterexample give for GVF learning under linear approximation? The setting is an off-policy prediction counterexample; the comparison is ordinary TD against correction-style methods. The main metrics are weight norm, divergence, and MSPBE-style diagnostics where available. Compute is small; fallback is a supporting warning until canonical Baird details and ETD/GTD baselines are added.
+
+## Independent Research Scope
+
+This report is an off-policy stability warning, not a general GVF solution. It should support future off-policy GVF proposals by documenting why ordinary TD can diverge, while staying honest that the current implementation still needs canonical verification.
+
+## Evidence Level
+
+Evidence level: supporting warning / pilot diagnostic. It is not yet a strong theory replication because the canonical feature/policy specification, expected-update audit, and emphatic/GTD comparisons still need to be checked.
+
+## Experiment Design Rationale
+
+Baird's counterexample is useful because it isolates the deadly-triad issue in the smallest possible linear setting. The next experiment should not add unrelated environments first; it should verify canonical details and add ETD, TDC/GTD2, and behavior-drift variants.
+
+## Reviewer Audit
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Off-policy theory | Canonical Baird details matter. | Report marks canonical verification as required. | Current result remains pilot-level. |
+| GVF | A counterexample does not solve GVF stability. | Frames the study as a warning. | Needs ETD/GTD baselines. |
+| Strict instructor | Do not overgeneralize from one counterexample. | Evidence level is supporting diagnostic. | Needs expected-update comparison. |
+
 ## Reproduction
 
 ```bash

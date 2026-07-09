@@ -64,6 +64,30 @@ Performance reviewer 会说：normalized TD 已经更好，为什么保留这个
 
 TIDBD-Lite Plasticity 是有效的独立机制 proposal，但不是正向性能故事。它显示 relevance switch 后 per-feature step sizes 会朝合理方向变化，同时 normalized TD 在 prediction error 上更强。下一版应实现 canonical TIDBD/AutoStep，加入 repeated switches，并报告 recovery AUC，而不是只看 late error 或 mean alpha。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：per-feature step-size adaptation 能否在 streaming prediction/control setting 中追踪 changing feature relevance？当前 setting 是 TIDBD-lite diagnostic，不是 canonical TIDBD。比较 TIDBD-lite 与 fixed/normalized TD-style baselines；指标是 prediction error、alpha trajectories、relevance switches 和 recovery。compute 中等；fallback 是 mechanism diagnostic，直到实现 canonical TIDBD 或 AutoStep。
+
+## 独立研究范围
+
+本报告研究 feature-wise plasticity signals，不是完成的 performance method。它不应被并入 Predictive State Plasticity 当作已完成正向证据。它的角色是说明 alpha dynamics 是否响应 relevance changes，以及还缺什么。
+
+## 证据等级
+
+证据等级：supporting mechanism diagnostic。当前 TIDBD-lite implementation 展示了可解释 alpha dynamics，但 normalized TD 在部分条件下 error 更好。因此报告不能声称 TIDBD-lite 提高性能。
+
+## 实验设计依据
+
+实验只有在区分“alpha visibly changes”和“learning improves”时才有价值。下一步应实现 canonical TIDBD/AutoStep，加入 repeated relevance switches，并报告 recovery AUC，而不只是 final error。
+
+## 审查矩阵
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Algorithm | TIDBD-lite 不是 canonical TIDBD。 | 证据等级写成 diagnostic。 | 需要 canonical TIDBD/AutoStep。 |
+| Performance | alpha adaptation 不一定改善 error。 | 区分 alpha dynamics 和 prediction gain。 | normalized TD 可能仍更强。 |
+| 严格老师 | 没有 utility evidence 不应过度使用 plasticity 语言。 | 下一步指标包含 recovery AUC 和 repeated switches。 | 当前结果只能 supporting。 |
+
 ## 复现
 
 ```bash

@@ -56,6 +56,30 @@ Strict reviewer 会说：toy setting 容易让弱 proposal 看起来强。回应
 
 Centered TD Diagnostics 是有用的独立机制研究。它清楚展示 centering 如何在 reward translation 下控制 value scale。它的范围有意受限：支持但不替代 Reward-Centered Continuing Sarsa。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：在一个很小的 continuing prediction problem 中，centering Bellman error 是否能去掉任意 reward offset 对 TD learning dynamics 的影响？setting 是 two-loop MDP，比较 ordinary TD 与 centered variants，证据是 value scale、TD error 和 reward baseline behavior。compute 很小；fallback 是把它作为 Reward-Centered Sarsa 的机制附录。
+
+## 独立研究范围
+
+这是独立机制诊断，不是主控制 proposal。它研究 centering 为什么可能影响 continuing prediction，应服务 Reward-Centered Sarsa 的解释，而不是替代 access-control 控制实验。
+
+## 证据等级
+
+证据等级：supporting diagnostic。环境刻意很小，不应被写成完整 project-scale result。它的价值是清楚隔离 reward-offset mechanism。
+
+## 实验设计依据
+
+two-loop MDP 的作用是让 reward offsets 可以变化而不引入复杂 control。这样 value scale 和 TD-error 的变化更容易归因。更强版本可以加入 analytic shift table，但更大环境反而会遮住这个机制。
+
+## 审查矩阵
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Core RL | 环境太 toy。 | 明确写成 mechanism diagnostic。 | 不能作为主 proposal。 |
+| Reward-centering | update 必须连接到控制结果。 | 报告把 Reward-Centered Sarsa 作为主研究。 | 仍可补 analytic table。 |
+| 严格老师 | 不要从 tiny MDP 过度泛化。 | 证据等级写成 supporting diagnostic。 | 适合作为 appendix-style material。 |
+
 ## 复现
 
 ```bash

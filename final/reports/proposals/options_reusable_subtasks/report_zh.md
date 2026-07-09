@@ -58,6 +58,30 @@ Strict reviewer 会指出：没有 fixed-goal sanity win 就谈 transfer 太早�
 
 Doorway Options 是独立负结果。它贡献的教训是：options 必须按真实 interaction cost 评估，不能因为它们编码了合理 subtask 就假设有用。下一版需要 fixed-goal sanity win、duration caps 和更干净的 transfer protocol。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：hand-coded doorway options 在 changing Four Rooms task 中，按真实 environment-step accounting 是否提供 reusable subtasks？setting 是 changing-goal Four Rooms；比较 primitive control 和 option-augmented control。主指标是 reward per real environment step、option duration、option success 和 goal-switch recovery。compute 小；fallback 是 fixed-goal sanity 通过前 quarantine。
+
+## 独立研究范围
+
+本报告研究 hand-coded option utility 和 accounting，不研究 option discovery。它是独立课题，但当前 quarantined，因为 primitive baseline 没有被击败，而且 fixed-goal sanity check 缺失。
+
+## 证据等级
+
+证据等级：quarantined negative result。当前证据主要用于防止 overclaim：options 在 decision-step accounting 下可能看起来更好，但在真实 environment-step accounting 下可能更差或无优势。
+
+## 实验设计依据
+
+下一步必须从 fixed-goal sanity case 开始。如果 doorway options 在 stationary Four Rooms goal 下按 real-step accounting 都不能帮忙或至少行为正确，那么 goal-transfer result 无法解释。重新作为正向 temporal-abstraction proposal 前，必须补 SMDP duration accounting 和 option termination diagnostics。
+
+## 审查矩阵
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Options | 没有 fixed-goal sanity check。 | 证据等级为 quarantined。 | transfer claim 前必须通过 sanity。 |
+| Accounting | decision-step metrics 会虚假偏向 options。 | 强调 real environment-step reward。 | SMDP duration 仍需更完整报告。 |
+| 严格老师 | 不要把失败 options 结果写成 reusable-subtask evidence。 | 报告定位为 negative/quarantine。 | 需要新实验才能恢复。 |
+
 ## 复现
 
 ```bash

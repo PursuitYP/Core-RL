@@ -9,7 +9,7 @@ This distinction is deliberate. The project requirement asked for independent pr
 | Proposal | Source | Status | Workspace | Current result | Report |
 |---|---|---|---|---|---|
 | Reward-Centered Sarsa | Reference/course-derived | Main study | `experiments/alberta_core_rl/configs/reward_centered_sarsa` | `experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended` | `reward_centered_sarsa/report.md` |
-| Output-Controlled TD | Reference/course-derived | Main study | `experiments/alberta_core_rl/configs/output_controlled_td` | `experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main` | `output_controlled_td/report.md` |
+| Output-Controlled TD | Reference/course-derived | Main study | `experiments/alberta_core_rl/configs/output_controlled_td` | `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended` | `output_controlled_td/report.md` |
 | GVF Predictive State | Reference/course-derived | Negative/redesign | `experiments/alberta_core_rl/configs/useful_gvfs_state` | `experiments/alberta_core_rl/results/useful_gvfs_state/20260708T155740Z_main` | `gvf_predictive_state/report.md` |
 | Generate-and-Test Features | Reference/course-derived | Negative/redesign | `experiments/alberta_core_rl/configs/generate_test_features` | `experiments/alberta_core_rl/results/generate_test_features/20260708T154941Z_main` | `generate_test_features/report.md` |
 | Doorway Options | Reference/course-derived | Quarantined | `experiments/alberta_core_rl/configs/options_reusable_subtasks` | `experiments/alberta_core_rl/results/options_reusable_subtasks/20260708T161717Z_main` | `options_reusable_subtasks/report.md` |

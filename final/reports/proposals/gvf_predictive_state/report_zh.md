@@ -6,6 +6,30 @@
 
 本 proposal 检验 General Value Function predictions 是否能在 partial observability 下成为有用 agent state。T-maze 任务中，agent 在起点看到左右 cue，之后进入 aliased corridor，直到 junction 才需要根据早期 cue 选择动作。当前 main pilot 比较 raw observation、short history、trace memory、recurrent GVF features 和 oracle memory。Trace memory 与 oracle memory 能解决任务，而当前 recurrent GVF design 仍接近 chance。这个结果不说明 GVF 一般无用；它说明当前 GVF question/state design 没有携带 control 所需的 hidden cue 信息。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：learned GVF feature 能否在 partially observable T-maze 中提供 control 所需的 missing cue information？这是 useful-state question，不是 prediction-error question。
+
+Setting / testbed：testbed 是 long aliased T-maze。agent 在起点看到 cue，在 corridor 中失去 cue，最后必须在 junction 根据 cue 行动。hidden-state retention 可以通过 trial-end accuracy 直接观察。
+
+Implemented comparison：pilot 比较 raw observation、short history、trace memory、recurrent GVF features 和 oracle cue memory，并使用 online linear Sarsa。Trace 和 oracle 不是装饰性 baseline；它们说明不用 deep network 也能解这个任务。
+
+Metric / figure：主证据是 trial-end accuracy，并用 position-level GVF/trace trajectories 辅助解释。GVF feature 必须接近 trace memory 或至少优于 raw observation；仅仅降低 GVF TD error 不算成功。
+
+Compute need / fallback：当前 standalone result 是 five-seed pilot。诚实 fallback 是把它报告为 negative redesign target，并使用 integrated Predictive State Plasticity extended run 作为更强证据。
+
+## 独立研究范围
+
+本 proposal 是 integrated Predictive State Plasticity 的较小 standalone precursor。它只回答一个窄问题：初始 recurrent GVF design 是否能在 T-maze 中成为 useful state。它不评价 generate-and-test、TIDBD、feature replacement 或完整 predictive-state program。
+
+范围之所以窄，是因为结果是负的。它不能用来宣称 GVFs 不能构造 state；它应该用于推动更好的 GVF question design、direct cue-decodability probes 和更严格 useful-prediction evaluation。
+
+## 证据等级
+
+证据等级：negative pilot / redesign target。这个结果足以说明当前 recurrent-GVF pilot 不应被提交为 positive GVF-state result。它没有 integrated 20-seed Predictive State Plasticity run 强，后者应作为最终证据来源。
+
+因此本报告应作为 failure mechanism 引用：cheap trace memory 能解任务，recurrent GVF 不能。任何最终 predictive-state claim 都应依赖 extended integrated run 或新的 cue-decodability experiments。
+
 ## 研究动机
 
 在 partially observable environments 中，当前 observation 不是完整 state。长期 agent 必须从经验中构造可用于控制的 state。Alberta Plan 把 GVFs 视为一种重要路线：agent 可以通过预测未来信号形成知识，并把这些 predictions 用于后续决策。但这里有一个关键陷阱：一个 prediction 可以稳定、准确，却对当前 decision 完全无用。
@@ -42,6 +66,12 @@
 
 ![GVF values 和 cue traces 随 maze position 的变化。](../../../../experiments/alberta_core_rl/results/useful_gvfs_state/20260708T155740Z_main/figures/gvf_trace_by_position.png)
 
+## 实验设计依据
+
+T-maze 构造了一个最小但有意义的 partial-observability problem。Raw observation 按设计不足，但 trace 和 oracle memory 让任务可以用小型非深度 features 解决。这样实验就能问 GVF mechanism 是否增加 useful state，而不是任务本身是否不可能。
+
+当前设计只是 pilot，因为它只测试一个 maze length 和一个 GVF design。但这个负结果仍有价值：recurrent GVF 没有把 control 提升到 chance 以上，而 trace memory 成功。下一步不应只调 alpha，而应加入 hidden-cue probes，并重设 cumulants/discounts，使 learned prediction 明确绑定 cue。
+
 ## 结果
 
 Trace memory 与 oracle memory 能解决任务，seed-aware tail trial accuracy 分别约为 `0.944 +/- 0.018` 和 `0.939 +/- 0.027`。这说明在项目限制下，任务并不是不可解；小型非深度记忆足以提供所需 state augmentation。
@@ -65,6 +95,16 @@ GVF reviewer 会指出：预测一个容易但无关的信号不是 useful state
 Strict baseline reviewer 会指出：如果 trace memory 这么便宜，GVF 必须接近它才值得宣传。回应是：当前报告不宣传正结果，而把 recurrent GVF 降级为 redesign target。
 
 下一步必须加入 cue-decodability probe、hidden-cue correlation plot 和更贴近未来 cue-relevant events 的 cumulant 设计。
+
+逐 proposal 审查矩阵：
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| GVF | prediction accuracy 不等于 useful state。 | 报告 trial accuracy，并加入 trace/oracle baselines。 | 仍缺 direct cue-decodability。 |
+| Baseline | 如果 trace memory 解任务，GVF 必须接近它。 | 包含 trace 和 oracle 强 baseline。 | GVF 仍接近 chance。 |
+| 证据 | 5 seeds 和一个 maze length 有限。 | 报告定位为 negative pilot。 | extended evidence 应来自 Predictive State Plasticity。 |
+| Alberta Plan | GVF 很重要，因此负结果必须精确。 | 结论限定于当前 GVF design。 | 更好的 GVF questions 可能成功。 |
+| 严格老师 | 不要把它写成正向 proposal。 | status 和 conclusion 都称为 redesign target。 | 若纳入 final material，需要与 integrated report 同步。 |
 
 ## 结论
 

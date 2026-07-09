@@ -1,103 +1,171 @@
 # Output-Controlled TD 中文报告
 
-状态：独立主线 proposal；当前可引用证据仍是 main pilot。20-seed CPU-task extended run `core-rl-output-extended-fixed-46602102` 正在运行，`experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended` 目前是不完整/空结果目录，不能引用为完成证据。它是最早指定的两个 Core RL 题目之一，研究重点是 streaming TD 更新的“输出效果”是否比 raw parameter step 更适合作为稳定学习单位。
+状态：独立主线 proposal，已经有 20 seeds extended evidence。当前结果路径是 `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`。CPU task `core-rl-output-extended-fixed-46602102` 已在 2026-07-09 成功完成，并写出标准 artifacts。由于 rjob 结果目录由容器用户创建，普通项目 shell 不能在其中写 figures，因此 report-ready figures 存在本报告目录的 `figures/` 下。
 
-## 摘要
+## Abstract
 
-在线 TD 学习里，固定参数步长 `alpha` 并不等价于固定 prediction change。在线性函数逼近中，如果把 feature vector 放大 10 倍或 100 倍，底层预测问题可以基本不变，但同一个 raw `alpha` 会造成完全不同的 parameter displacement 和 prediction displacement。这个 proposal 在 tile-coded random-walk prediction 中比较 fixed TD、normalized TD、trace-normalized TD(lambda) 和 true-online TD(lambda)，检验 output-controlled update 是否能在不同 feature scale 下保持稳定。当前 main pilot 显示：fixed TD 在 high-scale feature 下容易发散，normalized 和 trace-normalized TD 在测试的 scale/alpha grid 中保持稳定；true-online TD(lambda) 当前实现/参数网格下也会在 high-scale/high-alpha 条件发散，但这不能被解释成对 true-online TD 的一般否定，必须做更公平的 max-stable-alpha audit。
+本 proposal 研究 streaming temporal-difference learning 中一个很实际的稳定性问题：固定 parameter step size 并不等价于固定 prediction change。在线性函数逼近中，把 feature 乘以一个常数，概念上的 prediction problem 可以基本不变，但同一个 alpha 对参数和输出的影响会改变几个数量级。我们在 tile-coded random-walk prediction task 中比较 fixed TD、normalized TD、trace-normalized TD(lambda) 和 raw-alpha true-online TD(lambda) baseline。20 seeds extended 结果显示非常清晰的稳定性差异：normalized TD 和 trace-normalized TD 在各自 400 个 seed-conditions 中都没有 seed-level divergence；fixed TD 和当前 raw-alpha true-online baseline 各有 141/400 个 seed-conditions 发散。核心结论不是某个 alpha 在某个 benchmark 上更好，而是 online TD 的更新单位应该更接近 prediction/output effect，而不只是 raw parameter displacement。
 
-## 研究动机
+## Proposal Template Answers / 提案模板回答
 
-Streaming RL 没有 replay buffer、minibatch 和离线多轮优化来平滑异常样本。Agent 每一步都从当前 transition 更新，任何 feature magnitude 的变化都可能直接变成一次很大的参数移动。对于长期存在的 continual agent，假设所有 sensor、representation channel、tile coding 或 auxiliary feature 都已经被人工缩放到匹配某个固定 `alpha`，并不现实。
+What do we want to understand? 我们想理解 online TD prediction 在每个 transition 只用一次、没有 replay buffer 的 streaming 设置中，能否对 nuisance feature scaling 保持稳定。
 
-Alberta Plan 强调 ordinary experience、continual value-function learning 和大量 predictions。这样的 agent 可能同时维护许多 value functions、GVFs、models 或 control values。若每个预测都需要手工调 `alpha` 才能适应 feature scale，系统就很难保持可扩展和可维护。Output-Controlled TD 的核心动机是把 `alpha` 解释成“希望 prediction output 改变多少”的单位，而不是“parameter vector 移动多少”的单位。
+What setting or testbed is used? Testbed 是 tile-coded random-walk prediction problem。底层 Markov chain 和目标 value function 固定，但 feature magnitude 被 uniform、uneven 和 lognormal patterns 人为缩放。
 
-## 研究问题
+What will we examine? 我们比较 fixed-step TD、normalized TD、trace-normalized TD(lambda) 和 true-online TD(lambda)，并在 feature scales 和 alpha 网格上观察 stability region，而不是只看一个调好的 alpha。
 
-主问题：在 streaming linear TD prediction 中，normalized 或 output-controlled updates 是否能显著扩大 feature scale 和 alpha 的稳定区域？
+What will we look at? 主要证据是 RMSE、seed-level divergence、weight norm、prediction-change magnitude 和 effective step size 的 heatmaps/tables。一个方法更强，意味着同一组 alpha 在更多 feature scales 下保持稳定。
 
-具体问题包括：固定 `alpha` 是否会因为 feature scale 改变而从稳定变成发散；把 update 除以当前 feature norm 或 eligibility trace norm 是否能让 prediction-change magnitude 更一致；trace-normalized TD(lambda) 是否能把这个思想推广到带 eligibility traces 的在线更新；true-online TD(lambda) 在公平 step-size 审计后是否仍然是强 baseline。
+## 独立研究范围
 
-## Alberta Plan 关联
+本 proposal 是关于 streaming value prediction 中 update units 的独立研究。它隔离 broader unit-invariance problem 中的 feature-scale side：底层 random-walk prediction problem 在概念上保持不变，只改变 feature vector 的单位和尺度。reward-origin effects、control behavior 和 model-based planning 不属于本报告范围，分别由其他 proposal 处理。
 
-这个 proposal 直接关联 value functions、streaming one-sample learning、limited computation、step-size adaptation 和 temporal uniformity。它没有使用 deep network，也没有 replay buffer。虽然它是 prediction-only 任务，但研究的是一个会影响所有 continual RL value learning 的基础机制：更新的单位究竟应该是 parameter space 还是 prediction/output space。
+本报告也不应被理解为对 true-online TD(lambda) 的一般否定。当前 true-online 条件是 feature-scale stress test 中的 raw-alpha trace baseline。它的 divergence 说明在 feature rescaling 下 raw parameter-space alpha 不公平，而不是说明 true-online TD(lambda) 在合适 tuning 或 normalization 下本质不稳定。
 
-## 环境设计
+## 证据等级
 
-实验环境是 tile-coded random-walk value prediction。Agent 在随机策略下观察一维 random walk 的 transitions，并预测到达右端 terminal 的概率。这个任务本身简单，但使用 overlapping tile-coded features 让 representation scale 成为可控变量，从而隔离 feature magnitude 对 TD update 的影响。
+证据等级：强独立主线候选，主要支持 prediction-side update geometry 机制；但 trace baseline 仍有公平性 caveat。完成的 CPU run 包含 20 seeds、20000 steps、5 种 feature-scale patterns、4 个 alphas 和 4 个 algorithms。关键结果按 seed-level event 统计：normalized TD 和 trace-normalized TD 在完整网格中没有 divergent seed-condition；fixed TD 和 raw-alpha true-online baseline 各有 141/400 个 seed-conditions 发散。
 
-当前 main pilot 使用四类 feature scale：`one` 表示正常尺度；`ten` 和 `hundred` 分别把 feature magnitude 放大 10 倍和 100 倍；`uneven` 使用非均匀 feature scaling，模拟不同 sensor/feature channel 尺度不一致的情况。Extended config 进一步加入 `lognormal` scale，并扩大 alpha/seeds/steps；该 CPU run 完成前，报告结论只基于 main pilot。
+当前证据还不是 control result，也不是完整 true-online TD(lambda) audit。下一步必须加入 max-stable-alpha table、normalized true-online TD(lambda)，以及同一条 stream 中的 no-reset feature-scale switch。只有完成这些后，才能声称 output-controlled updates 可以解决 control agent 中的 feature-unit drift。
 
-## 方法
+## Research Motivation
 
-比较方法包括 fixed TD、normalized TD、trace-normalized TD(lambda) 和 true-online TD(lambda)。Fixed TD 使用固定 raw `alpha`，update 方向是当前 feature 或 eligibility trace，因此同一个 TD error 在大尺度 feature 下会造成更大的 prediction movement。Normalized TD 使用近似 `alpha / (epsilon + ||x_t||^2)` 的缩放，使同一个 `alpha` 更接近对当前 prediction 的 output-level change 控制。Trace-normalized TD(lambda) 则用 `epsilon + ||z_t||^2`，因为带 trace 时实际 update direction 是 accumulated eligibility trace 而不是当前 feature 本身。
+Streaming RL 没有 replay buffer、minibatch 或多次遍历数据带来的稳定化效果。每一步更新都来自当前 transition。如果当前 feature vector 特别大，parameter-space alpha 可能在 agent 看到下一个 correction sample 前就造成巨大的 prediction change。这不是一个表面上的 numerical scaling 问题：Alberta Plan 式的 long-lived agent 可能同时维护许多 value functions、GVFs 和 learned models，而这些 predictions 会依赖不同单位、不同量纲、甚至随时间漂移的 sensory channels。
 
-True-online TD(lambda) 被纳入是因为它是重要的 online trace baseline。但当前报告对它保持谨慎：如果直接使用同一 raw alpha grid，它在 high-scale/high-alpha 下发散，并不能自动说明 true-online TD 不好；更合理的批评是本 proposal 必须补充 true-online 的 max-stable-alpha 和 canonical sanity audit。
+Alberta Plan 强调 ordinary experience、temporal uniformity、continual value-function learning 和 limited computation。这些约束使得人工为每个 sensor 或每个 value function 手动调 alpha 很不可取。更可扩展的原则是用 update 对 prediction 的预期影响定义更新大小，这与 normalized LMS 和 recent intentional updates for streaming RL 的观点一致。本 proposal 在一个机制最清楚的线性 Core RL 设置中检验这个思想。
 
-## 实验设计
+## Research Question
 
-当前可引用 main pilot result path 是 `experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main`。实验变量包括 feature scales `one/ten/hundred/uneven`，alphas `0.03/0.1/0.3`，lambda 对 trace variants 使用 `0.8`，seeds `0-4`，steps `5000`。主要指标包括 RMSE、divergence flag、weight norm、prediction_change 和 effective step size。
+Output-controlled 或 normalized TD 能否让 streaming value prediction 对 feature scale 和 trace magnitude 更稳健？
 
-这个实验不把“某个 alpha 下最低 RMSE”作为唯一成功标准。更重要的判据是同一 alpha range 是否能跨 feature scales 稳定工作，以及 prediction-change magnitude 是否因为 feature scale 变化而失控。一个方法如果只要每换一个 scale 就重新调 alpha 才能稳定，就不适合被解释成 streaming-compatible。
+Hypothesis：normalized TD variants 应该比 fixed-step TD 在 feature scales 和 step sizes 上有更大的稳定区域，因为它们的 alpha 更接近控制 output change，而不是 raw parameter movement。
 
-Extended 设计包括 seeds `0-19`、steps `20000`、scales `one/ten/hundred/uneven/lognormal`、alphas `0.01/0.03/0.1/0.3`。当前 CPU task 名为 `core-rl-output-extended-fixed-46602102`，目标目录是 `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`。在该目录出现 `condition_summary.json`、`config_used.json` 和 figures 前，它只能算 running/incomplete，不应写进结果索引。
+## Alberta Plan Connection
 
-## 当前结果
+本研究对应 Alberta Plan base agent 中 value-functions component。一个持续 agent 可能从同一条 experience stream 中学习许多 predictions，而这些 predictions 必须在每个 time step 用有限计算在线更新。本 proposal 也对应 temporal uniformity：没有特殊 calibration phase，没有 replay buffer，也没有事后重新缩放 dataset。agent 必须在 experience 到来时立即学习。
 
-![不同 algorithm、scale 和 alpha 下的 tail RMSE stability atlas。](../../../../experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main/figures/report_log_rmse_heatmap.png)
+## Related Work
 
-![不同 algorithm、scale 和 alpha 下的 divergence-rate atlas。](../../../../experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main/figures/report_divergence_heatmap.png)
+最直接的近年动机来自 Intentional Updates for Streaming Reinforcement Learning：在 batch-size-one learning 中，parameter-space step size 会产生不可预测的 output change，因此应先指定 update 的 intended outcome。Reward Centering 在 reward side 提出平行的 invariance 问题：arbitrary reward offsets 不应改变 continuing-control behavior。Streaming Deep RL Finally Works 和 Squeezing More from the Stream 提供 no-replay streaming regime 的背景；本项目为了保持 Core RL 和可解释性，故意停留在线性方法。True Online TD(lambda) 是重要的在线 trace baseline；当前 raw-alpha 实现必须谨慎解释，因为 true-online methods 在合适 step-size 使用下本来是很强的算法。
 
-![不同 algorithm、scale 和 alpha 下的 output-change atlas。](../../../../experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main/figures/report_prediction_change_heatmap.png)
+## Environment
 
-Main pilot 中，fixed TD 在 `hundred` scale 下对所有测试 alpha 都发散，在 `ten` scale 且 alpha `0.3` 时也发散，并且在若干 `uneven` 条件下出现非常大的 RMSE 或 weight norm。这支持核心担忧：raw `alpha` 并不是跨 feature scale 稳定的学习单位。
+环境是一个较大的 random-walk prediction task，使用 overlapping tile-coded features。agent 在 random policy 下预测到达右终端状态的概率。true values 已知，因此可以在 stream 中定期计算所有 states 上的 RMSE。
 
-Normalized TD 在所有测试 scale 和 alpha 下保持 finite，RMSE 大致处于 `0.44-0.56` 范围；trace-normalized TD(lambda) 也保持相近稳定区间。这个结果说明用 feature norm 或 trace norm 控制 update magnitude，可以显著降低 feature scale 对 TD stability 的影响。
+Feature-scale conditions 包括 `one`、`ten`、`hundred`、`uneven` 和 `lognormal`。这些条件让 qualitative prediction task 基本不变，但改变 feature vectors 的几何结构。`hundred` 是故意很严苛的 uniform rescaling；`uneven` 和 `lognormal` 让某些维度比其他维度大很多，更接近 multi-sensor setting。
 
-True-online TD(lambda) 在 easy scale 条件表现正常，但在 high-scale/high-alpha 条件发散。当前报告只把它当作 baseline audit 的提示：需要更小 alpha、更多 lambda 条件和 canonical true-online verification 后，才能对其公平评价。
+## Methods
 
-## 分析
+Fixed TD 使用常数 alpha，更新方向是 `x_t` 或 `z_t`。Normalized TD 用近似 `epsilon + ||x_t||^2` 的分母缩放 alpha，因此较大的 feature vector 不会自动带来更大的 prediction movement。Trace-normalized TD(lambda) 用 trace norm 做分母，因为 lambda 非零时真正的更新方向是 eligibility trace，而不是当前 feature 本身。True-online TD(lambda) 使用 lambda `0.8`，作为 principled trace method 加入比较；但在本报告中它是 raw-alpha baseline，不是经过调参或 normalization 的 true-online variant。
 
-这个 proposal 的核心 insight 不是 normalized TD 在某个曲线上 RMSE 更低，而是 `alpha` 的语义不同。Fixed TD 的 `alpha` 是 parameter-space multiplier；当 feature scale 改变时，它对 prediction output 的影响随之改变。Normalized TD 尝试让 `alpha` 更接近 output-space unit，使更新行为对 feature scaling 更鲁棒。
+记录的 `prediction_change` metric 估计更新后当前 prediction 变化了多少。这个指标很关键：一个 update rule 在 parameter space 看起来合理，但在 prediction space 可能已经不稳定。
 
-这对 continual RL 很重要。Long-lived agent 可能不断加入新 features、改变 sensory preprocessing、生成 auxiliary predictions，或者从环境中遇到 scale 变化。如果每次 representation scale 改变都要人工重新调所有 `alpha`，agent 的学习系统就不是 self-maintaining 的。Output-controlled update 提供了一种低计算成本的机制，让 value learning 更适合 streaming setting。
+## Experimental Design
 
-Trace-normalized TD(lambda) 的意义在于 eligibility traces 会改变 update direction 的 scale。只归一化当前 feature 不一定足够，因为真正写入 weights 的是 trace。当前 pilot 显示 trace normalization 能继承 normalized TD 的稳定性，但还需要更系统地扫 lambda 和 alpha。
+完成的 extended sweep 设置如下：
 
-## 有效性威胁
+- result path: `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`;
+- CPU task: `core-rl-output-extended-fixed-46602102`;
+- seeds: `0-19`;
+- 每个 seed-condition steps: `20000`;
+- representation: tile coding;
+- feature scales: `one`, `ten`, `hundred`, `uneven`, `lognormal`;
+- alphas: `0.01`, `0.03`, `0.1`, `0.3`;
+- algorithms: fixed TD, normalized TD, trace-normalized TD(lambda), raw-alpha true-online TD(lambda);
+- lambda: trace-normalized 和 true-online variants 使用 `0.8`，其他为 `0`。
 
-第一，当前任务是 prediction-only。它让机制更干净，但不能自动证明 control 中 policy improvement 也更稳定。后续应连接到 normalized Sarsa、actor-critic 或 reward-centered continuing control。
+决策标准不只是最低 RMSE。一个更适合 streaming 的 update 应该在 nuisance feature-unit changes 下保持稳定。因此 divergence 按 seed-level event 评价：只要某个 seed-condition 任意 logged row 中出现 `diverged = 1`，该 seed-condition 就记为 diverged。
 
-第二，true-online TD(lambda) baseline 还不够公平。当前 raw alpha grid 可能对 fixed/true-online baseline 太粗，应加入 max-stable-alpha 表和已知小任务 sanity check。
+## 实验设计依据
 
-第三，当前 main pilot 只有 5 seeds 和 5000 steps。Divergence 模式强，但最终报告应等待正在运行的 extended 20-seed 结果完成后再升级主要证据。
+random-walk prediction task 故意比 control benchmark 简单，因为研究问题是 update geometry。已知 true value function 允许直接测量 RMSE；tile coding 提供 overlapping linear features，使 feature norms 和 trace norms 真正影响学习动态。这个设计可以区分 prediction error、raw weight movement 和 actual output change 三个机制。
 
-第四，feature scaling 是 synthetic stress test。它适合研究 invariance，但真实 sensor stream 可能同时有 nonstationary scale、sparse features 和 changing relevance。更强实验应加入 midstream scale switch 且不 reset weights/traces。
+scale conditions 本身不是现实 sensor model，而是 invariance tests。uniform scaling 检查同一个 represented prediction 在不同单位下是否还能学习；uneven 和 lognormal scaling 检查少数大 feature components 是否会主导 streaming update。alpha grid 用来展示 stability boundary，不是为了选一个 tuned alpha。因此正确主图是 stability atlas 和 divergence table，而不是 single final-RMSE leaderboard。
 
-## 审稿式批评与回应
+## Results
 
-严格 reviewer 可能会说：random walk prediction 太简单，像数值技巧。回应是：本 proposal 的问题本来就是 update geometry 和 scale robustness；tile-coded overlapping features、scale/alpha grid、prediction-change logging 让这个问题可解释。下一步需要把机制迁移到 control，但不应在机制没弄清前直接上复杂 benchmark。
+![不同 algorithm、scale 和 alpha 下的 tail RMSE stability atlas。](figures/report_log_rmse_heatmap.png)
 
-Baseline reviewer 会指出：true-online TD(lambda) 不能被随便当作负结果。回应是：报告已经明确这只是当前配置下的 baseline warning；后续必须补 max-stable-alpha audit。
+![不同 algorithm、scale 和 alpha 下的 seed-level divergence-rate atlas。](figures/report_divergence_heatmap.png)
 
-Alberta Plan reviewer 会追问：这个 prediction-only 题目为什么有长期 agent 意义。回应是：Alberta Plan 的许多组件都依赖持续学习的 value functions 和 predictions。如果基础 TD update 的 step-size 语义随 representation scale 任意改变，后续 GVF、model、option value 或 actor-critic 都会继承这个不稳定性。
+![不同 algorithm、scale 和 alpha 下的 tail output-change atlas。](figures/report_prediction_change_heatmap.png)
 
-## 结论
+| Algorithm | Lambda | Seed-conditions diverged | Non-diverged final RMSE mean | Interpretation |
+|---|---:|---:|---:|---|
+| fixed TD | 0.0 | `141/400` (`35.2%`) | `0.551` | easy scales 下可用，但对 feature scale 极其敏感。 |
+| normalized TD | 0.0 | `0/400` (`0.0%`) | `0.461` | 所有测试 scale 和 alpha 下都稳定。 |
+| trace-normalized TD(lambda) | 0.8 | `0/400` (`0.0%`) | `0.497` | 带 traces 时，如果 normalize trace direction，也能保持稳定。 |
+| true-online TD(lambda), raw alpha | 0.8 | `141/400` (`35.2%`) | `0.382` | 在 surviving easy conditions 上 RMSE 低，但很多 high-scale conditions 发散。 |
 
-当前证据支持 Output-Controlled TD 的基本观点：streaming TD 不应只控制 raw parameter movement，还应控制 update 对 prediction output 的影响。Normalized 和 trace-normalized TD 在测试的 feature-scale stress grid 中更稳，而 fixed TD 明显脆弱。作为独立 Core RL 课题，它的研究问题清晰、机制可解释、与 Alberta Plan 的 value-function learning 关系直接；但最终版本仍需要 extended 结果、true-online baseline audit，以及至少一个 control-side extension 才能达到更强论文级证据。
+Fixed TD 在 scale `hundred` 的所有 alpha 下所有 seeds 都发散，在 scale `ten` 的 alpha `0.3` 下发散，在 scale `uneven` 的 alpha `0.1` 和 `0.3` 下发散。它在 `lognormal` alpha `0.3` 下也有小但真实的 divergence rate。
 
-## 复现
+Normalized TD 在完整网格中没有任何 seed-level divergence。Scale `hundred` 下，它在 alpha `0.01`、`0.03`、`0.1`、`0.3` 的 final RMSE 约为 `0.56`、`0.53`、`0.44`、`0.28`。Trace-normalized TD(lambda) 也没有 divergence；在 scale `hundred` 下，final RMSE 约为 `0.56`、`0.54`、`0.49`、`0.40`。
+
+Raw-alpha true-online TD(lambda) baseline 需要谨慎解读。它和 fixed TD 的 diverged seed-condition 数量相同，包括所有 `hundred` conditions；但它在未发散条件下 RMSE 很低，因为 surviving conditions 多数是更容易的 scale settings。因此这是一条关于公平 step-size comparison 的警示，不是对 true-online TD(lambda) 本身的否定。
+
+## Analysis
+
+Heatmaps 支持核心机制：当 feature scale 改变时，fixed alpha 不是一个好的 streaming prediction progress 单位。在 large 或 uneven scales 下，同一个 TD error 可能仅仅因为 feature vector 更大而产生巨大 output change。Normalized TD 改变 update 的分母，使 feature direction 变大时 effective step size 收缩。Trace-normalized TD 把同一思想应用到 accumulated eligibility trace。
+
+结果也说明为什么只做 one-alpha leaderboard 会误导。True-online TD(lambda) 有强理论和以往经验支持，但当实验操控的是 feature magnitude 时，用 raw-alpha true-online baseline 去和 normalized methods 比较并不公平。下一版应该加入 max-stable-alpha audit 和 normalized true-online variant，再决定如何评价 true-online TD(lambda)。
+
+## Threats To Validity
+
+当前任务是 prediction-only。这让 feature-scale mechanism 很干净，但如果要说明 control 侧也受益，需要在 Sarsa 或 actor-critic 中做进一步实验。
+
+Feature scaling 是 synthetic 的。这适合做 invariance test，但真实 sensor streams 可能有 drifting scale、changing relevance 和 partial observability。最重要的下一步是做 no-reset feature-scale switch。
+
+Divergence 现在使用 seed-level event rate，比 logged-row average 更可解释；但 final RMSE 仍然是最后 logged point，而不是 area-under-learning-curve。未来分析应同时报告 stability 和 learning speed。
+
+## Reviewer Critique And Revisions
+
+Strict Core-RL reviewer：random-walk prediction task 可能看起来太 toy。回应：最终实验使用 overlapping tile coding、5 种 feature-scale patterns、20 seeds 和 4-by-5 scale/alpha stress grid。环境简单是因为问题是 update geometry，而不是复杂行为。
+
+Function-approximation reviewer：true-online TD(lambda) 不应被不公平比较。回应：报告现在明确把它称为 raw-alpha baseline，并把 fair true-online audit 写成必需下一步。
+
+Reproducibility reviewer：CPU job 之前看起来像卡住，因为旧 runner 只有整个 sweep 结束才写结果。回应：job 已成功完成；后续 Output-Controlled TD runs 已加入 condition-level progress log。本报告也记录 rjob ownership 问题，并把 figures 存在 report folder。
+
+逐 proposal 审查矩阵：
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Core RL | random walk 可能显得太简单。 | 使用 tile coding、feature-scale stress、seed-level divergence 和 known-value RMSE 隔离 update-unit mechanism。 | 仍需 Sarsa 或 actor-critic control transfer。 |
+| Function approximation | raw-alpha true-online TD(lambda) 不是公平最终 baseline。 | 把它明确标为 raw-alpha baseline，避免泛化否定 true-online TD(lambda)。 | 需要 max-stable-alpha 和 normalized true-online variants。 |
+| Streaming learning | 每个 run 固定 scale 弱于 sensor drift。 | 当前结论限定为 fixed-condition invariance。 | 需要 no-reset feature-scale switch。 |
+| 统计 | logged-row divergence 会夸大长 run。 | 使用 seed-level divergence events。 | 仍可补 time-to-divergence 和 AUC。 |
+| 严格老师 | 报告应回答问题，而不是说 normalized TD 赢了。 | 主 claim 是 output-controlled update units 在 nuisance feature scaling 下保持稳定性。 | 若作为最终项目，还需更紧密连接 downstream control。 |
+
+## Conclusion
+
+Extended evidence 支持本 proposal 的主要观点：streaming TD 应该控制 prediction space 中的 update consequence，而不仅仅是 raw parameter movement。Normalized TD 和 trace-normalized TD(lambda) 在所有测试 feature scales 和 alphas 下稳定，而 fixed TD 在 scale stress 下非常脆弱。这个 proposal 作为独立 Core RL 研究很强，也为更大的 Scale-Invariant Continuing Control proposal 提供了直接动机。
+
+## Reproduction / 复现
 
 ```bash
 cd /mnt/shared-storage-user/yupeng/Core-RL
 
-PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/output_controlled_td/config_main.json
-
-PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_results.py --result-dir experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main --y-key rmse --group-keys algorithm scale alpha
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
+  --config experiments/alberta_core_rl/configs/output_controlled_td/config_extended.json
 ```
 
-Extended run 当前通过 CPU task wrapper 提交。若当前长实验完成，应先核对 `config_used.json`、`condition_summary.json` 和 figures，再把新 result path 回填到本报告、`final/indexes/results_zh.md` 和 `final/indexes/reproduction_zh.md`。
+当前 extended evidence 使用的 CPU-task 命令：
 
 ```bash
-PARTITION=safethm_cpu_task CPU=8 MEM=16000 bash experiments/alberta_core_rl/scripts/run_cpu_task.sh core-rl-output-extended-fixed "PYTHONNOUSERSITE=1 python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/output_controlled_td/config_extended.json"
+cd /mnt/shared-storage-user/yupeng/Core-RL
+
+PARTITION=safethm_cpu_task CPU=8 MEM=16000 \
+  bash experiments/alberta_core_rl/scripts/run_cpu_task.sh \
+  core-rl-output-extended-fixed \
+  "PYTHONNOUSERSITE=1 python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/output_controlled_td/config_extended.json"
+```
+
+由于 rjob 结果目录不可写，报告图表生成到 report folder：
+
+```bash
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  python experiments/alberta_core_rl/scripts/plot_report_figures.py \
+  --kind output-td \
+  --result-dir experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended \
+  --figure-dir final/reports/proposals/output_controlled_td/figures
 ```

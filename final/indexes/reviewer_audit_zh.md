@@ -8,7 +8,7 @@
 
 主要批评：最强几个报告仍然主要基于 5 seeds、5000 steps 的 pilot evidence，但部分结论使用了比证据更强的措辞。审稿人建议在 extended sweep 完成前，把当前结果明确降级为 pilot evidence。
 
-处理状态：已经启动 `reward_centered_sarsa`、`output_controlled_td`、`predictive_state_plasticity`、`continual_dyna_model_aging`、`dyna_planning_budget` 和 `unit_switching_continuing_control` 的 extended runs。Reward-Centered Sarsa、Dyna Planning Budget、Continual Dyna Model Aging、Predictive State Plasticity 和 Unit-Switching Continuing Control 的 extended evidence 已纳入报告或索引；Output-Controlled TD 现在通过已验证的 CPU task 通道运行，任务名为 `core-rl-output-extended-fixed-46602102`。
+处理状态：已经启动 `reward_centered_sarsa`、`output_controlled_td`、`predictive_state_plasticity`、`continual_dyna_model_aging`、`dyna_planning_budget` 和 `unit_switching_continuing_control` 的 extended runs。Reward-Centered Sarsa、Output-Controlled TD、Dyna Planning Budget、Continual Dyna Model Aging、Predictive State Plasticity 和 Unit-Switching Continuing Control 的 extended evidence 已纳入报告或索引；Output-Controlled TD 的 CPU task `core-rl-output-extended-fixed-46602102` 已成功完成。
 
 主要批评：`scale_invariant_continuing_control` 不能只做固定条件之间的 cross-run invariance，还需要同一条 stream 中途改变 reward/feature units 的 no-reset 实验。
 
@@ -24,9 +24,9 @@
 
 ### 复现与报告质量审查者
 
-主要批评：中文 `report_zh.md` 只是短的快速审阅笔记，不是英文报告的真正对应版本，并且缺少图表。
+主要批评：中文 `report_zh.md` 一开始只是短的快速审阅笔记，不是英文报告的真正对应版本；即使扩展后，仍有若干报告需要更严格的中英文内容一致性检查。
 
-处理状态：所有 `final/reports/**/report_zh.md` 都已经从快速摘要扩展为可单独审阅的中文报告，包含研究动机、RL setting、方法、实验设计、结果、解释、局限、审稿式批评回应、可用图表和复现命令。强主线报告有更完整的中文对应版本；支持性和负结果 proposal 也以诚实的独立研究记录呈现，而不是模板化摘要。
+处理状态：中文报告已经从快速摘要显著扩展，许多报告包含研究动机、RL setting、方法、实验设计、结果、解释、局限、审稿式批评回应、可用图表和复现命令。但这还不是完成的 consistency guarantee：下一轮必须逐个检查中英文报告的 result path、claim、limitations、figures 和 Proposal Template answers 是否一致。
 
 主要批评：`proposal_overview.md` 比 `proposal_overview_zh.md` 简短太多。
 
@@ -42,9 +42,9 @@
 
 ### 最新多角色复审跟进
 
-主要批评：Output-Controlled TD 的 extended 状态在中英文报告和索引中容易被误读，磁盘上存在 `20260709T051934Z_extended`，但该目录目前仍不完整。
+主要批评：Output-Controlled TD 的 extended 状态在中英文报告和索引中容易被误读；此前磁盘上存在 `20260709T051934Z_extended`，但当时目录仍不完整。
 
-处理状态：Output-Controlled TD 报告和索引已经统一写成：当前可引用 evidence 仍是 `20260708T153802Z_main`；CPU task `core-rl-output-extended-fixed-46602102` 正在运行；`20260709T051934Z_extended` 在标准 artifacts 写出前不能引用。
+处理状态：CPU task `core-rl-output-extended-fixed-46602102` 已成功完成，`20260709T051934Z_extended` 已包含标准 artifacts。Output-Controlled TD 的中英文报告、结果索引、复现说明和图表已更新为使用 extended evidence；divergence 现在按 seed-level event rate 汇总。
 
 主要批评：Dyna aging 的报告图静默丢掉了 `half_life` 维度。
 
@@ -60,13 +60,21 @@
 
 主要批评：不完整结果目录可能被误当作 evidence。
 
-处理状态：`experiments/alberta_core_rl/results/README.md` 已列出已知 incomplete directories；可写的旧目录加入 `INCOMPLETE.md` marker。当前 Output extended 目录由 rjob 容器用户创建，因此只在 README 和索引中标明 incomplete/running。
+处理状态：`experiments/alberta_core_rl/results/README.md` 已把 known incomplete directories 和 current extended evidence 分开列出。完成的 Output extended 目录由 rjob 容器用户创建，因此数据作为 evidence 保留，report-ready figures 存放在 report 目录下。
+
+主要批评：用户明确要求逐条核验原始需求后，`requirements_audit` 和 `status` 文档仍有过度完成表述。
+
+处理状态：`final/indexes/requirements_audit_zh.md` 和 `final/indexes/status_zh.md` 已改成保守的 gap-tracking 口径。现在会区分“结构上覆盖”和“研究深度完成”，明确记录缺少的 Proposal Template sections、弱/暂停 proposal 的真实状态，并把 `core-rl-scale-invariant-extended-33723554` 标成 running 而不是 evidence。
+
+主要批评：即使索引修正后，正式报告本体仍缺显式 Proposal Template answers、独立研究范围、证据等级、实验设计依据和逐 proposal 审查记录。
+
+处理状态：16 个英文报告和 16 个中文报告现在都已经包含必要结构章节。强 proposal 按强证据但仍需补实验处理；弱 proposal 明确写成 supporting、negative、dropped 或 quarantined。结构审计记录在 `final/indexes/report_section_audit_zh.md`。
 
 ## 当前待办
 
-- 等待仍在运行的 CPU-task extended job 完成：`output_controlled_td/config_extended.json`。目标结果目录是 `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`；完成后需要核对 `config_used.json`、`condition_summary.json` 和 figures，再写入报告。
-- 对 `scale_invariant_continuing_control/config_extended.json` 决定运行范围；这是最大的 fixed-condition sweep，应在当前任务完成后再安排，或迁移到已验证可用的 CPU-task 队列。
-- `output_controlled_td` extended summary 可用后，更新对应结果索引和报告；当前报告已经标明 extended 目录仍不完整。
+- 继续深化刚补上的 Proposal Template、证据等级和 reviewer sections；第一轮结构修复已经完成，但不是每个报告都已经 paper-perfect。
+- 继续 Output-Controlled TD follow-up：补 true-online TD(lambda) 的 max-stable-alpha 公平审计，以及 no-reset feature-scale switch 实验。
+- 继续监控 `core-rl-scale-invariant-extended-33723554`；它在 2026-07-09 14:40 HKT 确认为 RUNNING，`20260709T063128Z_extended` 已创建但尚无标准 artifacts。
 - 如果 `reward_centered_sarsa` 被选为最终独立题目，需要补 beta/gamma sweep 和 midstream reward-origin switch。
 - Dyna aging 在做一般化结论前，需要加入 gradual/stochastic drift environments。
 - 在把 true-online TD(lambda) 作为强负 baseline 前，需要补 max-stable-alpha audit。
@@ -75,6 +83,8 @@
 ## 本轮验证记录
 
 - `final/` 下所有 Markdown 图片链接检查通过。
+- 本轮修复后 `final/reports/**/report*.md` 图片检查通过，缺失图片为 0。
+- 16 个英文 `report.pdf` 已重新生成，PDF 导出输出中 `missing_images=0`。
 - `python -m compileall experiments/alberta_core_rl` 已完成且无报错。
-- 编译检查生成的 `__pycache__` 目录已清理。
+- 编译检查生成的 `__pycache__` 没有完全清理：`experiments/alberta_core_rl/` 下两个目录由 `nobody:nogroup` 拥有，普通用户删除时会 permission denied。
 - 拆分 report plotting utilities 后，Python 源文件仍满足每个文件低于 500 行的维护建议；当前最大文件是 `envs.py`，474 行。

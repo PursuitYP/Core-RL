@@ -12,7 +12,8 @@ See `draft/live_plan.md` for the evolving plan. This snapshot records the curren
 - Shared implementation in `experiments/alberta_core_rl/`, with proposal implementations split under `experiments/alberta_core_rl/studies/`.
 - Separate proposal configs and result directories for independent runs.
 - Main configs use `config_main.json`; `config_minimal.json` is preliminary only. `config_extended.json` files reuse internal `"suite": "main"` logic where needed, but new runner outputs from extended configs are labeled with `_extended`.
-- Completed extended evidence currently exists for Reward-Centered Sarsa, Dyna Planning Budget, Continual Dyna Model Aging, Predictive State Plasticity, and Unit-Switching Continuing Control. Output-Controlled TD extended run is still running and must be incorporated after completion.
+- Completed extended evidence currently exists for Reward-Centered Sarsa, Output-Controlled TD, Dyna Planning Budget, Continual Dyna Model Aging, Predictive State Plasticity, and Unit-Switching Continuing Control. Output-Controlled TD now uses the completed CPU-task result `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`.
+- The full fixed-condition Scale-Invariant Continuing Control extended sweep has been submitted as CPU task `core-rl-scale-invariant-extended-33723554`; it is not evidence until standard artifacts are produced.
 - Constraints: no replay buffer, no deep networks, CPU-scale experiments, exact commands and seed/result manifests for each run.
 
 This snapshot is intentionally brief; the current review entry point is `final/README.md`. Historical gate decisions are archived in `final/archive/legacy/proposal_gate_review.md`.

@@ -113,6 +113,30 @@ Upgrade path:
 
 Streaming Representation With Auxiliary Prediction is a useful negative diagnostic. It shows that auxiliary prediction alone is not a research contribution unless the auxiliary question is connected to downstream value or control. The proposal should be redesigned or merged conceptually with GVF Question Design.
 
+## Proposal Template Answers
+
+Focused RL question: Does an auxiliary next-feature prediction target improve online value prediction in a streaming linear setting? The setting is a streaming prediction task with an auxiliary head; the comparison is value-only versus value-plus-auxiliary learning. The metrics are value error, auxiliary error, and phase/switch recovery. Compute is small; fallback is a negative diagnostic for useful-auxiliary-question design.
+
+## Independent Research Scope
+
+This proposal studies one auxiliary target, not representation learning in general. It should not be used as evidence against auxiliary learning or GVFs broadly. Its role is to show that an auxiliary target must be task-relevant to improve the main prediction/control objective.
+
+## Evidence Level
+
+Evidence level: negative diagnostic / redesign target. The current auxiliary prediction does not materially improve value error. That is useful because it prevents the shallow conclusion that any extra prediction makes representation better.
+
+## Experiment Design Rationale
+
+The experiment should be judged by downstream value error, not only auxiliary MSE. A future version needs task-relevant cumulants, learned-feature ablations, and downstream control metrics. Without those, the correct conclusion is that the chosen auxiliary question is not useful enough.
+
+## Reviewer Audit
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Representation | Auxiliary accuracy may not imply usefulness. | Evidence level is negative diagnostic. | Needs task-relevant GVF targets. |
+| Metrics | Auxiliary MSE is not the main outcome. | Value error is emphasized. | Control metric remains absent. |
+| Strict instructor | Do not call this representation learning success. | Report frames it as redesign target. | Should merge with GVF useful-question line if expanded. |
+
 ## Reproduction
 
 ```bash

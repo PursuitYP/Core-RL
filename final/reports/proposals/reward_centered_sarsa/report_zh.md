@@ -12,6 +12,30 @@
 
 本研究测试 continuing control 中的 reward-shift invariance。RL 问题是 access-control queue：agent 观察服务器空闲数量和当前 customer priority，然后持续在线决定 accept/reject，不存在离线训练阶段或 replay buffer。实现的方法是 discounted Sarsa、reward-centered Sarsa 和 differential Sarsa，均使用 tabular/linear action values。实验改变 constant reward shifts，并记录 unshifted reward、accept behavior、high-priority acceptance、reward baseline、TD error 和 Q norm。当前最强证据来自 20 seeds、20000 steps 的 alpha sweep：ordinary discounted Sarsa 会产生明显依赖 reward shift 的 value scale，而 centered 和 differential variants 在 value norm 与 unshifted reward 上更稳定。下一步需要继续补 beta/gamma sensitivity，并在同一条 stream 中途切换 reward origin，检查 reward baseline 的恢复速度。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：在 online continuing control task 中，agent 是否能学习到对 arbitrary constant reward shift 不敏感的 action values 和行为？这个问题不是问 reward-centered Sarsa 的 shifted return 是否最高，而是问学习动态是否满足 average-reward continuing problem 中应有的 reward-origin invariance。
+
+Setting / testbed：testbed 是经典 access-control queue。它比 two-state diagnostic 更有意义，因为它有 state-dependent action feasibility、priority-dependent rewards 和 accept/reject control tradeoff；同时它仍足够小，可以审计 TD error、value norm、reward baseline 和 policy probes。
+
+Implemented comparison：实验比较 discounted Sarsa、reward-centered Sarsa 和 differential Sarsa，所有方法都从单条 online stream 学习，不使用 replay buffer 和 deep network。已完成 sweep 改变 reward shift 和 alpha；后续必须补 beta、gamma 和 midstream reward-origin change。
+
+Metric / figure：主证据必须同时包括 unshifted reward、Q norm、high-priority acceptance 和 divergence。只有当 centered methods 保持行为并防止 value-scale inflation 时，才算支持 hypothesis；只看 reward 的表格无法回答 invariance question。
+
+Compute need / fallback：当前 alpha/reward-shift extended evidence 已完成，CPU 成本可控。如果没有时间继续扩实验，诚实 fallback 是把本课题提交为 fixed-condition reward-origin invariance study，并明确 nonstationary reward-origin switching 仍是 future work。
+
+## 独立研究范围
+
+本 proposal 是关于 continuing control 中 reward-origin invariance 的独立研究。它不依赖 Output-Controlled TD 或 Scale-Invariant Continuing Control 才能读懂：那些报告研究 feature scale 或 combined unit effects，本报告只隔离 reward side。它也不声称解决所有 average-reward learning、reward shaping 或 nonstationarity；它的范围更窄也更清楚：constant reward translation 不应该迫使 access-control Sarsa 重新调 step size、不应该造成任意 value-scale expansion，也不应该改变 accept/reject behavior。
+
+它与 Centered TD Diagnostics 的边界也需要明确。diagnostic report 在 tiny prediction setting 中解释机制；本报告提供 control environment、policy probes、seed sweep 和主要证据。如果最终只选择一个 reward-centering 方向提交，本报告应作为主 paper-style study，diagnostic 只作为 supporting material。
+
+## 证据等级
+
+证据等级：强独立主线候选，但仍有明确未完成 sensitivity tests。已完成结果包含 20 seeds、每个 condition 20000 online steps、5 个 reward shifts、3 个 alphas 和 3 个 algorithms。它足以支持 fixed-condition claim：ordinary discounted Sarsa 对 reward origin 敏感，而 centered/differential variants 明显更稳健。
+
+但这还不是完整 continual-adaptation paper。当前没有 no-reset midstream reward-origin switch，没有 reward baseline 的 beta sweep，也没有 discounted variants 的 gamma sweep。因此当前结论应限制在 separate streams across fixed reward origins 的 invariance，而不是同一条 stream 中 reward sensor 改变后的适应能力。
+
 ## 研究动机
 
 Alberta Plan 把智能体看作在 temporally uniform experience stream 中持续行动和持续学习的系统，而不是在 episodic benchmark 中反复 reset 的训练器。在这种设定下，reward origin 是一个很干净的压力测试：如果所有 reward 都平移同一个常数，average-reward continuing task 的 policy preference 不应该改变。长期运行的 agent 不应该因为工程师重新定义 reward sensor 的零点，就需要重新调 step size 或换 representation。
@@ -54,6 +78,12 @@ Alberta Plan 把智能体看作在 temporally uniform experience stream 中持�
 
 仍未完成的敏感性实验包括 beta values `0.003, 0.01, 0.03`，discounted/centered variants 的 gamma sweep，以及同一条 stream 中途切换 reward origin、不重置 weights 的 nonstationary extension。
 
+## 实验设计依据
+
+环境、变量和指标用于拆开三个容易被混淆的解释。第一，unshifted reward 和 high-priority acceptance 测试任务行为，而不是 learner 看到的 shifted scalar reward。第二，Q norm 和 TD-error scale 测试 learner 是否把任意 reward offset 编码成巨大的 value component。第三，divergence 和 policy probes 测试这种影响是否只是数值外观，还是会改变实际 control。因此 access-control queue 在这里不是 leaderboard benchmark，而是用来测量 reward-origin invariance 的 controlled continuing system。
+
+当前 grid 是有针对性的，不是 blind hyperparameter search。reward shifts `-8` 到 `8` 相对于 access-control priority 足够大，可以给 nuisance value offset 施压。alpha grid 同时包含 ordinary Sarsa 可学习的设置和 value-scale inflation 明显的设置。下一步不应只是随机扩大网格，而应针对剩余因果缺口：beta 决定 baseline lag，gamma 决定 discounted offset amplification，midstream shift 检查不重置 weights 的 continual recovery。
+
 ## 结果
 
 下面的报告图使用 seed-tail condition summaries，而不是把所有 learning curves 挤在一张图里。它们分别展示 reward、value scale、行为倾向和 divergence，因此更适合支撑 reward-origin invariance 的结论。
@@ -81,6 +111,16 @@ Reward-centered Sarsa 的 Q norm 小得多，在当前 reward shifts 和 alphas 
 ## 审稿式批评与修订
 
 Sutton-style critique：报告不能声称 episodic return improvement，必须聚焦 continuing invariance 和 average-reward reasoning。Experimental critique：最初 5-seed pilot 不足以支撑最终统计结论；这一点已经通过 20-seed extended sweep 部分解决。Baseline critique：differential Sarsa 是严肃 baseline，不应当被放到 appendix。已经完成的修订包括：主环境从 two-loop MDP 升级到 access-control queue；shifted observed reward 和 unshifted task reward 分开记录；运行 seeds `0-19`、steps `20000`、alpha grid 的 extended sweep。仍需修订：beta/gamma ablations 和 midstream reward-shift changes。
+
+逐 proposal 审查矩阵：
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Alberta Plan | 本研究必须是 continual ordinary experience，不是 episodic score。 | 使用 continuing access-control stream，并把 unshifted task reward 与 observed reward 分开。 | 仍缺 midstream reward-origin switch。 |
+| Average-reward RL | Discounted Sarsa 不是唯一相关 baseline。 | 加入 differential Sarsa 作为严肃 average-reward baseline。 | gamma/beta interaction 仍需更大 sweep。 |
+| 统计 | 5 seeds 不足以支撑结论。 | 已完成 20-seed extended sweep。 | 仍可补 AUC 和 paired seed effects。 |
+| 机制 | reward 改善可能隐藏行为变化。 | 加入 Q norm、high-priority acceptance、accept rate 和 divergence figures。 | 仍缺全状态 policy-distance probes。 |
+| 严格老师 | 不应把 reward centering 写成 universal solution。 | 结论限定在 access-control Sarsa 的 reward-origin invariance。 | 更大 continuing environments 才能支撑泛化 claim。 |
 
 ## 结论
 

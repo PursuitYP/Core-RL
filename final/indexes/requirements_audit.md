@@ -2,41 +2,45 @@
 
 Date: 2026-07-09
 
-This audit maps the original and follow-up user requirements to current project artifacts. It is meant to prevent the project from silently narrowing into only a few strong results.
+This audit is deliberately conservative. It maps the user's original and follow-up requirements to the current project artifacts, but it does not claim that the full research revision is complete. The source-of-truth plan for the current large revision is `final/indexes/revise_plan_20260709.md`; this file records coverage status and remaining gaps.
 
 ## Coverage Summary
 
-| Requirement | Current status | Artifact |
-|---|---|---|
-| Read course/project sources and Alberta Plan materials | Done; source map maintained | `AGENTS.md`, `resources/alberta_plan_related/README.md`, `draft/iterative_research_record.md` |
-| Prioritize Reward-Centered Sarsa and Output-Controlled TD | Done; both implemented and expanded into independent reports. Reward-Centered Sarsa has completed extended evidence; Output-Controlled TD extended run is still running. | `final/reports/proposals/reward_centered_sarsa/`, `final/reports/proposals/output_controlled_td/` |
-| Analyze other proposals and design new angles | Done and continuing; all canonical proposals have independent folders and reports | `final/reports/proposals/` |
-| Search Alberta Plan and follow-up work | Done and continuing; 2024-2026 reward-centering, intentional-update, streaming, GVF, continual-RL work cached | `resources/alberta_plan_related/README.md` |
-| Complete Proposal Template questions for each proposal | Done for all 13 canonical proposals inside the current standalone reports; earlier template drafts are archived for audit | `final/reports/proposals/*/report.md`, `final/archive/proposal_fragments/*/proposal_template.md` |
-| At least five reference/course-derived proposals | Covered: reward centering, output control, GVF state, generate-and-test, options | `final/reports/proposals/` |
-| At least five self-designed or extended proposals | Covered: TIDBD, Baird, Dyna, centered TD, on-policy atlas, GVF question design, bandit, streaming representation | `final/reports/proposals/` |
-| New larger integrated Core RL proposals | Three independent larger proposals created; Scale-Invariant has pilot plus unit-switch extension, Dyna Aging has completed extended half-life/budget evidence, Predictive State has completed extended negative gate | `final/reports/integrated/` |
-| No replay buffer and no deep network | Enforced in implementations and manifests | `experiments/alberta_core_rl/`, `final/indexes/reproduction.md` |
-| Use richer environments beyond toy-only | Main studies use access-control, tile random walk, changing gridworld, long T-maze; diagnostics are clearly bounded | `final/indexes/results.md` |
-| Continual improvement with critic rounds | Done; multiple critique rounds recorded, including independent-study gap audit | `draft/critique_round_9_independent_study_gap_matrix.md` |
-| Professional project structure and clean environment | Done; dedicated conda env and modular implementation | `conda-env-configs/README.md`, `experiments/alberta_core_rl/studies/` |
-| Each proposal independent | Done structurally through one canonical standalone `report.md` per proposal; earlier separate template/results/critique/reproduction fragments are archived, not current review files | `final/reports/proposals/`, `final/archive/proposal_fragments/` |
-| Reports include figures/tables | Done via linked figures and result summaries; more polished tables can still be added after longer CPU sweeps | `final/reports/proposals/*/report.md`, `final/reports/integrated/*/report.md` |
+| Requirement | Current status | Main artifact | Remaining gap |
+|---|---|---|---|
+| Read course/project sources and Alberta Plan materials | Covered, but still needs deeper per-proposal integration | `AGENTS.md`, `resources/alberta_plan_related/README.md`, `draft/iterative_research_record.md` | Many reports cite the Alberta Plan lens too generally; each strong report should explain exactly how the source changes the research question or experimental design. |
+| Prioritize Reward-Centered Sarsa and Output-Controlled TD | Covered with implementation, reports, figures, and extended evidence | `final/reports/proposals/reward_centered_sarsa/`, `final/reports/proposals/output_controlled_td/` | Reward-Centered still needs beta/gamma and no-reset reward-origin switch experiments; Output-Controlled still needs a fair true-online audit and no-reset feature-scale switch. |
+| Analyze other proposals and design new angles | Partially covered | `final/reports/proposals/`, `final/reports/integrated/` | Several reports remain diagnostic or negative; their reports must explicitly say whether they are submission-grade, support material, redesign targets, or quarantined. |
+| Search Alberta Plan and follow-up work | Covered and continuing | `resources/alberta_plan_related/README.md`, `final/indexes/revise_plan_20260709.md` | The new literature needs to be threaded into individual proposal reports rather than only stored in index-level notes. |
+| Complete Proposal Template questions for each proposal | First structural pass covered | `final/reports/**/report.md`, `final/reports/**/report_zh.md`, `final/indexes/report_section_audit.md` | The sections now exist in all reports; the next gap is depth, content matching, and experiment follow-through. |
+| At least five reference/course-derived proposals | Structurally covered | Reward centering, output control, GVF state, generate-and-test, options | Some course-derived proposals are weak or quarantined; they should not be presented as equally mature research studies. |
+| At least five self-designed or extended proposals | Structurally covered | TIDBD, Baird, Dyna, centered TD, on-policy atlas, GVF question design, streaming representation, integrated proposals | Several self-designed proposals need deeper experiments or honest demotion to diagnostic/negative material. |
+| New larger integrated Core RL proposals | Partially covered | `final/reports/integrated/` | Three integrated reports exist, but the new `Useful Predictive Knowledge Under Partial Observability and Resource Limits` candidate is only planned, not implemented as a full report/experiment package. |
+| No replay buffer and no deep network | Covered | `experiments/alberta_core_rl/`, `final/indexes/reproduction.md` | Continue checking this constraint whenever adding experiments. |
+| Use richer environments beyond toy-only | Partially covered | Access-control, tile random walk, changing gridworld, T-maze streams | Some weaker proposals remain too toy-like and should either be upgraded with richer environments or demoted. |
+| Continual improvement with critic rounds | Partially covered | `final/indexes/reviewer_audit.md`, `draft/critique_round_9_independent_study_gap_matrix.md` | The current audit is mostly global; the new plan requires per-proposal 12-role critique/action/risk tables. |
+| Professional project structure and clean environment | Partially covered | `conda-env-configs/README.md`, `experiments/alberta_core_rl/studies/`, `final/README.md` | The final structure is improved, but status/index files still need stricter source-of-truth discipline. Two `__pycache__` directories are owned by `nobody:nogroup` and cannot be removed by the normal user. |
+| Each proposal independent | First structural pass covered | `final/reports/proposals/`, `final/reports/integrated/` | Every report now states independent scope and evidence level; strong reports still need deeper experiments and weak reports need continued honest framing. |
+| Reports include figures/tables | Covered for several strong reports; partial overall | `final/reports/**/figures/`, report PDFs | Some weak/supporting reports still need clearer primary tables or diagnostic figures tied to named research questions. |
+| Current CPU-task tracking | Covered for status only | `final/indexes/status.md`, `final/indexes/revise_plan_20260709.md` | `core-rl-scale-invariant-extended-33723554` is RUNNING as of 2026-07-09 14:40 HKT; its result directory exists but has no standard artifacts yet, so it is not evidence. |
 
 ## Current Deliverable Structure
 
 - Canonical proposal index: `final/reports/proposals/README.md`
 - Canonical proposal reports: `final/reports/proposals/<proposal>/report.md`
+- Chinese proposal reports: `final/reports/proposals/<proposal>/report_zh.md`
 - Archived proposal fragments: `final/archive/proposal_fragments/<proposal>/`
-- Three larger integrated proposals: `final/reports/integrated/`
+- Larger integrated reports: `final/reports/integrated/`
 - Current result index: `final/indexes/results.md`
 - Reproduction note: `final/indexes/reproduction.md`
+- Current major revision plan: `final/indexes/revise_plan_20260709.md`
 - Iterative research log: `draft/iterative_research_record.md`
 
-## Remaining Risks
+## Highest-Priority Remaining Work
 
-- Several proposals are still negative or diagnostic rather than strong positive studies. They are independent, but their conclusions must remain honest.
-- Several strong lines now have 20-seed extended evidence. Output-Controlled TD still needs its running extended sweep incorporated.
-- Many supporting or negative proposals remain 5-seed pilots. That is acceptable only because they are explicitly framed as diagnostics, redesign targets, or dropped sanity checks.
-- Predictive State Plasticity is currently an extended negative gate result rather than a positive learned-state result.
-- Scale-Invariant Continuing Control still needs the full fixed-condition extended grid or a deliberately scoped replacement sweep.
+1. Add explicit Proposal Template Answers, independent scope, evidence level, required next experiments, and reviewer-audit sections to all 16 current reports.
+2. Deepen the strongest proposals with targeted experiments rather than only polishing text.
+3. Recast weak proposals as negative/diagnostic/quarantined where appropriate, with failure mechanisms and upgrade conditions.
+4. Make English and Chinese report pairs content-consistent, not merely parallel in filename.
+5. Integrate current literature into each proposal's motivation and design instead of keeping it only in global notes.
+6. Monitor `core-rl-scale-invariant-extended-33723554` and incorporate it only after `metrics.csv`, `summary.json`, `condition_summary.json`, `config_used.json`, and `manifest.json` are present.

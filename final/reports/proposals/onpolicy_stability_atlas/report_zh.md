@@ -60,6 +60,30 @@ Strict reviewer 会说：没有 intervention 的 study 不能作为主贡献。�
 
 On-Policy TD(lambda) Stability Atlas 是聚焦的诊断 proposal。它展示 feature scale 和 trace length 会实质改变 fixed-alpha stability。结果支持 output-control argument，同时作为 TD(lambda) failure regions 的独立地图保留下来。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：online prediction 中，TD(lambda) 的稳定性如何随 alpha、lambda 和 feature scale 改变？setting 是 tile-coded prediction stream；比较是 descriptive atlas，不是新算法。主证据应是 max-stable-alpha maps 或 heatmaps，而不是单条曲线。compute 小到中等；fallback 是作为 Output-Controlled TD 的 diagnostic appendix。
+
+## 独立研究范围
+
+这个 atlas 可以作为独立诊断图谱，但不是 intervention study。它解释为什么需要 output-controlled 或 normalized updates：ordinary parameter-step TD(lambda) 在某些 scale/alpha/lambda 下会变脆弱。
+
+## 证据等级
+
+证据等级：supporting atlas。它对机制和 baseline calibration 有价值，但不应作为主正向方法提交，因为它没有提出或测试 remedy。
+
+## 实验设计依据
+
+alpha/lambda/scale grid 本身就是科学对象。它把 stability 从个别 divergence 变成边界地图。下一步应把过载 learning curves 转成真正 atlas figures：tail RMSE 和 divergence heatmaps。
+
+## 审查矩阵
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Stability | curve 不是 atlas。 | 报告把 heatmaps/max-stable-alpha 写成下一步主图。 | 当前图仍可能过密。 |
+| Method | 没有新算法。 | 证据等级写成 supporting diagnostic。 | 不能替代 Output-Controlled TD。 |
+| 严格老师 | 不能只是画图。 | 用来动机化 normalized update units。 | 需要与 Output-Controlled metrics 对齐。 |
+
 ## 复现
 
 ```bash

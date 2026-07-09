@@ -8,7 +8,7 @@ This log records the current multi-reviewer critique cycle for the Core-RL proje
 
 Main critique: the strongest reports were still written around 5-seed, 5000-step pilot evidence, while several conclusions used language stronger than the evidence justified. The reviewer recommended demoting current results to pilot evidence until extended sweeps are available.
 
-Action taken: extended runs were launched for `reward_centered_sarsa`, `output_controlled_td`, `predictive_state_plasticity`, `continual_dyna_model_aging`, `dyna_planning_budget`, and `unit_switching_continuing_control`. Completed extended evidence has been incorporated for Reward-Centered Sarsa, Dyna Planning Budget, Continual Dyna Model Aging, Predictive State Plasticity, and Unit-Switching Continuing Control. Output-Controlled TD is now running as CPU task `core-rl-output-extended-fixed-46602102` after a successful CPU smoke validation.
+Action taken: extended runs were launched for `reward_centered_sarsa`, `output_controlled_td`, `predictive_state_plasticity`, `continual_dyna_model_aging`, `dyna_planning_budget`, and `unit_switching_continuing_control`. Completed extended evidence has been incorporated or indexed for Reward-Centered Sarsa, Output-Controlled TD, Dyna Planning Budget, Continual Dyna Model Aging, Predictive State Plasticity, and Unit-Switching Continuing Control. Output-Controlled TD completed as CPU task `core-rl-output-extended-fixed-46602102`.
 
 Main critique: `scale_invariant_continuing_control` needs an in-stream unit-change experiment, not only separate fixed-condition sweeps.
 
@@ -24,9 +24,9 @@ Action taken: future report edits will keep this framing. The extended run now a
 
 ### Reproducibility And Report-Quality Reviewer
 
-Main critique: Chinese `report_zh.md` files are short quick-review notes, not true counterparts to the English reports, and they do not include figures.
+Main critique: Chinese `report_zh.md` files started as short quick-review notes, not true counterparts to the English reports, and several reports still need stronger content matching.
 
-Action taken: all `final/reports/**/report_zh.md` files have been expanded from quick-review notes into standalone Chinese review reports with motivation, RL setting, method, experiment design, results, interpretation, threats, critique response, figures where available, and reproduction commands. The strongest reports now have fuller Chinese counterparts; supporting and negative proposals are also written as honest independent studies rather than generic summaries.
+Action taken: Chinese reports have been expanded substantially from quick-review notes, and many now include motivation, RL setting, method, experiment design, results, interpretation, threats, critique response, figures where available, and reproduction commands. This is not yet a completed consistency guarantee: the next revision must check each English/Chinese pair for matching result paths, claims, limitations, figures, and Proposal Template answers.
 
 Main critique: `proposal_overview.md` was much shorter than `proposal_overview_zh.md`.
 
@@ -42,9 +42,9 @@ Action taken: `run_proposal` now labels outputs from `config_extended.json` with
 
 ### Latest Multi-Role Follow-Up
 
-Main critique: Output-Controlled TD had inconsistent evidence status. English and Chinese reports could be read as implying that extended evidence was available, while the actual `20260709T051934Z_extended` directory is still incomplete.
+Main critique: Output-Controlled TD had inconsistent evidence status. English and Chinese reports could be read as implying that extended evidence was available, while the actual `20260709T051934Z_extended` directory was incomplete at the time.
 
-Action taken: Output-Controlled TD reports and indexes now state that the citable evidence is still `20260708T153802Z_main`; CPU task `core-rl-output-extended-fixed-46602102` is running, and `20260709T051934Z_extended` must not be cited until standard artifacts exist.
+Action taken: CPU task `core-rl-output-extended-fixed-46602102` has now succeeded, and `20260709T051934Z_extended` contains the standard artifacts. Output-Controlled TD reports, result indexes, reproduction notes, and figures have been updated to use this extended evidence. Divergence is now summarized as a seed-level event rate.
 
 Main critique: Dyna aging report figures silently dropped the `half_life` dimension.
 
@@ -60,13 +60,21 @@ Action taken: the report now states that the current submission-grade evidence i
 
 Main critique: incomplete result directories could be mistaken for evidence.
 
-Action taken: `experiments/alberta_core_rl/results/README.md` now lists known incomplete directories. Local old incomplete directories have `INCOMPLETE.md` markers where writable; the active rjob-created Output directory is noted in the README because it is owned by the container user.
+Action taken: `experiments/alberta_core_rl/results/README.md` now lists known incomplete directories and separately lists current extended evidence. The completed rjob-created Output directory is noted as evidence, with report-ready figures stored in the report folder because the result directory is not writable from the normal shell.
+
+Main critique: the requirement audit and status documents still overclaimed completion after the user explicitly asked for a stricter check against the original requirements.
+
+Action taken: `final/indexes/requirements_audit.md` and `final/indexes/status.md` have been rewritten in a conservative gap-tracking form. They now distinguish structural coverage from completed research depth, identify missing Proposal Template sections, record weak/quarantined proposals honestly, and track `core-rl-scale-invariant-extended-33723554` as running rather than evidence.
+
+Main critique: even after the indexes were corrected, the formal reports themselves still lacked explicit Proposal Template answers, independent research scope, evidence level, experiment-design rationale, and per-proposal critique records.
+
+Action taken: all 16 English reports and all 16 Chinese reports now include the required structural sections. Strong proposals were framed as strong with remaining experiments; weak proposals were explicitly marked as supporting, negative, dropped, or quarantined. The structural audit is recorded in `final/indexes/report_section_audit.md`.
 
 ## Current Open Items
 
-- Finish the still-running CPU-task extended job: `output_controlled_td/config_extended.json`. The expected result directory is `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`; verify `config_used.json`, `condition_summary.json`, and generated figures before citing it.
-- Run or decide scope for `scale_invariant_continuing_control/config_extended.json`; it is the largest fixed-condition sweep and should be scheduled after current jobs finish or moved to a verified CPU-task queue.
-- Update `output_controlled_td` result indexes and reports once its extended summary is available; the current reports already mark the extended directory as incomplete.
+- Deepen the newly added Proposal Template/evidence/reviewer sections where they change scientific decisions; the first structural pass is complete, but not every report is paper-perfect.
+- Continue the Output-Controlled TD follow-up: add a fair true-online TD(lambda) max-stable-alpha audit and a no-reset feature-scale switch experiment.
+- Continue monitoring `core-rl-scale-invariant-extended-33723554`; it was RUNNING at 2026-07-09 14:40 HKT, and `20260709T063128Z_extended` exists but has no standard artifacts yet.
 - Add beta/gamma and midstream reward-origin tests for `reward_centered_sarsa` if the standalone paper is selected as a final topic.
 - Add gradual/stochastic drift environments for Dyna aging before making general claims beyond abrupt changing gridworlds.
 - Add true-online TD(lambda) max-stable-alpha audit before treating that baseline as a strong negative comparison.
@@ -75,6 +83,8 @@ Action taken: `experiments/alberta_core_rl/results/README.md` now lists known in
 ## Verification After This Revision
 
 - Markdown image-link check passed for all files under `final/`.
+- Report-image check passed for `final/reports/**/report*.md` with zero missing images after this repair pass.
+- All 16 English `report.pdf` files were regenerated, with `missing_images=0` in the PDF export output.
 - `python -m compileall experiments/alberta_core_rl` completed without errors.
-- Generated `__pycache__` directories were cleaned after the compile check.
+- Generated `__pycache__` directories were not fully cleaned: two directories under `experiments/alberta_core_rl/` are owned by `nobody:nogroup`, and normal-user cleanup fails with permission denied.
 - Python source files remain under the 500-line guidance after splitting report plotting utilities; `envs.py` is the largest at 474 lines.

@@ -141,6 +141,30 @@ Required next revision:
 
 TIDBD-Lite Plasticity is a valid independent mechanism proposal, but not yet a positive performance story. It shows meaningful per-feature step-size adaptation after a relevance switch, while normalized TD remains stronger on prediction error. The next version should upgrade the algorithm and environment before making broader claims about plasticity.
 
+## Proposal Template Answers
+
+Focused RL question: Can per-feature step-size adaptation track changing feature relevance in a streaming prediction/control setting? The current setting is a TIDBD-lite diagnostic, not canonical TIDBD. The comparison is TIDBD-lite versus fixed/normalized TD-style baselines; the metrics are prediction error, alpha trajectories, relevance switches, and recovery. Compute is modest; fallback is a mechanism diagnostic until canonical TIDBD or AutoStep is implemented.
+
+## Independent Research Scope
+
+This report studies feature-wise plasticity signals, not a finished performance method. It should not be merged into Predictive State Plasticity as completed positive evidence. Its role is to show whether alpha dynamics respond to relevance changes and what remains missing.
+
+## Evidence Level
+
+Evidence level: supporting mechanism diagnostic. The current TIDBD-lite implementation shows interpretable alpha dynamics, but normalized TD has stronger error in some conditions. Therefore the report cannot claim that TIDBD-lite improves performance.
+
+## Experiment Design Rationale
+
+The experiment is useful only if it separates "alpha changes visibly" from "learning improves." The next design should implement canonical TIDBD/AutoStep, add repeated relevance switches, and report recovery AUC, not only final error.
+
+## Reviewer Audit
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Algorithm | TIDBD-lite is not canonical TIDBD. | Evidence level is diagnostic. | Needs canonical TIDBD/AutoStep. |
+| Performance | Alpha adaptation may not improve error. | Report distinguishes alpha dynamics from prediction gain. | Normalized TD may remain stronger. |
+| Strict instructor | Do not use plasticity language without utility evidence. | Required next metrics include recovery AUC and repeated switches. | Current result is supporting only. |
+
 ## Reproduction
 
 ```bash

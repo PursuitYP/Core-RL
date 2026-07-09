@@ -66,6 +66,30 @@ Strict reviewer 会指出：oracle 比 random 还差时，这个实验不能支�
 
 Generate-and-Test Trace Features 是一个有效的独立负结果。它说明 limited-capacity feature adaptation 是有意义的 Core RL 问题，但当前实现没有改善 prediction error。下一版需要更强 oracle、重复非平稳变化，以及直接绑定 recovery 或 downstream control 的 utility metric。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：在 limited feature budget 下，generate-and-test replacement 能否发现改善 nonstationary delay prediction 的 trace features？setting 是 delay-switch trace-prediction stream；比较 random replacement、utility replacement 和 oracle-style trace banks。主指标是 downstream prediction error、active trace timescale、feature survival 和 post-switch recovery。compute 小；fallback 是 negative redesign result。
+
+## 独立研究范围
+
+这是独立负结果 representation-learning proposal。它没有证明 generate-and-test 成功；它说明当前 utility rule 和 testbed 不足。它不应被并入 Predictive State Plasticity 当作正向 feature-selection evidence。
+
+## 证据等级
+
+证据等级：negative/redesign。当前 utility rule 没有清楚优于 random replacement，oracle trace bank 也不够强，无法验证环境。这是设计失败信号，不是方法成功。
+
+## 实验设计依据
+
+这个任务只有在存在已知应当获胜的 feature bank 时才有价值。没有这个 validation，generate-and-test 失败会很模糊。下一版必须先构造 oracle traces 稳定降低 downstream error 的 stream，再测试 utility replacement 是否能在预算下恢复这些 traces。
+
+## 审查矩阵
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Representation | utility replacement 没有明显优于 random。 | 证据等级写成 negative/redesign。 | 需要 validated oracle trace bank。 |
+| 实验设计 | oracle 不是清楚上界。 | 要求先验证 testbed。 | 当前结果无法公平评价 generate-and-test。 |
+| 严格老师 | plausible feature dynamics 不等于成功。 | 成功标准必须是 downstream error/control improvement。 | 需要 feature-budget sweep 和 repeated switches。 |
+
 ## 复现
 
 ```bash

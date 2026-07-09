@@ -9,7 +9,7 @@
 | Proposal | 当前定位 | 当前结果路径 | 报告入口 |
 |---|---|---|---|
 | Reward-Centered Sarsa | 独立主线，已有 20-seed extended evidence | `experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended` | `reward_centered_sarsa/report.md` / `report_zh.md` |
-| Output-Controlled TD | 独立主线，当前可引用 evidence 仍是 main pilot；20-seed CPU run 正在运行 | `experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main` | `output_controlled_td/report.md` / `report_zh.md` |
+| Output-Controlled TD | 独立主线，已有 20-seed extended evidence | `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended` | `output_controlled_td/report.md` / `report_zh.md` |
 | GVF Predictive State | 负结果 / redesign | `experiments/alberta_core_rl/results/useful_gvfs_state/20260708T155740Z_main` | `gvf_predictive_state/report.md` / `report_zh.md` |
 | Generate-and-Test Features | 负结果 / redesign | `experiments/alberta_core_rl/results/generate_test_features/20260708T154941Z_main` | `generate_test_features/report.md` / `report_zh.md` |
 | Doorway Options | 暂停 / quarantine，需 fixed-goal sanity | `experiments/alberta_core_rl/results/options_reusable_subtasks/20260708T161717Z_main` | `options_reusable_subtasks/report.md` / `report_zh.md` |

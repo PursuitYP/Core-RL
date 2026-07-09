@@ -11,6 +11,30 @@ This proposal studies a basic invariance requirement for continual reinforcement
 
 This study tests reward-shift invariance in continuing control. The RL problem is the access-control queue: the agent observes server availability and customer priority, then accepts or rejects each customer while learning online. The implemented methods are discounted Sarsa, reward-centered Sarsa, and differential Sarsa with linear/tabular action values. The experiment varies constant reward shifts and measures unshifted reward, accept behavior, high-priority acceptance, reward baseline, TD error, and Q norm. The main evidence is now a 20-seed, 20000-step alpha sweep: ordinary discounted Sarsa develops large reward-shift-dependent value scales, while centered and differential variants keep value norms and unshifted reward more stable. The next step is beta/gamma sensitivity and a midstream reward-origin switch.
 
+## Proposal Template Answers
+
+Focused RL question: In an online continuing control task, can an agent learn action values whose scale and behavior are insensitive to an arbitrary constant added to every reward? The question is not whether reward-centered Sarsa has the highest shifted return, but whether the learning dynamics respect the reward-origin invariance expected in an average-reward continuing problem.
+
+Setting and testbed: The testbed is the access-control queue from tabular continuing RL. It is larger and more meaningful than a two-state diagnostic because it has state-dependent action feasibility, priority-dependent rewards, and a real accept/reject control tradeoff, while still being interpretable enough to audit TD errors and value norms.
+
+Implemented comparison: The implemented comparison is discounted Sarsa versus reward-centered Sarsa versus differential Sarsa, all trained online from a single stream with no replay buffer and no deep network. The varied factors are reward shift and alpha in the completed run; beta, gamma, and midstream reward-origin changes are the required next factors.
+
+Observation or figure that answers the question: The main figures must jointly show unshifted reward, Q norm, high-priority acceptance, and divergence as a function of reward shift. The proposal is supported only if centered methods maintain behavior while preventing value-scale inflation; a reward-only table would not answer the invariance question.
+
+Compute need and fallback: The current extended evidence is CPU-scale and already complete for the alpha/reward-shift grid. If there is no time for a larger sweep, the honest fallback is to submit this as a strong fixed-condition invariance study and state that nonstationary reward-origin switching remains future work.
+
+## Independent Research Scope
+
+This proposal is an independent study of reward-origin invariance in continuing control. It should be read separately from Output-Controlled TD and Scale-Invariant Continuing Control: those reports study feature-scale and combined-unit effects, while this report isolates the reward side of the problem. The study deliberately does not claim to solve all continuing average-reward learning, all reward shaping, or all nonstationarity. Its scope is narrower and sharper: a constant reward translation should not force a retuned step size, distorted value scale, or changed accept/reject behavior in access-control Sarsa.
+
+The proposal also has a clear boundary relative to the small Centered TD Diagnostics report. The diagnostic report explains the mechanism in a tiny prediction setting; this report supplies the control environment, policy probes, seed sweep, and main evidence. If only one reward-centering proposal is submitted, this one should be the main paper-style study and the diagnostic should be cited as supporting material.
+
+## Evidence Level
+
+Evidence level: strong independent main-candidate evidence, with specific unfinished sensitivity tests. The completed result uses 20 seeds, 20000 online steps per condition, five reward shifts, three alphas, and three algorithms. This is substantially stronger than a pilot and is enough to support the central fixed-condition claim that ordinary discounted Sarsa is reward-origin sensitive while centered/differential variants are much less sensitive.
+
+The evidence is not yet a full continual-adaptation paper. It does not include a no-reset midstream reward-origin switch, a beta sweep for the reward baseline, or a gamma sweep for discounted variants. Those omissions do not invalidate the current fixed-condition result, but they limit the conclusion to reward-origin invariance across separate streams rather than adaptation to a changing reward sensor inside one stream.
+
 ## Research Motivation
 
 The Alberta Plan frames intelligence as a temporally uniform stream of experience: the agent is always acting, always learning, and not periodically reset into a special training phase. In that setting, reward origin is an especially clean stress test. If every reward is translated by a constant, the preference ordering of policies in an average-reward continuing task should not change. A long-lived agent should therefore not require a new step size or a new representation merely because an engineer redefined the zero point of the reward sensor.
@@ -111,6 +135,12 @@ Remaining sensitivity tests:
 
 The report-ready figures below use seed-tail condition summaries rather than dense learning-curve overlays. They show reward, value scale, behavior, and divergence separately, which is the right evidence for an invariance claim.
 
+## Experiment Design Rationale
+
+The environment, variables, and metrics were chosen to separate three explanations that a skeptical reviewer would otherwise conflate. First, unshifted reward and high-priority acceptance test task behavior rather than the shifted scalar reward observed by the learner. Second, Q norm and TD-error scale test whether the learner has encoded an arbitrary reward offset as a large value component. Third, divergence and policy probes test whether the effect is merely cosmetic or can change actual control. The access-control queue is therefore not being used as a benchmark leaderboard; it is being used as a controlled continuing system in which reward-origin invariance can be measured.
+
+The current grid is deliberately modest rather than blind. Reward shifts `-8` through `8` are large relative to access-control priorities, so they stress the nuisance value offset. The alpha grid includes settings where ordinary Sarsa still learns and settings where value-scale inflation becomes severe. The next experiment should not simply add more random hyperparameters; it should target the remaining causal gaps: beta controls baseline lag, gamma controls discounted offset amplification, and a midstream shift tests continual recovery without resetting weights.
+
 ![Tail unshifted reward under reward shifts and alpha values.](../../../../experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended/figures/report_avg_unshifted_reward_by_reward_shift.png)
 
 ![Tail action-value norm under reward shifts and alpha values.](../../../../experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended/figures/report_q_norm_by_reward_shift.png)
@@ -167,6 +197,16 @@ Revision already made:
 Next required revision:
 
 - Add beta/gamma ablations and midstream reward-shift changes.
+
+Per-proposal audit matrix:
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Alberta Plan | The study must be about continual ordinary experience, not episodic score. | Uses a continuing access-control stream and reports unshifted task reward separately from observed reward. | Midstream reward-origin switching is still missing. |
+| Average-reward RL | Discounted Sarsa is not the only relevant baseline. | Adds differential Sarsa as a serious average-reward baseline. | Gamma/beta interactions need a wider sweep. |
+| Statistics | Five seeds were insufficient. | Completed a 20-seed extended sweep. | Confidence intervals are tail summaries; AUC and paired seed effects would strengthen the report. |
+| Mechanism | Reward improvements alone could hide behavior changes. | Adds Q norm, high-priority acceptance, accept rate, and divergence figures. | Full policy-distance probes over all states are not yet reported. |
+| Strict instructor | The proposal should not overclaim a universal reward-centering solution. | Conclusion is limited to reward-origin invariance in access-control Sarsa. | Larger continuing environments would be needed for a broader claim. |
 
 ## Conclusion
 

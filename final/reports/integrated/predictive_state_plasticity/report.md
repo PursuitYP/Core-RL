@@ -11,6 +11,30 @@ Predictive knowledge is a central Alberta Plan idea, but a prediction is valuabl
 
 This study asks whether learned predictions become useful state for control under partial observability. The RL problem is a T-maze with an early hidden cue and a delayed junction decision; raw observation is insufficient unless the agent retains cue information. The implemented comparison uses raw features, hand-coded trace memory, recurrent GVFs, redesigned cue GVFs, and oracle memory with online linear Sarsa control. The extended experiment varies maze length and representation mode over 20 seeds and 20000 online steps; the main metrics are trial accuracy, cue-alignment margin, GVF TD error, and control TD error. The result is a useful negative gate: cue-GVF outputs have some cue-aligned signal but do not improve control over chance, while trace and oracle memory solve the task. The next experiment must separate GVF question design, output scaling, control utilization, and feature-selection/plasticity mechanisms.
 
+## Proposal Template Answers
+
+Focused RL question: In a partially observable online control task, can learned predictions carry the hidden cue information needed for later action, or does the agent need a different state-construction mechanism? The present report answers this as a first-gate question about fixed learned GVF features, not as a completed feature-plasticity result.
+
+Setting and testbed: The testbed is an aliased T-maze with an early binary cue and a delayed junction decision. It is intentionally sharper than a generic benchmark: raw observation is insufficient, trace/oracle memory can solve the task, and learned predictive state must prove that it carries useful hidden information.
+
+Implemented comparison: The completed experiment compares raw observation, trace memory, recurrent GVF, cue GVF, and oracle memory with online linear Sarsa. Generate-and-test, TIDBD, feature replacement, and phase-change plasticity are staged next experiments, not current evidence.
+
+Observation or figure that answers the question: The main evidence is trial accuracy by maze length, supported by cue-alignment margin and GVF TD error. A low GVF TD error or a small positive cue-alignment signal is not enough; the learned prediction must improve junction decisions over raw observation and move toward trace/oracle memory.
+
+Compute need and fallback: The extended first-gate run is complete. If no further experiments are run, the honest fallback is to submit this as a negative/redesign proposal: current cue-GVF predictions do not yet become useful state, and the next work is diagnostic rather than performance polishing.
+
+## Independent Research Scope
+
+This proposal is an independent representation and partial-observability study. It does not depend on the ordinary GVF Predictive State report, although that report is a smaller precursor. It also should not be merged with Generate-and-Test or TIDBD reports as if those mechanisms already produced a successful predictive-state learner. The current scope is fixed predictive state under T-maze partial observability; feature replacement and per-feature step-size adaptation are later stages gated on whether a useful predictive feature can first be demonstrated.
+
+The proposal explicitly does not claim that GVFs fail in general. It claims that the current cue-GVF and recurrent-GVF constructions do not carry or expose the cue strongly enough for downstream linear control in this setting. This boundary is important because it turns a negative result into a design constraint rather than a broad dismissal of predictive knowledge.
+
+## Evidence Level
+
+Evidence level: high-value negative gate with 20-seed extended evidence. The completed run covers maze lengths `8`, `12`, `20`, and `30`, five representation modes, and 20000 online steps per condition. The evidence is strong enough to say that the current learned GVF features do not become useful state in this T-maze.
+
+The evidence is not a positive plasticity result. It does not yet include cue-decodability probes, oracle-prediction control, GVF output normalization, feature ablations, phase switches, generate-and-test replacement, or canonical TIDBD/AutoStep. Those missing experiments are not minor details; they are the necessary next gates for turning the negative result into a stronger research program.
+
 ## Research Motivation
 
 Partial observability makes current observation insufficient. A long-lived agent must build state from history, but the course constraints rule out deep recurrent networks and replay. GVFs offer a Core RL alternative: predictions about future signals can become features. Generate-and-test offers a resource mechanism: create candidate features and discard weak ones. TIDBD offers a plasticity mechanism: adapt step sizes per feature. The interesting question is not whether any one mechanism looks plausible in isolation, but whether the agent can maintain useful predictive state under limited capacity.
@@ -54,9 +78,9 @@ Learning variants:
 
 - Fixed feature set with ordinary TD/Sarsa.
 - Fixed feature set with normalized updates.
-- Generate-and-test replacement based on downstream TD-error contribution.
-- TIDBD-style per-feature step-size adaptation.
-- Combined generate-and-test plus TIDBD, treated as exploratory.
+- Planned generate-and-test replacement based on downstream TD-error contribution.
+- Planned TIDBD-style per-feature step-size adaptation.
+- Planned combined generate-and-test plus TIDBD, treated as exploratory and only worth running after the fixed useful-GVF gate is understood.
 
 ## Experimental Design
 
@@ -88,6 +112,12 @@ Metrics:
 - Feature survival and replacement counts.
 - Per-feature alpha trajectories.
 - Downstream value loss with and without each feature group.
+
+## Experiment Design Rationale
+
+The T-maze is used because it forces a clean separation between observation and state. If the agent does not retain the initial cue, the junction action is close to chance. Trace and oracle memory are included not as strawmen but as necessary controls: they show that the task is solvable under the course constraints and define how far the learned predictive feature is from a cheap memory baseline.
+
+The current extended run is a gate rather than a full program. Maze length tests whether cue retention survives longer delays. Cue-alignment margin asks whether the learned feature contains any hidden-cue signal. Trial accuracy asks the stricter question of whether control can use that signal. GVF TD error is deliberately secondary because an accurate prediction can still be useless for control.
 
 ## Expected Results And Failure Modes
 
@@ -122,7 +152,7 @@ Main result:
 - Redesigned cue-GVF has some positive cue-alignment margin at shorter lengths, but the margin weakens as length grows.
 - Cue-GVF control accuracy remains near chance across all tested lengths: about `0.504`, `0.508`, `0.505`, and `0.494` for lengths `8`, `12`, `20`, and `30`.
 
-Interpretation: the redesigned GVF is a better diagnostic signal but still not sufficient state. The next stage must either strengthen the predictive feature, improve how control uses it, or add explicit feature-plasticity/selection mechanisms.
+Interpretation: the redesigned GVF is a better diagnostic signal but still not sufficient state. The current result should be stated as "the learned GVF does not carry or expose the cue strongly enough for control," not as "GVFs cannot carry the cue." The next stage must separate information content from control utilization by adding cue-decodability probes, oracle-prediction controls, GVF output normalization, and then feature-plasticity/selection mechanisms.
 
 Main figures below use seed-tail condition summaries with 95% confidence intervals. They show the current negative gate more clearly than the earlier overloaded curve plots: cheap trace/oracle memory works, while learned GVF features remain near chance.
 
@@ -137,6 +167,16 @@ Main figures below use seed-tail condition summaries with 95% confidence interva
 Strict reviewer challenge: "The GVF result is negative, so why continue?" Response: the negative result is exactly the design signal. It says current GVF questions do not carry the cue; the next experiment must measure cue information and downstream usefulness directly.
 
 Strict reviewer challenge: "This is too broad." Response: the proposal should be run in layers: first fixed useful GVF questions, then limited-budget selection, then step-size plasticity. The combined variant is not promoted until earlier layers pass.
+
+Per-proposal audit matrix:
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Alberta Plan | GVFs matter only if predictions become useful state. | The report evaluates control accuracy, not only prediction error. | Current GVF questions still fail the useful-state gate. |
+| Partial observability | The task could be impossible without deep recurrence. | Trace and oracle baselines solve the task. | Learned prediction needs a stronger information probe. |
+| Representation | Cue alignment may exist but be unusable by control. | Reports both cue-alignment margin and trial accuracy. | Needs cue decodability and GVF output normalization. |
+| Plasticity | Generate-and-test and TIDBD are not yet tested in the integrated loop. | The report now marks them as staged future work. | A positive plasticity claim requires new experiments. |
+| Strict instructor | Do not sell a broad negative result as a broad GVF conclusion. | Conclusion is limited to the current cue-GVF/recurrent-GVF designs. | Better GVF questions may reverse the result. |
 
 ## Threats To Validity
 

@@ -132,6 +132,30 @@ Required next revision:
 
 Doorway Options is an independent negative proposal. It contributes a useful lesson: options must be evaluated by real interaction cost and cannot be assumed helpful because they encode reasonable subtasks. The next version needs a fixed-goal sanity win, duration caps, and a clean transfer protocol before it can become a positive temporal-abstraction study.
 
+## Proposal Template Answers
+
+Focused RL question: Do hand-coded doorway options provide reusable subtasks under real environment-step accounting in a changing Four Rooms task? The setting is Four Rooms with changing goals; the comparison is primitive control versus option-augmented control. The main metrics are reward per real environment step, option duration, option success, and goal-switch recovery. Compute is small; fallback is quarantine until fixed-goal sanity passes.
+
+## Independent Research Scope
+
+This report studies hand-coded option utility and accounting, not option discovery. It is independent but currently quarantined because the primitive baseline is not beaten and the fixed-goal sanity check is missing.
+
+## Evidence Level
+
+Evidence level: quarantined negative result. The current evidence is useful mainly because it prevents an overclaim: options can look better under decision-step accounting while being worse or neutral under real environment-step accounting.
+
+## Experiment Design Rationale
+
+The next experiment must start with a fixed-goal sanity case. If doorway options cannot help or at least behave correctly in a stationary Four Rooms goal under real-step accounting, then goal-transfer results are uninterpretable. SMDP duration accounting and option termination diagnostics are required before reopening this as a positive temporal-abstraction proposal.
+
+## Reviewer Audit
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Options | No fixed-goal sanity check. | Evidence level is quarantined. | Must pass sanity before transfer claims. |
+| Accounting | Decision-step metrics can falsely favor options. | Real environment-step reward is emphasized. | SMDP duration details need fuller reporting. |
+| Strict instructor | Do not submit a failed options result as reusable-subtask evidence. | Report frames it as negative/quarantine. | Requires new experiment to revive. |
+
 ## Reproduction
 
 ```bash

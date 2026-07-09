@@ -131,6 +131,30 @@ Required next revision:
 
 GVF Question Design is a valuable independent diagnostic. It shows why a GVF proposal must ask "what is this prediction for?" before adding predictions as state. The study should feed directly into a redesigned GVF Predictive State proposal with usefulness metrics.
 
+## Proposal Template Answers
+
+Focused RL question: Which GVF questions are likely to become useful state rather than merely easy predictions? The setting is a controlled GVF question-design diagnostic; the comparison varies cumulants/discounts and inspects prediction behavior. The required metrics are prediction error plus downstream usefulness probes such as cue decodability and control ablation. Compute is modest; fallback is a redesign guide for GVF Predictive State.
+
+## Independent Research Scope
+
+This report is a GVF design diagnostic. It should not be presented as proof that a GVF state helps control, because the current evidence is mostly about prediction behavior. Its role is to decide which GVF questions deserve downstream control evaluation.
+
+## Evidence Level
+
+Evidence level: supporting redesign tool. The report is useful because it separates easy-to-predict cumulants from potentially useful ones. It is not positive evidence until cue-decodability or control-ablation metrics are added.
+
+## Experiment Design Rationale
+
+Prediction error alone is not enough because an easy prediction can be irrelevant. The next design should pair each cumulant/discount with a hidden-cue probe and a downstream-control ablation. That makes the experiment answer "useful for what?" rather than only "learnable how well?"
+
+## Reviewer Audit
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| GVF | Easy prediction is not useful prediction. | Report is framed as design diagnostic. | Needs cue decodability. |
+| Control | No downstream ablation yet. | Evidence level is supporting/redesign. | Cannot claim useful state. |
+| Strict instructor | Avoid treating TD error as the main success metric. | Required next metrics include control relevance. | Current figures may still overemphasize prediction error. |
+
 ## Reproduction
 
 ```bash

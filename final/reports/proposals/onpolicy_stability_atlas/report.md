@@ -130,6 +130,30 @@ Decision:
 
 The On-Policy TD(lambda) Stability Atlas is a focused diagnostic proposal. It shows that feature scale and trace length materially change fixed-alpha stability. The result supports the broader output-control argument while remaining an independent map of TD(lambda) failure regions.
 
+## Proposal Template Answers
+
+Focused RL question: How does TD(lambda) stability change across alpha, lambda, and feature scale in an online prediction problem? The setting is a tile-coded prediction stream; the comparison is descriptive rather than a new algorithm. The main evidence should be max-stable-alpha maps or heatmaps, not a single curve. Compute is small to moderate; fallback is to use this as a diagnostic appendix for Output-Controlled TD.
+
+## Independent Research Scope
+
+This atlas is independent as a diagnostic map, but it is not an intervention study. It explains why output-controlled or normalized updates are needed by showing where ordinary parameter-step TD(lambda) becomes fragile.
+
+## Evidence Level
+
+Evidence level: supporting atlas. It is valuable for mechanism and baseline calibration, but it should not be submitted as a main positive method because it does not propose or test a remedy.
+
+## Experiment Design Rationale
+
+The alpha/lambda/scale grid is the scientific object. It turns stability from an anecdotal divergence into a map of boundaries. The next repair should convert overloaded learning curves into actual atlas figures: tail RMSE and divergence heatmaps by `scale x alpha x lambda`.
+
+## Reviewer Audit
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Stability | A curve is not an atlas. | Report frames heatmaps/max-stable-alpha as required next figures. | Current report may still rely on dense curves. |
+| Method | No new algorithm is introduced. | Evidence level is supporting diagnostic. | Must not replace Output-Controlled TD. |
+| Strict instructor | The study needs a reason beyond plotting. | It motivates normalized update units. | Needs direct alignment with Output-Controlled metrics. |
+
 ## Reproduction
 
 ```bash

@@ -56,6 +56,30 @@ Strict reviewer 会说：question-design study 需要 downstream usefulness metr
 
 GVF Question Design 是有价值的独立诊断。它提醒我们，在把 predictions 当作 state 前必须问“这个 prediction 用来做什么”。该 study 应直接反馈到 redesigned GVF Predictive State proposal 中，并用 usefulness metrics 选择 GVF questions。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：哪些 GVF questions 更可能成为 useful state，而不只是 easy predictions？setting 是 controlled GVF question-design diagnostic；比较不同 cumulants/discounts，并检查 prediction behavior。必要指标是 prediction error 加 downstream usefulness probes，例如 cue decodability 和 control ablation。compute 中等偏小；fallback 是作为 GVF Predictive State 的 redesign guide。
+
+## 独立研究范围
+
+本报告是 GVF design diagnostic。它不应被写成 GVF state 已经帮助 control 的证据，因为当前证据主要是 prediction behavior。它的角色是筛选哪些 GVF questions 值得进入 downstream control evaluation。
+
+## 证据等级
+
+证据等级：supporting redesign tool。报告有价值，因为它区分 easy-to-predict cumulants 和 potentially useful cumulants。但在加入 cue-decodability 或 control-ablation metrics 之前，它不是正向 useful-state evidence。
+
+## 实验设计依据
+
+prediction error 单独不够，因为容易预测的信号可能与控制无关。下一步应把每个 cumulant/discount 与 hidden-cue probe 和 downstream-control ablation 配对。这样实验回答的是“对什么有用”，而不仅是“学得多好”。
+
+## 审查矩阵
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| GVF | easy prediction 不等于 useful prediction。 | 报告定位为 design diagnostic。 | 需要 cue decodability。 |
+| Control | 还没有 downstream ablation。 | 证据等级为 supporting/redesign。 | 不能声称 useful state。 |
+| 严格老师 | 不要把 TD error 当主要成功指标。 | 下一步指标包括 control relevance。 | 当前图仍可能过度强调 prediction error。 |
+
 ## 复现
 
 ```bash

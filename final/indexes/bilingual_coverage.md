@@ -16,7 +16,10 @@ The following important final-facing files have English and Chinese counterparts
 - `final/indexes/reproduction.md` and `final/indexes/reproduction_zh.md`
 - `final/indexes/status.md` and `final/indexes/status_zh.md`
 - `final/indexes/requirements_audit.md` and `final/indexes/requirements_audit_zh.md`
+- `final/indexes/report_section_audit.md` and `final/indexes/report_section_audit_zh.md`
 - `final/indexes/project_plan.md` and `final/indexes/project_plan_zh.md`
+- `final/indexes/revise_plan_20260709.md` and `final/indexes/revise_plan_20260709_zh.md`
+- `final/indexes/reviewer_audit.md` and `final/indexes/reviewer_audit_zh.md`
 - `final/presentation/poster_outline.md` and `final/presentation/poster_outline_zh.md`
 
 ## Archive Materials
@@ -31,5 +34,4 @@ Archive files are not the main review path, so they are not all translated one b
 
 ## Consistency Rule
 
-English `report.md` files remain canonical for formal citation, while `_zh.md` files provide content-matched Chinese review versions. When a result or status changes, update both versions in the same edit. If a conflict is found, trust the current English report plus `final/indexes/results.md`, then update the Chinese counterpart immediately.
-
+English and Chinese versions are expected to carry the same substantive content. When a result or status changes, update both versions in the same edit. If a conflict is found, trust the current final-facing report plus `final/indexes/results.md` for evidence, then update the mismatched language counterpart immediately.

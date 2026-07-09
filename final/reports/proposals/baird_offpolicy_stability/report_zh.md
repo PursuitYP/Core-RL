@@ -60,6 +60,30 @@ GVF reviewer 会说：这不能只停留在教材例子。回应是：报告明�
 
 Baird Off-Policy Stability 是强支持性诊断。它展示了为什么 continual predictive agent 不能随意使用 off-policy TD。若要升级成主线研究，需要 canonical verification、更多 correction baselines 和 GVF-style behavior-drift extension。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：Baird-style counterexample 对 linear off-policy GVF learning 提供什么稳定性警示？setting 是 off-policy prediction counterexample；比较 ordinary TD 与 correction-style methods。主指标是 weight norm、divergence 和可用的 MSPBE-style diagnostics。compute 很小；fallback 是 supporting warning，直到补 canonical Baird details 和 ETD/GTD baselines。
+
+## 独立研究范围
+
+本报告是 off-policy stability warning，不是一般 GVF solution。它应支持未来 off-policy GVF proposals，说明 ordinary TD 为什么可能 diverge；同时必须诚实说明当前 implementation 仍需 canonical verification。
+
+## 证据等级
+
+证据等级：supporting warning / pilot diagnostic。它还不是强理论复现，因为 canonical feature/policy specification、expected-update audit 和 emphatic/GTD comparisons 仍需核对。
+
+## 实验设计依据
+
+Baird counterexample 的价值是用最小 linear setting 隔离 deadly triad 问题。下一步不应先加无关环境，而应核对 canonical details，并加入 ETD、TDC/GTD2 和 behavior-drift variants。
+
+## 审查矩阵
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Off-policy theory | canonical Baird details 很关键。 | 报告标明必须 canonical verification。 | 当前仍是 pilot-level。 |
+| GVF | counterexample 不解决 GVF stability。 | 写成 warning。 | 需要 ETD/GTD baselines。 |
+| 严格老师 | 不要从单个 counterexample 过度泛化。 | 证据等级写成 supporting diagnostic。 | 需要 expected-update comparison。 |
+
 ## 复现
 
 ```bash

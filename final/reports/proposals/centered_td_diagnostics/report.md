@@ -122,6 +122,30 @@ Decision:
 
 Centered TD Diagnostics is a useful independent mechanism study. It clearly shows how centering controls value scale under reward translation. Its scope is intentionally limited: it supports, but does not replace, the Reward-Centered Continuing Sarsa proposal.
 
+## Proposal Template Answers
+
+Focused RL question: In a tiny continuing prediction problem, does centering the Bellman error remove arbitrary reward-offset components from TD learning dynamics? The setting is a two-loop MDP, the comparison is ordinary TD versus centered variants, and the evidence is value scale, TD error, and reward-baseline behavior. The compute need is minimal; the fallback is to treat this as a mechanism appendix for Reward-Centered Sarsa.
+
+## Independent Research Scope
+
+This is an independent mechanism diagnostic, not a main control proposal. It studies why centering can matter in continuing prediction and should be used to explain Reward-Centered Sarsa, not to replace the access-control control study.
+
+## Evidence Level
+
+Evidence level: supporting diagnostic. The environment is intentionally small and should not be represented as a full project-scale result. Its value is clarity: it isolates the reward-offset mechanism in a setting where the dynamics are inspectable.
+
+## Experiment Design Rationale
+
+The two-loop MDP is useful because reward offsets can be changed without adding control complexity. That makes value-scale and TD-error changes easy to attribute. A stronger version would add an analytic shift table, but a larger environment would make this specific mechanism harder to see.
+
+## Reviewer Audit
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Core RL | The environment is toy-sized. | Framed as a mechanism diagnostic only. | Cannot stand alone as a main proposal. |
+| Reward-centering | The update must connect to the control result. | Report points to Reward-Centered Sarsa as the main study. | Needs explicit analytic table for stronger exposition. |
+| Strict instructor | Do not overclaim from a tiny MDP. | Evidence level is supporting diagnostic. | Should be cited as appendix-style material. |
+
 ## Reproduction
 
 ```bash

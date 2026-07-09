@@ -54,6 +54,30 @@ Course-project reviewer 会说：这个实验有用但太基础，不适合作�
 
 Nonstationary Bandit 是有用的 plasticity sanity diagnostic，但不应升级为主要最终 Core RL study。它的角色是帮助读者理解 continual learners 为什么需要 persistent adaptation。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：作为最小 sanity check，一个简单 online agent 是否能在无 replay 情况下适应 nonstationary reward probabilities？setting 是 nonstationary bandit，比较 lightweight exploration/adaptation rules，指标是 regret 和 best-action rate。compute 很小；fallback 是只作为 introductory sanity check。
+
+## 独立研究范围
+
+这不是完整 Core RL proposal。它缺少 state、bootstrapping、value functions over time、planning、GVFs 和 control dynamics。它的独立角色是检查 plasticity 语言和提供简单引入例子，而不是作为最终研究题目。
+
+## 证据等级
+
+证据等级：dropped sanity diagnostic。结果可能有教学价值，但对本课程项目的 Core RL 主标准来说太浅。
+
+## 实验设计依据
+
+bandit 的价值只在于足够简单，可以暴露 adaptation speed 和 exploration tradeoff。不应仅通过增加 arms 或 seeds 来扩展。如果要恢复，应升级为 contextual bandit 或带 value-function learning 的 continuing control task。
+
+## 审查矩阵
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Core RL | 没有 bootstrapping 或 state。 | 证据等级为 dropped sanity。 | 不适合作为提交主线。 |
+| Continual learning | 有 adaptation 但太浅。 | 报告限制为 sanity check。 | 需要更丰富环境才有价值。 |
+| 严格老师 | 不要把它算作强 proposal。 | 标成 diagnostic only。 | 若使用应放 appendix/intro。 |
+
 ## 复现
 
 ```bash

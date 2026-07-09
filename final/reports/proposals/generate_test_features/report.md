@@ -134,6 +134,30 @@ Required next revision:
 
 Generate-and-Test Trace Features is a valid independent negative proposal. It shows that limited-capacity feature adaptation is a meaningful Core RL question, but the current implementation does not improve prediction error. The next version needs a stronger oracle, repeated nonstationarity, and a utility metric tied directly to recovery or downstream control.
 
+## Proposal Template Answers
+
+Focused RL question: Under a limited feature budget, can generate-and-test replacement discover trace features that improve a nonstationary delay prediction problem? The setting is a delay-switch trace-prediction stream; the comparison includes random replacement, utility replacement, and oracle-style trace banks. The main metrics are downstream prediction error, active trace timescale, feature survival, and post-switch recovery. Compute is small; fallback is a negative redesign result.
+
+## Independent Research Scope
+
+This is an independent negative representation-learning proposal. It does not show that generate-and-test succeeds; it shows that the current utility rule and testbed are insufficient. It should not be merged into Predictive State Plasticity as positive feature-selection evidence.
+
+## Evidence Level
+
+Evidence level: negative/redesign. The current utility rule does not clearly beat random replacement, and the oracle trace bank is not strong enough to validate the environment. This is a design failure signal, not a method success.
+
+## Experiment Design Rationale
+
+The task is useful only if there is a known feature bank that should win. Without that validation, a generate-and-test failure is ambiguous. The next version must first construct a stream where oracle traces reliably improve downstream error, then test whether utility replacement can recover those traces under a budget.
+
+## Reviewer Audit
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Representation | Utility replacement does not beat random convincingly. | Evidence level is negative/redesign. | Needs validated oracle trace bank. |
+| Experimental design | Oracle is not a clear upper bound. | Report requires testbed validation first. | Current result cannot evaluate generate-and-test fairly. |
+| Strict instructor | Do not call plausible feature dynamics a success. | Success must be downstream error/control improvement. | Needs feature-budget sweep and repeated switches. |
+
 ## Reproduction
 
 ```bash

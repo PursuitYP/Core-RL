@@ -6,6 +6,34 @@
 
 Dyna-style planning 通过 learned model 做 background backups，让 agent 在不增加真实环境交互的情况下改进 value estimates。但在 nonstationary world 中，同一个机制也可能放大过期知识。本 proposal 把 model freshness 作为第一等 Core RL 问题：一个小型 online Dyna agent 能否根据 recency 或 prediction error 来 age/distrust model entries，使 planning 在环境改变后仍然有用？当前 20-seed extended sweep 显示，recency aging 和 recency/error gating 能在不使用 oracle change detector 的情况下显著降低 stale-backup rate；reward 改善在部分 high-budget setting 中存在，但依赖 planning budget 和 half-life。因此最终结论应聚焦 freshness-aware search control，而不是宣称某个 aging rule 普遍 reward 最优。
 
+## 独立研究总结
+
+本研究问：continual Dyna agent 在世界变化后应当何时信任 learned model？RL 问题是一个 layout 会中途改变的 continuing gridworld，agent 不 reset，继续行动、学习和 planning。实现方法比较 no planning、random keep-model planning、oracle model flushing、recency-weighted model aging 和 recency/error-gated model aging。extended experiment 改变 planning budgets `0, 1, 5, 20`、model-handling rules 和 aging half-lives `250, 750, 1500, 4000`；主要指标是 average reward、stale-backup rate、model error、planning TD magnitude 和 post-change recovery window。当前结果显示 freshness-aware sampling 能显著降低 stale backups；reward 改善在部分高 planning budget 条件下存在，但依赖 half-life 和 budget，因此最终 claim 应聚焦 search-control freshness，而不是 universal reward superiority。
+
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：在 continual Dyna agent 中，环境变化后 learned model entries 什么时候不应该继续获得 planning computation？本 proposal 研究 planning trust 和 search-control freshness，不只是问“more planning 是否提高 reward”。
+
+Setting / testbed：主环境是 midstream layout change 的 continuing gridworld，不重置 agent。它大到 planning 有意义，小到可以标注 stale model entries，因此能做 model-freshness diagnostics。第二个 stochastic 或 gradual-drift environment 仍是计划项，用于测试 abrupt maze change 之外是否成立。
+
+Implemented comparison：比较 no planning、keep-model Dyna、oracle model flushing、recency aging 和 recency/error gating，跨 planning budgets 和 aging half-lives。oracle flush 明确只是 diagnostic，不是现实算法。
+
+Metric / figure：主要证据是 late reward、stale-backup rate、model error、planning budget 和 half-life 的关系。一个有价值的结果可以是 tradeoff curve，而不一定是单一 winner，因为核心问题是 model freshness 如何改变 computation 的价值。
+
+Compute need / fallback：20-seed extended grid 已完成。如果没有时间跑第二环境，诚实 fallback 是把本课题提交为 abrupt-change model-freshness study，并明确 gradual/stochastic drift 是 future work。
+
+## 独立研究范围
+
+这个 integrated proposal 是独立 planning study，不应被合并成 Dyna Planning Budget 的小变体。Budget proposal 问 planning 数量在 change 前后如何帮助或伤害；本报告问 continual agent 如何决定 learned model 的哪些部分值得 planning。核心对象是 model aging 下的 search control。
+
+本报告不研究 replay buffers 或 offline model learning。model 是 compact、online updated，并被查询用于 planning backups。这与课程约束直接相关：agent 不存储旧 experience 并 replay，而是维护可能过时的 learned model entries。
+
+## 证据等级
+
+证据等级：强 integrated-candidate evidence，支持 abrupt nonstationarity 和 model-freshness diagnostics。已完成结果包含 20 seeds、4 个 planning budgets、多种 model-handling rules 和 4 个 aging half-lives。它直接测量 stale-backup rate 和 model error，因此支持 mechanism claim，而不是只支持 reward claim。
+
+但证据还不足以做一般 nonstationary planning claim。当前环境变化是 abrupt 且 deterministic，stale entries 比较容易定义。更完整研究应加入 gradual drift、repeated changes 和 stochastic transition environment。因此当前结论应强调“freshness-aware search control 在 abrupt changing gridworld 中减少 stale backups”，而不是“model aging 解决 continual planning”。
+
 ## 研究动机
 
 Alberta Plan 把 learned models 和 background planning 放在长期 agent 的核心位置。一个 base agent 不应只被动更新当前 transition，还应利用已学到的模型在有限计算预算内做额外 value updates。经典 Dyna 的成功故事通常是 stationary world 中的 sample efficiency：模型越准，planning 越能加速学习。
@@ -47,6 +75,12 @@ Continual setting 改变了问题本质。长期 agent 的 model entry 是过去
 成功标准不是“某个方法在一个 budget 下 reward 稍高”。更严谨的判据是：方法是否在不用 oracle change detector 的情况下减少 stale backups；减少 stale backups 是否伴随 post-change recovery 改善或至少不显著破坏 pre-change benefit；不同 planning budget 下是否出现一致 tradeoff；半衰期是否过于敏感。
 
 Extended sweep 的作用是把早期 pilot 中固定 half-life 和 5 seeds 的证据升级成更可信的 sensitivity analysis。当前结果正好说明 reward 差异需要谨慎解释：freshness control 稳定减少 stale planning computation，但 reward ranking 会随 budget 和 half-life 改变。
+
+## 实验设计依据
+
+changing gridworld 的作用不是做传统 maze benchmark，而是让 stale model entries 可定义、可计数。这个 diagnostic visibility 对研究问题是必要的：单独 reward curve 无法告诉我们 planning 是因为 model useful 而有帮助，还是因为 model obsolete 而有害。planning budgets `0, 1, 5, 20` 分离 no-planning baseline、low-compute regime 和 high-compute regime，在 high-compute regime 中 stale backups 更可能主导结果。
+
+half-life sweep 是主要科学控制。很短的 half-life 会快速不信任旧知识，但可能丢掉仍然有用的结构；很长的 half-life 会保留更多知识，但也可能继续规划 stale entries。因此正确结果不一定是一个最佳 half-life，而是展示 freshness 何时帮助、何时只是降低有效 planning 的 map。
 
 ## 当前结果
 
@@ -91,6 +125,16 @@ Budget `5` 下，keep-model 和 oracle flush 的 late reward 都很强，约 `0.
 Sutton-style reviewer 会问：“这个机制是否符合 ordinary experience 和 temporal uniformity？”回应是：recency 和 model-error signals 都来自 agent 自身的 stream，不需要 replay buffer、offline training 或外部 change labels。
 
 Statistics reviewer 会指出：“reward winner 依赖 half-life。”回应是：报告已经把 strong claim 收紧为 freshness-aware search control reduces stale backups；reward 部分作为 budget/half-life tradeoff 解释。
+
+逐 proposal 审查矩阵：
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Alberta Plan | planning 应是 ordinary experience 中 learned models 的问题，不是 offline replay。 | 使用 online learned model 和 planning backups，不使用 replay buffer。 | 环境仍是 compact synthetic gridworld。 |
+| Planning reviewer | reward alone 无法诊断 stale planning。 | 报告 stale-backup rate、model error、planning budget 和 half-life。 | planning utility per backup 还需要更完整表格。 |
+| Nonstationarity reviewer | abrupt change 可能让 aging 看起来太容易。 | 结论限制在 abrupt changing gridworld。 | 仍需 gradual/stochastic drift 和 repeated changes。 |
+| 统计 | half-life sensitivity 可能被单条曲线隐藏。 | 图例区分 half-life，并报告数值例子。 | compact Pareto table 会更清楚。 |
+| 严格老师 | 不要声称 universal reward superiority。 | 报告强调 stale-backup reduction 和 tradeoffs。 | 部分 reward comparison 仍依赖 budget。 |
 
 ## 结论
 

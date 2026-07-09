@@ -12,6 +12,30 @@ Predictive knowledge 是 Alberta Plan 的核心思想之一，但一个 predicti
 
 本研究问 learned predictions 是否能在 partial observability 下成为对 control 有用的 state。RL 问题是 T-maze：trial 开始时出现短暂 hidden cue，之后 agent 进入 aliased corridor，直到 junction 才需要根据早期 cue 做动作；如果 agent 没有保留 cue 信息，raw observation 不足以解决任务。当前实现比较 raw features、hand-coded trace memory、recurrent GVFs、redesigned cue GVFs 和 oracle memory，control learner 是 online linear Sarsa。extended experiment 使用 20 seeds 和 20000 online steps，跨 maze lengths `8, 12, 20, 30` 评估 representation mode；主要指标是 trial accuracy、cue-alignment margin、GVF TD error 和 control TD error。结果是有价值的 negative gate：cue-GVF 有一些 cue-aligned signal，但没有把控制表现提升到 chance 以上；trace 和 oracle memory 能解决任务。下一步必须拆开 GVF question design、output scaling、control utilization 和 feature-selection/plasticity mechanisms。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：在 partially observable online control task 中，learned predictions 能否携带 later action 所需的 hidden cue information，还是 agent 需要不同的 state-construction mechanism？当前报告回答的是 fixed learned GVF features 的 first-gate question，不是已经完成的 feature-plasticity result。
+
+Setting / testbed：testbed 是 aliased T-maze，包含 early binary cue 和 delayed junction decision。它不是普通 benchmark，而是 sharp diagnostic：raw observation 不足，trace/oracle memory 可以解决，learned predictive state 必须证明自己携带 useful hidden information。
+
+Implemented comparison：已完成实验比较 raw observation、trace memory、recurrent GVF、cue GVF 和 oracle memory，并使用 online linear Sarsa。Generate-and-test、TIDBD、feature replacement 和 phase-change plasticity 是 staged next experiments，不是当前 evidence。
+
+Metric / figure：主证据是不同 maze length 下的 trial accuracy，并用 cue-alignment margin 和 GVF TD error 辅助解释。低 GVF TD error 或小的正 cue-alignment signal 不够；learned prediction 必须提高 junction decisions，相比 raw observation 更好并接近 trace/oracle memory。
+
+Compute need / fallback：extended first-gate run 已完成。如果不继续跑新实验，诚实 fallback 是把它提交为 negative/redesign proposal：当前 cue-GVF predictions 尚未成为 useful state，下一步是 diagnostic，而不是 performance polishing。
+
+## 独立研究范围
+
+本 proposal 是独立的 representation/partial-observability study。它不依赖 ordinary GVF Predictive State report 才能读懂，尽管后者是更小的 precursor。它也不应和 Generate-and-Test 或 TIDBD reports 合并成“已经成功的 predictive-state learner”。当前范围是 T-maze partial observability 下的 fixed predictive state；feature replacement 和 per-feature step-size adaptation 是后续阶段，必须等 useful predictive feature gate 更清楚后再推进。
+
+本 proposal 明确不声称 GVFs 一般失败。它只说明当前 cue-GVF 和 recurrent-GVF constructions 在这个 setting 中没有强到足以被 downstream linear control 使用。这个边界很重要，因为它把负结果变成设计约束，而不是对 predictive knowledge 的泛化否定。
+
+## 证据等级
+
+证据等级：高价值 negative gate，并有 20-seed extended evidence。完成 run 覆盖 maze lengths `8, 12, 20, 30`、5 种 representation modes，每个 condition 20000 online steps。证据足以说明当前 learned GVF features 没有在这个 T-maze 中成为 useful state。
+
+证据还不是 positive plasticity result。当前没有 cue-decodability probe、oracle-prediction control、GVF output normalization、feature ablations、phase switches、generate-and-test replacement 或 canonical TIDBD/AutoStep。这些不是小细节，而是把负结果推进成完整研究计划所需的 next gates。
+
 ## 研究动机
 
 Partial observability 让当前 observation 不足以定义 Markov state。长期 agent 必须从历史中构造 state，但课程约束排除了 deep recurrent networks 和 replay。GVFs 提供了一个 Core-RL 路线：关于未来 signals 的 predictions 可以成为 features。Generate-and-test 提供了资源机制：生成 candidate features 并淘汰弱 features。TIDBD 提供了 plasticity 机制：按 feature 调整 step sizes。但真正重要的问题不是每个机制单独看起来是否合理，而是 agent 能否在有限容量下保持 useful predictive state。
@@ -46,6 +70,12 @@ GVF 与 control learner 都在线更新。评价不是 GVF TD error 单独低不
 
 主要指标包括 trial-end accuracy、average reward、GVF TD error、cue-alignment margin、control TD error。解释标准是：只有 learned prediction 明显携带 hidden cue，并把 control accuracy 提升到 raw observation 以上且接近 cheap trace baseline，才可以说它是 useful state。只要 GVF 有非零 cue alignment 但 control 仍 near chance，就只能算 diagnostic signal，不算解决 predictive-state 问题。
 
+## 实验设计依据
+
+T-maze 的作用是清楚地区分 observation 和 state。如果 agent 没有保留初始 cue，junction action 就接近 chance。Trace 和 oracle memory 不是 strawman，而是必要 control：它们说明任务在课程约束下可解，也定义 learned predictive feature 距离 cheap memory baseline 有多远。
+
+当前 extended run 是 gate，而不是完整 program。Maze length 测试 cue retention 是否能跨更长 delay。Cue-alignment margin 测试 learned feature 是否含有 hidden-cue signal。Trial accuracy 测试更严格的问题：control 是否能使用该 signal。GVF TD error 只是辅助指标，因为 accurate prediction 仍可能对 control 无用。
+
 ## 结果
 
 ![Tail trial accuracy by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_trial_accuracy_by_maze_length.png)
@@ -71,6 +101,16 @@ cue-GVF 的 cue-alignment margin 在较短长度上有一些正信号，但随 m
 ## 审稿式批评与修订
 
 严格审稿人可能会问：“GVF 是负结果，为什么还继续？”回答是：负结果正是设计信号，说明当前 GVF question 没有把 cue 信息变成可用控制 state。另一个批评是课题太大。对此，proposal 应分层推进：先验证 fixed useful GVF questions，再做 limited-budget selection，最后做 step-size plasticity；不能在第一层没通过时直接宣传 combined plasticity 成功。当前修订已经把报告明确定位为 negative/redesign gate，并通过 20-seed extended run 加强证据。
+
+逐 proposal 审查矩阵：
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Alberta Plan | GVFs 只有在 predictions 成为 useful state 时才重要。 | 报告评价 control accuracy，而不是只看 prediction error。 | 当前 GVF questions 仍未通过 useful-state gate。 |
+| Partial observability | 任务可能在无 deep recurrence 下不可解。 | Trace 和 oracle baselines 能解决任务。 | learned prediction 仍需更强 information probe。 |
+| Representation | cue alignment 可能存在但 control 用不了。 | 同时报告 cue-alignment margin 和 trial accuracy。 | 需要 cue decodability 和 GVF output normalization。 |
+| Plasticity | Generate-and-test 和 TIDBD 尚未在 integrated loop 中测试。 | 报告明确它们是 staged future work。 | positive plasticity claim 需要新实验。 |
+| 严格老师 | 不要把当前负结果泛化成 GVF 总体结论。 | 结论限定在当前 cue-GVF/recurrent-GVF designs。 | 更好的 GVF questions 可能改变结论。 |
 
 ## 结论
 

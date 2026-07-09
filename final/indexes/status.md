@@ -2,50 +2,48 @@
 
 Date: 2026-07-09
 
-This status report reflects the latest user clarification: every proposal is an independent research topic and needs its own paper-style report, critique record, result summary, and reproduction path. The overview paper is only an overview; it does not replace per-proposal work.
+This status report reflects the latest correction from the user: the project is not finished just because every proposal has a folder or a first report. Every proposal must stand as an independent research topic with its own question, setting, method, experiment design, evidence, critique response, limitations, and reproduction path. The current state is an improved intermediate state, not a completed final revision.
 
 ## Current Research Shape
 
-The project now has two independent layers:
+The project has two final-facing layers:
 
 1. Thirteen canonical proposal studies under `final/reports/proposals/`.
 2. Three larger integrated-but-independent Core RL studies under `final/reports/integrated/`.
 
-The proposals are not equally strong scientifically. Some are positive candidates, some are mechanism diagnostics, and some are negative or not submission-grade as-is. They are still documented independently.
+The proposals are intentionally not treated as equally strong. Reward-Centered Sarsa, Output-Controlled TD, Scale-Invariant Continuing Control, and Continual Dyna Model Aging are the strongest current candidates. Several other proposals are negative results, diagnostics, redesign targets, or quarantined topics. Those weaker studies should remain independent, but their reports must not overclaim.
 
-## Canonical Proposal Materials
+## Current Report Status
 
-Each canonical proposal folder under `final/reports/proposals/<proposal>/` is now intentionally simple: the primary review artifact is `report.md`. The report must stand alone and include the proposal-template answers, motivation, research question, method, environment, experiment design, result interpretation, limitations, critique response, and reproduction command.
+Each canonical proposal folder under `final/reports/proposals/<proposal>/` has a `report.md` and `report_zh.md`, and integrated reports follow the same pattern. The first structural repair pass is now complete: all 16 English reports and 16 Chinese reports contain visible Proposal Template answers, independent scope, evidence level, experiment-design rationale, and reviewer-audit style critique records. This does not make every report paper-perfect; weak proposals still need either deeper experiments or honest negative/quarantine framing, which is now stated inside the reports.
 
-Older split fragments are preserved for auditability under `final/archive/proposal_fragments/<proposal>/`. Those archived files include the earlier `proposal_template.md`, `results.md`, `critique.md`, and `reproduction.md` drafts, but they are no longer the main review path. If a claim differs between an archived fragment and the current report, the current `final/reports/**/report.md` is the source to cite.
+Older split fragments are preserved for auditability under `final/archive/proposal_fragments/<proposal>/`. They are not the current source to cite. If an archived fragment conflicts with a current report, the current `final/reports/**/report.md` is the active artifact, but the active artifact may still need revision under `final/indexes/revise_plan_20260709.md`.
 
-The short mini-report pass has been replaced with paper-style standalone reports. The reports are still bounded by the evidence actually available; weak proposals are not promoted artificially.
+## Three Larger Independent Proposals
 
-## Three New Larger Independent Proposals
-
-The three larger proposal candidates are:
+The three current integrated proposal candidates are:
 
 1. Scale-Invariant Continuing Control.
 2. Continual Dyna Model Aging.
 3. Predictive State Plasticity.
 
-Scale-Invariant Continuing Control now has a completed main pilot:
+Scale-Invariant Continuing Control has a completed main pilot:
 
 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`
 
-The pilot shows a meaningful interaction: reward centering alone fails under high feature scale, normalized Sarsa alone remains reward-shift sensitive, and combined normalized-centered/differential variants are robust across tested shifts and scales.
+It also has a completed no-reset unit-switch extension:
 
-Continual Dyna Model Aging now has a completed extended half-life/budget sweep:
+`experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
+
+The full fixed-condition extended sweep has been submitted as CPU task `core-rl-scale-invariant-extended-33723554` in namespace `ailab-safethm`. It was confirmed RUNNING at 2026-07-09 14:40 HKT on `lg-cmc-h-cpu-0058.host.h.pjlab.org.cn`. The run has created `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`, but that directory currently has no standard artifacts, so it is not evidence yet.
+
+Continual Dyna Model Aging has a completed extended half-life/budget sweep:
 
 `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`
 
-This extended run shows that freshness-aware sampling can sharply reduce stale backups without oracle change detection. At planning budget `20`, keep-model late stale-backup rate is `0.213 +/- 0.065`; recency and recency/error methods can reduce it to near zero under shorter half-lives. Reward ranking depends on budget and half-life.
-
-Predictive State Plasticity now has a completed extended first-gate run:
+Predictive State Plasticity has a completed extended first-gate negative run:
 
 `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`
-
-The extended run covers maze lengths `8/12/20/30`. Cue-GVF remains near chance, while trace and oracle memory remain far stronger. This is a useful negative gate: weak hidden-cue information is not enough to become useful state.
 
 ## Current Result Index
 
@@ -56,14 +54,15 @@ Final-facing result index:
 Important current result directories:
 
 - Reward-Centered Sarsa: `experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended`
-- Output-Controlled TD: current indexed evidence remains `experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main`; the extended CPU task `core-rl-output-extended-fixed-46602102` is running, with expected output under `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`.
+- Output-Controlled TD: `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`
 - Dyna Planning Budget: `experiments/alberta_core_rl/results/dyna_planning_budget/20260709T024602Z_extended`
 - GVF Predictive State: `experiments/alberta_core_rl/results/useful_gvfs_state/20260708T155740Z_main`
 - Generate-and-Test: `experiments/alberta_core_rl/results/generate_test_features/20260708T154941Z_main`
 - TIDBD: `experiments/alberta_core_rl/results/tidbd_plasticity/20260708T154941Z_main`
 - Options: `experiments/alberta_core_rl/results/options_reusable_subtasks/20260708T161717Z_main`
 - Baird: `experiments/alberta_core_rl/results/baird_offpolicy_stability/20260708T161717Z_main`
-- Scale-Invariant Continuing Control: `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`
+- Scale-Invariant Continuing Control: current evidence is `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`; running empty result directory is `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`
+- Unit-Switching Continuing Control: `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
 - Continual Dyna Model Aging: `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`
 - Predictive State Plasticity: `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`
 
@@ -81,7 +80,7 @@ Promising but needs extension:
 - Dyna Planning Budget.
 - Predictive State Plasticity as a negative first-gate result needing redesign.
 
-Important negative or diagnostic studies:
+Important negative, diagnostic, or quarantined studies:
 
 - GVF Predictive State.
 - Generate-and-Test Features.
@@ -100,8 +99,8 @@ Code remains modular:
 
 - `experiments/alberta_core_rl/proposals.py` is the proposal registry/runner.
 - Proposal implementations live in `experiments/alberta_core_rl/studies/`.
-- Workspaces and configs live under `experiments/alberta_core_rl/configs/`.
-- Result directories include `metrics.csv`, `summary.json`, `condition_summary.json`, `config_used.json`, and `manifest.json`.
+- Configs live under `experiments/alberta_core_rl/configs/`.
+- Result directories are expected to include `metrics.csv`, `summary.json`, `condition_summary.json`, `config_used.json`, and `manifest.json`.
 
 Environment:
 
@@ -109,11 +108,19 @@ Environment:
 - Use `PYTHONNOUSERSITE=1`
 - Use `MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig`
 
+Recent verification is mixed:
+
+- Markdown image-link checks passed earlier for final-facing reports.
+- `python -m compileall experiments/alberta_core_rl` completed earlier without code errors.
+- Generated `__pycache__` directories remain under `experiments/alberta_core_rl/` because they are owned by `nobody:nogroup`; normal user cleanup failed with permission denied.
+- Python source files remain under the 500-line guidance.
+
 ## Next Research Iteration
 
-1. Finish and incorporate the CPU-task extended sweep for Output-Controlled TD; then update result indexes, figures, and reports.
-2. Extend Dyna aging to gradual drift, repeated changes, and planning-utility analysis.
-3. Redesign GVF predictive-state questions with cue-decodability probes.
-4. Add fixed-goal sanity experiments for the Options proposal.
-5. Add canonical TIDBD or AutoStep for the plasticity proposal.
-6. Keep negative proposals independent and honest; do not promote weak evidence.
+1. Monitor CPU task `core-rl-scale-invariant-extended-33723554`; if it succeeds, incorporate the new Scale-Invariant Continuing Control extended sweep into reports, figures, PDFs, and indexes.
+2. Deepen the newly added Proposal Template, evidence-level, and reviewer-audit sections where they affect project decisions.
+3. Extend Dyna aging to gradual drift, repeated changes, and planning-utility analysis.
+4. Redesign GVF predictive-state questions with cue-decodability probes.
+5. Add fixed-goal sanity experiments for the Options proposal.
+6. Add canonical TIDBD or AutoStep for the plasticity proposal.
+7. Keep negative proposals independent and honest; do not promote weak evidence.

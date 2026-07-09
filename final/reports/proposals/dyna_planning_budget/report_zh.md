@@ -6,6 +6,30 @@
 
 Dyna planning 对 continual agent 很有吸引力，因为它把 ordinary experience 转成一个紧凑 learned model，然后用有限 background computation 改善 value，而不需要额外真实交互或 replay buffer。但在 changing world 中，更大的 planning budget 也可能把更多计算花在旧世界的 transition 上。本 proposal 研究 fixed per-step planning budget 是否会在 pre-change sample efficiency 与 post-change stale computation 之间产生 tradeoff。实验使用一个中途改变 goal 和 hazard layout 的 continuing gridworld。20 seeds extended run 显示：较大的 planning budget 在 change 前提升 reward，但 keep-model agent 在 change 后仍保留明显 stale-backup signal；即使 late reward 最终恢复，background computation 仍可能部分浪费在过期 model entry 上。因此这个 proposal 的价值不是证明 flush-on-change 是好算法，而是说明 model freshness 必须独立于 planning budget 被研究。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：在 continuing nonstationary task 中，增加固定 Dyna planning budget 是否会造成 pre-change sample efficiency 与 post-change stale computation 的 tradeoff？本 proposal 研究 planning budget 和 model staleness，不是证明 oracle flush 是好算法。
+
+Setting / testbed：testbed 是 changing continuing gridworld，使用 tabular Q-learning 和 compact one-step model。它让 planning 有意义，同时 model entries 可检查，layout change 后 stale backups 可计数。
+
+Implemented comparison：实验改变 planning budget `0/1/5/20` 和 model handling `keep_model` vs `flush_on_change`。Flush 有 privileged information，只是 diagnostic；keep-model 是现实 precursor baseline。
+
+Metric / figure：必须同时看 reward 和 stale-backup figures。只看 reward 无法回答问题，因为 policy 可以恢复，同时 background computation 仍在备份 obsolete model entries。
+
+Compute need / fallback：20-seed extended result 已完成。诚实 fallback 是把它作为 Continual Dyna Model Aging 的 precursor diagnostic，而不是 final planning solution。
+
+## 独立研究范围
+
+本报告是独立前置研究。它负责回答为什么 model freshness 重要；integrated Continual Dyna Model Aging 报告负责研究 realistic aging 和 error-gating mechanisms。这个边界可以防止 oracle flush 被误读成算法贡献。
+
+范围限制在 fixed planning budgets、uniform model sampling 和 abrupt gridworld change。本 proposal 不研究 learned search control、uncertainty-aware models 或 gradual drift；这些是 stale-backup failure mode 被建立后的自然下一步。
+
+## 证据等级
+
+证据等级：strong supporting/precursor evidence。完成的 20-seed、20000-step extended run 足以说明 planning 在 change 前有帮助，也足以说明 keep-model planning 在 change 后会继续把 computation 花在 old-phase entries 上。
+
+但它不应被提升为 standalone positive planning algorithm。flush condition 使用 privileged change information，late reward differences 也不够稳健到支持 winner claim。强 claim 是 diagnostic：planning budget 和 model freshness 是不同设计变量。
+
 ## 研究动机
 
 Alberta Plan 强调 learned models 和 background planning。经典 Dyna demonstration 往往强调 stationary setting 里的 sample efficiency：agent 学到模型后通过 simulated backups 比纯 model-free 更新学得更快。Continual learning 的问题更困难：模型不是永恒真理，而是 stream 的记忆；当世界改变后，过去正确的 transition 和 reward consequence 可能变成误导。如果 agent 仍然均匀抽样旧 model entry，planning 就可能从“加速学习”变成“强化过期知识”的机制。
@@ -39,6 +63,12 @@ Alberta Plan 强调 learned models 和 background planning。经典 Dyna demonst
 当前可引用 extended result path 是 `experiments/alberta_core_rl/results/dyna_planning_budget/20260709T024602Z_extended`。实验变量包括 planning budgets `0/1/5/20` 和 model modes `keep_model/flush_on_change`。主要指标包括 online average reward、stale-backup rate、model size、Q norm、phase 和 recovery window。
 
 这里 reward 不是唯一指标。Reward 回答 policy 是否恢复；stale-backup rate 回答 planning computation 是否仍在使用与当前环境不匹配的 model entries。一个方法可能 late reward 恢复，但仍把一部分有限计算浪费在过期知识上；在更大的 Alberta Plan 风格 agent 中，这种计算分配问题会影响 predictions、options、planning tasks 之间的资源竞争。
+
+## 实验设计依据
+
+设计刻意把 reward 与 process diagnostics 配对。changing gridworld 让我们能标注 model backup 是否来自 old phase，因此 stale-backup rate 是 planning relevance 的直接指标。Planning budgets `0`、`1`、`5`、`20` 分离 no-planning behavior、low-compute planning 和 high-compute planning；后者最容易暴露 stale search control 的问题。
+
+oracle flush baseline 的作用是诊断 model contents，而不是提出 realistic agent。如果 flush 和 keep-model 的 late reward 类似，但 stale-backup rate 差异很大，那么结论就是 reward 会隐藏 computation misuse。这正是后续 model-aging proposal 的动机。
 
 ## 结果
 
@@ -79,6 +109,16 @@ Continual-agent reviewer 会指出：flush-on-change 如果当成算法就违反
 Statistics reviewer 会指出：早期 5 seeds pilot 太弱。回应是：当前引用结果已经更新为 20 seeds、20000 steps、larger grid extended run，且结论只保留稳健部分：change 前 planning 有用，change 后 keep-model 有 persistent stale-backup signal。
 
 Sutton-style reviewer 会追问：你到底在研究 reward score，还是研究 agent 如何组织和使用知识？回应是：报告把 stale-backup rate 和 model freshness 放在中心，reward 只是一个结果指标，不是唯一评价标准。
+
+逐 proposal 审查矩阵：
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Planning | stationary Dyna result 太常见。 | 使用 nonstationary continuing gridworld 和 stale-backup diagnostics。 | 仍只有一次 abrupt change。 |
+| Continual learning | flush-on-change 不符合 temporal uniformity。 | 明确 flush 只是 oracle diagnostic。 | realistic aging/search-control 交给 integrated proposal。 |
+| 统计 | 5-seed pilot 太弱。 | 使用 20-seed extended run。 | recovery-window tables 还可更清楚。 |
+| Computation | reward 会隐藏 stale planning。 | stale-backup rate 是主指标。 | planning utility per backup 仍较粗。 |
+| 严格老师 | 不要把 precursor 包装成 final algorithm。 | 结论明确它是 model-aging 的诊断基础。 | 若不强调 evidence level，读者仍可能过度关注 flush。 |
 
 ## 结论
 

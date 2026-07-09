@@ -12,6 +12,30 @@
 
 本研究测试 continuing control agent 是否能在两个任意问题单位改变时保持稳定：reward zero-point 和 feature vector scale。RL 问题是 continuing access-control queue，agent 在线决定 accept/reject。实现的 agents 包括 discounted Sarsa、reward-centered Sarsa、normalized Sarsa、normalized reward-centered Sarsa 和 normalized differential Sarsa。fixed-condition pilot 交叉 reward shifts `-4, 0, 8` 与 feature scales `one, ten, hundred, uneven`，主要指标包括 unshifted average reward、Q norm、prediction change、divergence 和 policy probes。新增 unit-switching extension 在同一条 stream 中途改变 reward origin 和/或 feature scale，不重置 weights、traces 或 reward baseline。当前证据显示 reward centering 和 feature normalization 解决不同失败模式，并且组合机制明显更稳；但 abrupt no-reset feature-scale switch 后 long-run reward 仍可能下降，所以不能声称 unit invariance 已完全解决。
 
+## Proposal Template Answers / 提案模板回答
+
+Focused RL question：一个小型 online control agent 是否能在 reward origin 和 feature units 改变时保持行为和数值稳定，还是这些任意 measurement conventions 会泄漏进 learning dynamics？这是 combined invariance question，不是 benchmark score question。
+
+Setting / testbed：主环境是 continuing access-control queue with linear action values。它有真实 policy tradeoff，同时足够小，可以检查 Q norm、prediction changes、reward baselines 和 divergence。第二环境是同一 stream 的 no-reset unit-switching 版本。
+
+Implemented comparison：比较 discounted Sarsa、reward-centered Sarsa、differential Sarsa、normalized Sarsa、normalized reward-centered Sarsa 和 normalized differential variants。核心变量是 reward shifts 与 feature scales 的交叉，以及不重置 agent 的在线 reward/feature unit changes。
+
+Metric / figure：只有当方法在 reward shifts 和 feature scales 下同时保持 unshifted reward、policy probes、Q norm、output-change magnitude 和 divergence 稳定时，才支持本 proposal。unit-switching figures 尤其重要，因为它们测试 continual recovery，而不是 separate fixed-condition tuning。
+
+Compute need / fallback：main pilot 和 unit-switching extension 已完成。fixed-condition 20-seed extended CPU sweep 作为 `core-rl-scale-invariant-extended-33723554` 正在运行；在 artifacts 写出前，fallback 是提交 fixed-condition pilot evidence 加更强的 no-reset unit-switching evidence，并明确 full-grid confirmation pending。
+
+## 独立研究范围
+
+这是一个更大的 integrated proposal，但它仍然是独立研究，不是强行拼接 Reward-Centered Sarsa 和 Output-Controlled TD。reward-only 和 prediction-only reports 是 component evidence；本报告自己的研究对象是 combined control problem、reward/feature unit interaction，以及 no-reset unit-change failure mode。
+
+本报告不声称一般意义上解决 unit invariance。当前范围是 synthetic but controlled unit manipulations 下的 linear access-control Sarsa。fixed-condition pilot 支持 compositional stability；no-reset extension 则显示 abrupt feature-unit changes 即使避免 catastrophic divergence，也仍会损害长期 reward。
+
+## 证据等级
+
+证据等级：强 integrated-candidate evidence，但还不是 final full-grid evidence。已完成 fixed-condition pilot 展示 reward centering 和 update normalization 的 interaction；已完成 20-seed unit-switching run 对 continual-learning relevance 更强，因为它在同一 stream 中改变 units，不重置 weights。运行中的 `20260709T063128Z_extended` fixed-condition sweep 目前没有 artifacts，不能作为 evidence。
+
+当前 claim 必须收紧：combined centering/normalization 在当前测试 variants 和 access-control 设置中对 stable unit changes 是必要的，并且能在 no-reset switches 下避免严重数值不稳定；但它没有完全解决 abrupt feature-scale changes 后的 reward recovery。成熟最终论文还需要 running extended grid、gradual scale drift、beta sensitivity 和 policy-distance probes。
+
 ## 研究动机
 
 Alberta Plan 强调从 ordinary experience 中持续学习。对于这样的 agent，单位敏感性不是 cosmetic issue，而是核心稳定性问题。一个长期 agent 不会在 sensor rescale 或 reward baseline shift 后获得干净的重新调参阶段。如果 reward origin 或 feature scale 改变了有效学习问题，那么 agent 的能力就依赖任务外的人为约定。
@@ -48,6 +72,12 @@ unit-switching extension 使用 result path `experiments/alberta_core_rl/results
 
 尚未完成的是 full fixed-condition `scale_invariant_continuing_control/config_extended.json`，它会进一步扩展 shifts/scales/alphas。unit-switching 已经回答了一个更严格的问题，但不能替代完整 fixed-condition grid。
 
+## 实验设计依据
+
+设计刻意交叉两个 nuisance dimensions，因为单一机制各自有合理但不完整的故事。reward centering 在 scale one/current alpha 下能很好处理 reward-origin offset，但不能控制 feature-driven parameter update 的大小；normalization 应该控制 feature-scale effects，但不能移除 reward shift 引入的 constant value component。combined grid 因此是 compositional test：只处理一个 nuisance dimension 的方法应当在另一个 dimension 下失败。
+
+no-reset unit-switching extension 用来避免 fixed-condition sweep 隐含的 retuning assumption。continual agent 不应在 sensor rescale 时获得 fresh weights。switch experiment 因此测量 early/late post-change reward、Q norm 和 divergence。`hundred` scale switch 是故意严苛的，用于区分“只避免 numerical explosion”和“真正恢复 useful behavior”。
+
 ## 结果
 
 fixed-condition pilot 显示两个机制是互补的：reward-centered Sarsa 单独可以处理 reward shift，但在 feature scale `ten` 或 `hundred` 时会失败；normalized Sarsa 能控制 feature scale，但仍受 reward shift 影响；normalized reward-centered Sarsa 和 normalized differential Sarsa 在当前 sweep 中最稳，tail unshifted reward 大致保持 `2.4-2.5`，并且没有 divergence。
@@ -79,6 +109,16 @@ unit-switching 进一步说明，稳定性和恢复性是两个层次。组合�
 ## 审稿式批评与回应
 
 批评一：“你只是把两个 tricks 组合起来。”回应：科学对象不是 trick，而是 arbitrary problem units 下的 invariance；组合实验有价值，因为它检验两个看似独立合理的 normalization 是否互补或干扰。批评二：“Access-control 还是小。”回应：Core RL 机制研究允许小环境，前提是 manipulation sharp 且 diagnostics 能解释机制。新增 unit-switching experiment 已经比 fixed-condition pilot 更严格，并且它暴露了组合方法仍未完全解决的恢复问题。
+
+逐 proposal 审查矩阵：
+
+| 审查角度 | 批评 | 已处理 | 剩余风险 |
+|---|---|---|---|
+| Alberta Plan | unit invariance 必须服务 continual agents，而不是 synthetic stress。 | 加入 no-reset unit-switching stream，并以 temporal-uniform learning 下 measurement conventions 改变为问题。 | 真实 sensor drift 尚未建模。 |
+| Core RL | integrated proposal 可能只是两个 tricks 的松散组合。 | 报告定义单一 combined invariance question，并测试 interaction failures。 | 仍需 running full-grid extended sweep。 |
+| Stability | 避免 divergence 不等于 control 好。 | 报告 unshifted reward、Q norm、output change 和 divergence。 | 仍缺 policy-distance probes 和 recovery AUC。 |
+| 统计 | fixed-condition pilot 弱于 unit-switch extension。 | 分离 pilot evidence 和 completed 20-seed unit-switch evidence。 | running extended fixed grid 尚无 artifacts。 |
+| 严格老师 | 不要声称 unit invariance 已解决。 | 结论明确 abrupt feature-scale recovery 仍开放。 | 仍需 gradual drift 和 beta/gamma sensitivity。 |
 
 ## 结论
 

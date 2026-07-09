@@ -11,6 +11,30 @@ This proposal tests whether learned General Value Function predictions can serve
 
 This study asks whether GVFs can serve as useful agent state in a partially observable control task. The RL problem is a T-maze where an early cue determines the correct later junction action. The implemented representations are raw observation, short history, hand-coded trace memory, recurrent GVF features, and oracle memory; control uses online linear Sarsa. The experiment measures trial-end accuracy, reward, GVF values, cue traces, GVF TD error, and control TD error. The current evidence is negative: trace and oracle memory solve the task, while the current recurrent GVF representation remains near chance. The result is valuable as a redesign target, not as a claim that GVFs generally fail.
 
+## Proposal Template Answers
+
+Focused RL question: Can a learned GVF feature supply the missing cue information needed for control in a partially observable T-maze? This is a useful-state question, not a prediction-error question.
+
+Setting and testbed: The testbed is a long aliased T-maze. The agent sees a cue at the start, loses direct access to it in the corridor, and must act on that cue at the junction. This makes hidden-state retention observable through trial-end accuracy.
+
+Implemented comparison: The pilot compares raw observation, short history, trace memory, recurrent GVF features, and oracle cue memory under online linear Sarsa. Trace and oracle are not decorative baselines; they show that the task is solvable without deep networks.
+
+Observation or figure that answers the question: The main evidence is trial-end accuracy, supported by position-level GVF/trace trajectories. A GVF feature must approach trace memory or at least improve over raw observation; lower GVF TD error alone would not count.
+
+Compute need and fallback: The current standalone result is a five-seed pilot. The fallback is to report it as a negative redesign target and use the integrated Predictive State Plasticity extended run for stronger evidence.
+
+## Independent Research Scope
+
+This proposal is the smaller standalone precursor to the integrated Predictive State Plasticity study. It owns one narrow question: does the initial recurrent GVF design become useful state in a T-maze? It does not evaluate generate-and-test, TIDBD, feature replacement, or a full predictive-state program.
+
+The scope is intentionally limited because the result is negative. It should not be used to claim that GVFs cannot construct state. It should be used to motivate better GVF question design, direct cue-decodability probes, and a stricter useful-prediction evaluation.
+
+## Evidence Level
+
+Evidence level: negative pilot/redesign target. The result is convincing enough to show that the current recurrent-GVF pilot should not be submitted as a positive GVF-state result. It is not as strong as the integrated 20-seed Predictive State Plasticity run, which supersedes it for final evidence.
+
+The report should therefore cite this pilot as a failure mechanism: cheap trace memory solves the task; recurrent GVF does not. Any final claim about predictive state should rely on the extended integrated run or on new cue-decodability experiments.
+
 ## Research Motivation
 
 In partially observable environments, current observation is not state. A long-lived agent must construct state from experience. The Alberta Plan proposes GVFs as a major route: predictions about future signals can become knowledge used by the agent. This idea is powerful, but it has a sharp failure mode. A prediction can be accurate, stable, and still useless for the decision the agent must make.
@@ -92,6 +116,12 @@ Figures:
 
 ![GVF values and cue traces by maze position.](../../../../experiments/alberta_core_rl/results/useful_gvfs_state/20260708T155740Z_main/figures/gvf_trace_by_position.png)
 
+## Experiment Design Rationale
+
+The T-maze creates a minimal but meaningful partial-observability problem. Raw observation is insufficient by construction, but trace and oracle memory make the task solvable with small non-deep features. This lets the experiment ask whether the GVF mechanism adds useful state rather than whether the task is impossible.
+
+The current design is a pilot because it tests one maze length and one GVF design. It is still useful because the negative result is sharp: the recurrent GVF does not improve control over chance while trace memory succeeds. The next design should not merely tune alpha; it should add hidden-cue probes and redesign cumulants/discounts so the learned prediction is explicitly tied to the cue.
+
 ## Results
 
 Trace memory and oracle memory solve the task, with seed-aware tail trial accuracy about `0.944 +/- 0.018` and `0.939 +/- 0.027`. This establishes that the task is learnable with small non-deep state augmentation.
@@ -137,6 +167,16 @@ Strict baseline reviewer:
 Revision required:
 
 - Add cue-decodability probes, hidden-cue correlation plots, and redesigned cumulants tied to future cue-relevant events.
+
+Per-proposal audit matrix:
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| GVF | Prediction accuracy is not the same as useful state. | Reports trial accuracy and trace/oracle baselines. | Direct cue-decodability is still missing. |
+| Baseline | If trace memory solves the task, GVF must approach it. | Trace and oracle are included as strong baselines. | GVF remains near chance. |
+| Evidence | Five seeds and one maze length are limited. | Report is framed as a negative pilot. | Extended evidence belongs to Predictive State Plasticity. |
+| Alberta Plan | GVFs are important, so negative evidence must be precise. | Conclusion limits the claim to the current GVF design. | Better GVF questions may succeed. |
+| Strict instructor | Do not present this as a positive proposal. | Status and conclusion call it a redesign target. | Needs synchronization with integrated report if used in final materials. |
 
 ## Conclusion
 

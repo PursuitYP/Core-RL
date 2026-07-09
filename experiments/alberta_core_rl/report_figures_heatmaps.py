@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import csv
 import math
 from pathlib import Path
+from collections import defaultdict
 
 from .core import ensure_mpl_config, repo_root
 from .report_figures_core import (
@@ -14,9 +16,9 @@ from .report_figures_core import (
     _sorted_unique,
 )
 
-def plot_output_td(result_dir: Path) -> list[Path]:
+def plot_output_td(result_dir: Path, figure_dir: Path | None = None) -> list[Path]:
     rows = _load_condition_summary(result_dir)
-    fig_dir = result_dir / "figures"
+    fig_dir = figure_dir or result_dir / "figures"
     fig_dir.mkdir(parents=True, exist_ok=True)
     algorithms = ["fixed", "normalized", "trace_normalized", "true_online"]
     scales = ["one", "ten", "hundred", "uneven", "lognormal"]
@@ -24,10 +26,11 @@ def plot_output_td(result_dir: Path) -> list[Path]:
     alphas = _sorted_unique([_condition(row, "alpha") for row in rows])
     columns = [(scale, alpha) for scale in scales for alpha in alphas]
     labels = [f"{scale}\na={float(alpha):g}" for scale, alpha in columns]
+    divergence = _seed_divergence_rates(result_dir)
     outputs: list[Path] = []
     specs = [
         ("rmse", "Tail RMSE stability atlas", "magma", True, "report_log_rmse_heatmap.png", "mean"),
-        ("diverged", "Divergence rate atlas", "Reds", False, "report_divergence_heatmap.png", "mean"),
+        ("seed_divergence", "Seed-level divergence rate atlas", "Reds", False, "report_divergence_heatmap.png", "mean"),
         ("prediction_change", "Tail output-change atlas", "viridis", True, "report_prediction_change_heatmap.png", "mean"),
     ]
     for metric, title, cmap, log10, name, reducer in specs:
@@ -35,14 +38,17 @@ def plot_output_td(result_dir: Path) -> list[Path]:
         for alg in algorithms:
             row_vals = []
             for scale, alpha in columns:
-                matches = [
-                    row
-                    for row in rows
-                    if _condition(row, "algorithm") == alg
-                    and _condition(row, "scale") == scale
-                    and math.isclose(float(_condition(row, "alpha")), float(alpha))
-                ]
-                row_vals.append(_mean_over(matches, metric, reducer=reducer))
+                if metric == "seed_divergence":
+                    row_vals.append(divergence.get((alg, scale, float(alpha)), math.nan))
+                else:
+                    matches = [
+                        row
+                        for row in rows
+                        if _condition(row, "algorithm") == alg
+                        and _condition(row, "scale") == scale
+                        and math.isclose(float(_condition(row, "alpha")), float(alpha))
+                    ]
+                    row_vals.append(_mean_over(matches, metric, reducer=reducer))
             matrix.append(row_vals)
         outputs.append(
             _save_heatmap(
@@ -57,6 +63,22 @@ def plot_output_td(result_dir: Path) -> list[Path]:
             )
         )
     return outputs
+
+
+def _seed_divergence_rates(result_dir: Path) -> dict[tuple[str, str, float], float]:
+    metrics_path = result_dir / "metrics.csv"
+    if not metrics_path.exists():
+        return {}
+    seed_events: dict[tuple[str, str, float, int], bool] = defaultdict(bool)
+    with metrics_path.open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            key = (row["algorithm"], row["scale"], float(row["alpha"]), int(float(row["seed"])))
+            seed_events[key] = seed_events[key] or float(row.get("diverged") or 0.0) > 0.0
+    grouped: dict[tuple[str, str, float], list[bool]] = defaultdict(list)
+    for (algorithm, scale, alpha, _seed), diverged in seed_events.items():
+        grouped[(algorithm, scale, alpha)].append(diverged)
+    return {key: sum(values) / len(values) for key, values in grouped.items() if values}
 
 
 def plot_reward_centered(result_dir: Path) -> list[Path]:
@@ -226,5 +248,4 @@ def plot_unit_switching(result_dir: Path) -> list[Path]:
             )
         )
     return outputs
-
 

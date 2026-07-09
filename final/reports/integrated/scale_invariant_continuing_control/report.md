@@ -2,12 +2,36 @@
 
 ## Abstract
 
-Long-lived agents should not depend on arbitrary measurement units. In continuing control, adding a constant to all rewards does not change which behavior is desirable, yet ordinary discounted value methods can inflate their value scale and become harder to tune. Likewise, rescaling features does not change the represented value function, but it changes the effect of a fixed parameter step. This proposal asks whether reward centering and output-controlled updates can be combined into a small streaming Sarsa agent whose behavior is invariant to both reward translation and feature scaling.
+Long-lived agents should not depend on arbitrary measurement units. In continuing control, adding a constant to all rewards does not change which behavior is desirable, yet ordinary discounted value methods can inflate their value scale and become harder to tune. Likewise, rescaling features does not change the represented value function, but it changes the effect of a fixed parameter step. This proposal asks whether reward centering and output-controlled updates can be combined into a small streaming Sarsa agent that is more stable under reward translation and feature scaling. The current evidence supports a stability improvement, not a claim that unit invariance or no-reset recovery is solved.
 
 
 ## Standalone Study Summary
 
-This study asks whether a continuing control agent can remain stable when two arbitrary units of the problem change: the zero point of reward and the scale of the feature vector. The RL problem is a continuing access-control queue with online accept/reject decisions. The implemented agents are discounted Sarsa, reward-centered Sarsa, normalized Sarsa, normalized reward-centered Sarsa, and normalized differential Sarsa. The experiment crosses reward shifts `-4, 0, 8` with feature scales `one, ten, hundred, uneven`; the main metrics are unshifted average reward, Q norm, prediction change, divergence, and policy probes. The current result shows that reward centering and feature normalization solve different failure modes and compose well in the combined normalized-centered variants. The key remaining experiment is a longer CPU sweep plus an in-stream nonstationary unit-change test.
+This study asks whether a continuing control agent can remain stable when two arbitrary units of the problem change: the zero point of reward and the scale of the feature vector. The RL problem is a continuing access-control queue with online accept/reject decisions. The implemented agents are discounted Sarsa, reward-centered Sarsa, normalized Sarsa, normalized reward-centered Sarsa, and normalized differential Sarsa. The fixed-condition pilot crosses reward shifts `-4, 0, 8` with feature scales `one, ten, hundred, uneven`; the no-reset unit-switching extension changes reward origin and/or feature scale halfway through the same stream. The main metrics are unshifted average reward, Q norm, prediction change, divergence, and policy probes. The current result shows that reward centering and feature normalization solve different failure modes and compose well in the combined normalized-centered variants, but abrupt feature-unit recovery remains incomplete. The key remaining experiments are the running full fixed-condition CPU sweep, policy-distance probes, and gradual unit drift.
+
+## Proposal Template Answers
+
+Focused RL question: Can a small online control agent preserve behavior and numerical stability when reward origin and feature units change, or do these arbitrary measurement conventions leak into the learning dynamics? This is a combined invariance question, not a benchmark-score question.
+
+Setting and testbed: The main testbed is the continuing access-control queue with linear action values. It is chosen because it is a real continuing control problem with a policy tradeoff, yet small enough to expose Q norms, prediction changes, reward baselines, and divergence. The secondary testbed is a no-reset unit-switching version of the same stream.
+
+Implemented comparison: The study compares discounted Sarsa, reward-centered Sarsa, differential Sarsa, normalized Sarsa, normalized reward-centered Sarsa, and normalized differential variants. The key variation is the crossing of reward shifts and feature scales, followed by online reward/feature unit changes without resetting the agent.
+
+Observation or figure that answers the question: The proposal is supported only if a method preserves unshifted reward and policy probes while keeping Q norm, output-change magnitude, and divergence stable across both reward shifts and feature scales. The unit-switching figures are especially important because they test continual recovery rather than separate fixed-condition tuning.
+
+Compute need and fallback: The main pilot and unit-switching extension are complete. The fixed-condition 20-seed extended CPU sweep is running as `core-rl-scale-invariant-extended-33723554`; until its artifacts appear, the fallback is to present fixed-condition pilot evidence plus the stronger no-reset unit-switching evidence and state that full-grid confirmation is pending.
+
+## Independent Research Scope
+
+This is a larger integrated proposal, but it remains an independent study. It is not a forced merger of Reward-Centered Sarsa and Output-Controlled TD; it asks a new question about whether two separately justified invariance mechanisms compose inside one continuing control learner. The reward-only and prediction-only reports are supporting evidence for the components. This report owns the combined control problem, the interaction between reward and feature units, and the no-reset unit-change failure mode.
+
+The report does not claim that unit invariance is solved in general. Its current scope is linear access-control Sarsa under synthetic but controlled unit manipulations. The fixed-condition pilot supports compositional stability, while the no-reset extension shows that abrupt feature-unit changes still damage long-run reward even when catastrophic divergence is avoided.
+
+## Evidence Level
+
+Evidence level: strong integrated-candidate evidence, but not final full-grid evidence. The completed fixed-condition pilot demonstrates the interaction between reward centering and update normalization. The completed 20-seed unit-switching run is stronger for continual-learning relevance because it changes units inside the same stream without resetting weights. The running `20260709T063128Z_extended` fixed-condition sweep has no artifacts yet and must not be cited as evidence.
+
+The current claim should be deliberately narrow: combined centering/normalization is necessary for stable unit changes, and it prevents severe numerical instability under no-reset switches, but it does not fully solve recovery after abrupt feature-scale changes. A mature final paper would add the running extended grid, gradual scale drift, beta sensitivity, and policy-distance probes.
 
 ## Research Motivation
 
@@ -71,6 +95,12 @@ Metrics:
 - Policy invariance under reward shifts, measured by accept-probability probes.
 - Recovery window after online scale or reward-origin change.
 
+## Experiment Design Rationale
+
+The design deliberately crosses two nuisance dimensions because each single mechanism has a plausible but incomplete story. Reward centering should remove reward-origin offsets but does not control the magnitude of a feature-driven parameter update. Normalization should control feature-scale effects but does not remove the constant value component induced by reward shifts. The combined grid is therefore a compositional test: if a method handles only one nuisance dimension, it should fail in the other.
+
+The no-reset unit-switching extension is included because fixed-condition sweeps can hide a retuning assumption. A continual agent should not get fresh weights when a sensor is rescaled. The switch experiment therefore measures early and late post-change reward, Q norm, and divergence. It is intentionally harsh: the `hundred` scale switch reveals whether an algorithm merely avoids numerical explosion or also recovers useful behavior.
+
 ## Expected Results And Failure Modes
 
 Expected positive pattern: ordinary discounted Sarsa should be sensitive to reward shifts and feature scales; reward centering should control reward-origin sensitivity; normalized updates should control feature-scale sensitivity; the combined method should control both.
@@ -128,6 +158,16 @@ Main figures below use seed-tail condition summaries with 95% confidence interva
 Strict reviewer challenge: "You are just combining two tricks." Response: the scientific object is not the trick but invariance under arbitrary problem units. The combined experiment is valuable if it reveals whether independently plausible normalizations compose or interfere.
 
 Strict reviewer challenge: "Access-control is still small." Response: small is acceptable for Core RL if the manipulation is sharp and the diagnostics expose mechanism. The added unit-switching experiment now tests a harder no-reset adaptation case, and its mixed result prevents the report from overstating the fixed-condition pilot.
+
+Per-proposal audit matrix:
+
+| Reviewer angle | Critique | Action taken | Remaining risk |
+|---|---|---|---|
+| Alberta Plan | Unit invariance must matter for continual agents, not only for synthetic stress tests. | Adds a no-reset unit-switching stream and frames the problem as temporal-uniform learning under changing measurement conventions. | Natural sensor drift is not yet modeled. |
+| Core RL | The integrated proposal could be a loose combination of two tricks. | The report defines a single combined invariance question and tests interaction failures. | Needs the running full-grid extended sweep for stronger coverage. |
+| Stability | Avoiding divergence may not imply good control. | Reports unshifted reward, Q norm, output change, and divergence. | Policy-distance probes and recovery AUC remain missing. |
+| Statistics | Fixed-condition pilot is weaker than the unit-switch extension. | Separates pilot evidence from completed 20-seed unit-switch evidence. | The currently running extended fixed grid has no artifacts yet. |
+| Strict instructor | Do not claim unit invariance is solved. | Conclusion states that abrupt feature-scale recovery remains open. | Gradual drift and beta/gamma sensitivity are still needed. |
 
 ## Threats To Validity
 
