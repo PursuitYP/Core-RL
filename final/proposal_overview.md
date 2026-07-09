@@ -40,13 +40,13 @@ Nonstationary Bandit is a minimal tracking sanity check. It has no state bootstr
 
 ### Strongly Recommended
 
-1. Scale-Invariant Continuing Control. This is one of the strongest final directions because it combines reward translation and feature-scale invariance in one continuing control problem. Current evidence shows that reward centering and output normalization fix different failure modes and compose well in normalized-centered variants. Next step: extended sweep plus no-reset unit-change experiments.
+1. Scale-Invariant Continuing Control. This is a strong final direction because it combines reward translation and feature-scale invariance in one continuing control problem. Current evidence shows that reward centering and output normalization fix different failure modes and compose well in normalized-centered variants. The no-reset unit-switch extension is now complete and shows a stricter conclusion: combined variants prevent catastrophic instability, but abrupt feature-unit recovery remains open. Next step: full fixed-condition extended grid plus gradual unit drift.
 
-2. Continual Dyna With Model Aging. This is the strongest planning/model-based direction. It asks which model entries deserve planning after the world changes. Current evidence shows recency aging sharply reduces stale backups, especially at planning budget `20`. Next step: extended half-life/budget sweep and gradual stochastic drift.
+2. Continual Dyna With Model Aging. This is the strongest planning/model-based direction. It asks which model entries deserve planning after the world changes. Current 20-seed half-life/budget evidence shows recency aging sharply reduces stale backups, especially at planning budget `20`. Next step: gradual stochastic drift and tighter planning-utility diagnostics, not another claim of universal reward superiority.
 
 3. Reward-Centered Continuing Sarsa. This is a clean standalone main proposal. It asks whether continuing Sarsa should be invariant to arbitrary reward offsets. Current access-control evidence shows ordinary discounted Sarsa inflates value scale under reward shifts, while centered and differential variants remain more stable. Next step: alpha/beta/gamma sensitivity and midstream reward-origin changes.
 
-4. Output-Controlled TD. This is the clean standalone prediction/function-approximation proposal. It asks whether alpha should control prediction change rather than raw parameter change. Current tile-coded random-walk evidence shows normalized TD variants remain stable across large feature scales where fixed TD fails. Next step: true-online baseline audit and nonstationary feature-scale shift.
+4. Output-Controlled TD. This is the clean standalone prediction/function-approximation proposal. It asks whether alpha should control prediction change rather than raw parameter change. Current citable tile-coded random-walk evidence is still the main pilot, which shows normalized TD variants remain stable across large feature scales where fixed TD fails. A 20-seed CPU-task extended run is active but incomplete; next step is to incorporate it only after standard artifacts are written, then audit the true-online baseline and nonstationary feature-scale shift.
 
 5. Dyna Planning Budget and Model Staleness. This is useful either as a standalone conditional proposal or as the first diagnostic section of Continual Dyna With Model Aging. It shows that more planning can help before change but stale model backups can harm post-change recovery.
 
@@ -64,7 +64,7 @@ Centered TD Diagnostics supports Reward-Centered Sarsa. On-Policy TD(lambda) Sta
 
 ### Scale-Invariant Continuing Control
 
-Report: `final/reports/integrated/scale_invariant_continuing_control/report.md`. The study asks whether reward centering and output-controlled Sarsa can jointly make a continuing access-control agent robust to reward shifts and feature scaling. Current result: `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`. The combined normalized-centered and normalized-differential variants preserve tail unshifted reward around `2.4-2.5` across tested shifts/scales with zero divergence, while single mechanisms fail in their non-target dimension.
+Report: `final/reports/integrated/scale_invariant_continuing_control/report.md`. The study asks whether reward centering and output-controlled Sarsa can jointly make a continuing access-control agent robust to reward shifts and feature scaling. Current fixed-condition result: `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`. No-reset unit-switch extension: `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`. The combined normalized-centered and normalized-differential variants preserve tail unshifted reward around `2.4-2.5` in the fixed-condition pilot and avoid catastrophic Q-norm growth in the unit-switch extension, but harsh abrupt feature-scale switches still reduce recovery reward.
 
 ### Continual Dyna With Model Aging
 
@@ -80,4 +80,4 @@ Reward-Centered Sarsa and Output-Controlled TD are the strongest canonical propo
 
 ## Current Evidence Standard
 
-All current results use online interaction and seed-aware tail summaries in `condition_summary.json`. Several main candidates now have 20-seed, 20000-step extended evidence, while Output-Controlled TD, Scale-Invariant Continuing Control, and Continual Dyna Model Aging still need final extended-result incorporation. Report-ready integrated figures are generated with `experiments/alberta_core_rl/scripts/plot_report_figures.py` and stored as `figures/report_*.png` to avoid the old crowded legends.
+All current results use online interaction and seed-aware tail summaries in `condition_summary.json`. Reward-Centered Sarsa, Dyna Planning Budget, Continual Dyna Model Aging, Predictive State Plasticity, and Unit-Switching Continuing Control now have 20-seed extended evidence. Output-Controlled TD extended evidence is still running/incomplete and must not be cited until artifacts exist. Scale-Invariant Continuing Control still needs the full fixed-condition extended grid. Report-ready figures are generated with `experiments/alberta_core_rl/scripts/plot_report_figures.py` and stored as `figures/report_*.png` to avoid the old crowded legends.

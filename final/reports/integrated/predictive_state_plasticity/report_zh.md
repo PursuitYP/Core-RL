@@ -2,6 +2,8 @@
 
 英文对应报告：`report.md`
 
+状态：综合型但高风险的 proposal。当前可提交证据是 20-seed first-gate negative study：learned cue-GVF features 还没有成为 useful control state。Generate-and-test、TIDBD 和 feature replacement 是后续 staged program，不是本报告已经完成的正向证据。
+
 ## 摘要
 
 Predictive knowledge 是 Alberta Plan 的核心思想之一，但一个 prediction 只有在改善 learning 或 control 时才对 agent 有价值。当前 extended GVF predictive-state 实验是一个明确的负结果：trace memory 和 oracle memory 能解决 partially observable T-maze，而 learned GVF state 即使在 20 seeds、20000 online steps、maze length 到 30 的设置下仍接近 chance。这个失败不是废结果，而是把研究问题变得更尖锐：streaming agent 在有限 features 下，如何选择、适应并保留真正携带 control-relevant hidden information 的 predictions？
@@ -48,9 +50,9 @@ GVF 与 control learner 都在线更新。评价不是 GVF TD error 单独低不
 
 ![Tail trial accuracy by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_trial_accuracy_by_maze_length.png)
 
-![Tail cue-alignment margin by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_cue_alignment_margin_by_maze_length.png)
+![GVF-based state constructions 的 tail cue-alignment margin。](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_cue_alignment_margin_by_maze_length.png)
 
-![Tail GVF absolute TD error by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_gvf_abs_td_error_by_maze_length.png)
+![GVF-based state constructions 的 tail GVF absolute TD error。](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_gvf_abs_td_error_by_maze_length.png)
 
 extended 结果非常清楚。Oracle memory 在所有长度上保持高准确率，约 `0.931-0.950`。Trace memory 在短中长度上接近 oracle，在 length `30` 时下降到约 `0.827 +/- 0.013`，但仍明显高于 chance。Raw observation 接近 chance。Recurrent GVF 也接近 chance。Cue-GVF 在长度 `8,12,20,30` 上的 trial accuracy 分别约 `0.504, 0.508, 0.505, 0.494`，没有形成有效 control state。
 

@@ -1,5 +1,7 @@
 # Predictive State Plasticity
 
+Status: integrated but high-risk proposal. The current submission-grade evidence is a 20-seed first-gate negative study: learned cue-GVF features do not yet become useful control state. Generate-and-test, TIDBD, and feature-replacement mechanisms are staged next steps, not completed evidence in the present report.
+
 ## Abstract
 
 Predictive knowledge is a central Alberta Plan idea, but a prediction is valuable to an agent only if it improves learning or control. The extended GVF predictive-state experiment is a negative result: trace memory and oracle memory solve a partially observable T-maze, while the learned GVF state remains near chance even with 20 seeds, 20000 online steps, and maze lengths up to 30. This proposal turns that failure into a sharper research program: how can a streaming agent with limited features select, adapt, and retain predictions that carry control-relevant hidden information?
@@ -15,7 +17,15 @@ Partial observability makes current observation insufficient. A long-lived agent
 
 ## Research Question
 
-When observations are aliased and the relevant memory timescale changes, what combination of predictive question design, feature replacement, and step-size plasticity helps a streaming linear agent maintain useful state?
+Current first-gate question:
+
+> Before adding feature replacement or step-size plasticity, can fixed learned GVF features carry the hidden cue well enough to improve online linear control over raw observation and approach cheap trace memory?
+
+Longer staged-program question:
+
+> When observations are aliased and the relevant memory timescale changes, what combination of predictive question design, feature replacement, and step-size plasticity helps a streaming linear agent maintain useful state?
+
+The present evidence answers only the first question. It is negative, and that negative result determines whether the larger staged program is worth pursuing.
 
 ## Related Work
 
@@ -118,9 +128,9 @@ Main figures below use seed-tail condition summaries with 95% confidence interva
 
 ![Tail trial accuracy by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_trial_accuracy_by_maze_length.png)
 
-![Tail cue-alignment margin by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_cue_alignment_margin_by_maze_length.png)
+![Tail cue-alignment margin for GVF-based state constructions.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_cue_alignment_margin_by_maze_length.png)
 
-![Tail GVF absolute TD error by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_gvf_abs_td_error_by_maze_length.png)
+![Tail GVF absolute TD error for GVF-based state constructions.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_gvf_abs_td_error_by_maze_length.png)
 
 ## Reviewer Critique And Revisions
 

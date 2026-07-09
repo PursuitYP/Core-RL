@@ -14,13 +14,13 @@ The integrated proposals are not a synthetic “one paper” assembled from unre
 
 | Integrated proposal | Core topics combined | Main research pressure | Status |
 |---|---|---|---|
-| Scale-Invariant Continuing Control | reward centering, average reward, output-controlled TD/Sarsa, continuing control | reward translation and feature-scale changes in one ongoing control stream | first main pilot completed; strongest current integrated candidate |
-| Continual Dyna Model Aging | learned models, Dyna planning, nonstationarity, computation budget, average-reward control | stale model knowledge after world changes | first main pilot completed; planning-focused candidate |
-| Predictive State Plasticity | GVFs, useful predictions, generate-and-test, TIDBD, partial observability | maintaining useful memory features under changing hidden-state relevance | first-gate pilot completed; useful negative/redesign candidate |
+| Scale-Invariant Continuing Control | reward centering, average reward, output-controlled TD/Sarsa, continuing control | reward translation and feature-scale changes in one ongoing control stream | fixed-condition main pilot plus 20-seed no-reset unit-switch extension completed; full fixed-condition extended grid still open |
+| Continual Dyna Model Aging | learned models, Dyna planning, nonstationarity, computation budget, average-reward control | stale model knowledge after world changes | 20-seed half-life/budget extended sweep completed; strongest planning-focused candidate |
+| Predictive State Plasticity | GVFs, useful predictions, generate-and-test, TIDBD, partial observability | maintaining useful memory features under changing hidden-state relevance | 20-seed first-gate negative result completed; staged redesign candidate, not a solved plasticity method |
 
 ## How These Relate To Existing Proposals
 
-The integrated proposals are larger standalone directions produced by critique of the existing portfolio. The three primary candidates now have first-pilot evidence; cite each proposal's `report.md` and the result directories indexed in `final/indexes/results.md` rather than treating this README as the evidence source:
+The integrated proposals are larger standalone directions produced by critique of the existing portfolio. Current evidence differs by proposal: Scale-Invariant has a main pilot plus a unit-switch extension, Dyna Aging has completed extended evidence, and Predictive State Plasticity has a completed negative first-gate. Cite each proposal's `report.md` and the result directories indexed in `final/indexes/results.md` rather than treating this README as the evidence source:
 
 - Reward-Centered Sarsa and Output-Controlled TD become a single invariance story.
 - Dyna Planning Budget becomes a model-freshness and computation-allocation story.

@@ -12,7 +12,7 @@ Action taken: extended runs were launched for `reward_centered_sarsa`, `output_c
 
 Main critique: `scale_invariant_continuing_control` needs an in-stream unit-change experiment, not only separate fixed-condition sweeps.
 
-Action taken: a new runner `unit_switching_continuing_control` was implemented. It changes reward origin and/or feature scale halfway through a continuing access-control stream without resetting weights. The smoke config passed; the extended config is running.
+Action taken: a new runner `unit_switching_continuing_control` was implemented. It changes reward origin and/or feature scale halfway through a continuing access-control stream without resetting weights. The smoke config and 20-seed extended config have completed, and the result is incorporated into the Scale-Invariant Continuing Control report.
 
 Main critique: `continual_dyna_model_aging` should claim stale-backup reduction more strongly than reward superiority unless reward recovery becomes robust.
 
@@ -40,11 +40,33 @@ Main critique: `config_extended.json` outputs were confusing because they used `
 
 Action taken: `run_proposal` now labels outputs from `config_extended.json` with `_extended` while preserving `suite: main` for runner logic. Older runs launched before this patch are renamed after verification.
 
+### Latest Multi-Role Follow-Up
+
+Main critique: Output-Controlled TD had inconsistent evidence status. English and Chinese reports could be read as implying that extended evidence was available, while the actual `20260709T051934Z_extended` directory is still incomplete.
+
+Action taken: Output-Controlled TD reports and indexes now state that the citable evidence is still `20260708T153802Z_main`; CPU task `core-rl-output-extended-fixed-46602102` is running, and `20260709T051934Z_extended` must not be cited until standard artifacts exist.
+
+Main critique: Dyna aging report figures silently dropped the `half_life` dimension.
+
+Action taken: `plot_report_figures.py` was split into smaller modules and the Dyna aging report figures now include separate legend entries for aging half-lives. Captions explicitly say the plots are by planning budget, model mode, and half-life.
+
+Main critique: several report figures were overloaded learning-curve plots rather than publication-quality evidence.
+
+Action taken: report-ready summary figures were added for Output-Controlled TD, Reward-Centered Sarsa, On-policy Stability Atlas, Dyna Planning Budget, Unit-Switching Continuing Control, Scale-Invariant Continuing Control, Dyna Aging, and Predictive State Plasticity. Reports now prefer heatmaps or tail-summary figures over old spaghetti plots.
+
+Main critique: Predictive State Plasticity sounded broader than the evidence supported.
+
+Action taken: the report now states that the current submission-grade evidence is a 20-seed first-gate negative result. Generate-and-test, TIDBD, and feature replacement are staged future work, not completed positive evidence.
+
+Main critique: incomplete result directories could be mistaken for evidence.
+
+Action taken: `experiments/alberta_core_rl/results/README.md` now lists known incomplete directories. Local old incomplete directories have `INCOMPLETE.md` markers where writable; the active rjob-created Output directory is noted in the README because it is owned by the container user.
+
 ## Current Open Items
 
 - Finish the still-running CPU-task extended job: `output_controlled_td/config_extended.json`. The expected result directory is `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`; verify `config_used.json`, `condition_summary.json`, and generated figures before citing it.
 - Run or decide scope for `scale_invariant_continuing_control/config_extended.json`; it is the largest fixed-condition sweep and should be scheduled after current jobs finish or moved to a verified CPU-task queue.
-- Update `output_controlled_td` report, result indexes, reproduction indexes, and overview text once its extended summary is available.
+- Update `output_controlled_td` result indexes and reports once its extended summary is available; the current reports already mark the extended directory as incomplete.
 - Add beta/gamma and midstream reward-origin tests for `reward_centered_sarsa` if the standalone paper is selected as a final topic.
 - Add gradual/stochastic drift environments for Dyna aging before making general claims beyond abrupt changing gridworlds.
 - Add true-online TD(lambda) max-stable-alpha audit before treating that baseline as a strong negative comparison.
@@ -55,4 +77,4 @@ Action taken: `run_proposal` now labels outputs from `config_extended.json` with
 - Markdown image-link check passed for all files under `final/`.
 - `python -m compileall experiments/alberta_core_rl` completed without errors.
 - Generated `__pycache__` directories were cleaned after the compile check.
-- Python source files remain under the 500-line guidance; `envs.py` is the largest at 474 lines.
+- Python source files remain under the 500-line guidance after splitting report plotting utilities; `envs.py` is the largest at 474 lines.
