@@ -8,7 +8,7 @@ CPU task `core-rl-output-extended-fixed-46602102` 已经完成，状态为 `Succ
 
 当前正式材料结构是：`final/reports/proposals/` 下有 13 个 ordinary proposal 报告，`final/reports/integrated/` 下有 3 个 integrated proposal 报告；每个正式报告目录应以 `report.md`、`report_zh.md`、`report.pdf` 为主入口。`final/archive/` 只保留历史碎片和审计材料，不作为当前结论来源。
 
-下一个长 CPU task 也已经提交：`core-rl-scale-invariant-extended-33723554` 在 `ailab-safethm/safethm_cpu_task` 上运行 `scale_invariant_continuing_control/config_extended.json`。它在 2026-07-09 14:40 HKT 确认为 `RUNNING`，节点是 `lg-cmc-h-cpu-0058.host.h.pjlab.org.cn`；日志确认已经执行 `python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/scale_invariant_continuing_control/config_extended.json`。它已经创建 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`，但该目录目前没有标准 artifacts。在 `metrics.csv`、`summary.json`、`condition_summary.json`、`config_used.json`、`manifest.json` 写出前，它不能作为 evidence。
+长 CPU task `core-rl-scale-invariant-extended-33723554` 已成功。它在 `ailab-safethm/safethm_cpu_task` 上运行 `scale_invariant_continuing_control/config_extended.json`，并把标准 artifacts 写到 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`。该目录现在已经是 evidence，并已纳入 Scale-Invariant report、figures 和 indexes。
 
 ## 诚实缺口声明
 
@@ -53,7 +53,7 @@ CPU task `core-rl-output-extended-fixed-46602102` 已经完成，状态为 `Succ
 | Proposal | 当前证据级别 | 主要缺口 | 下一轮实验/分析 | 报告重构要求 |
 |---|---|---|---|---|
 | Reward-Centered Sarsa | 强；20-seed extended | 缺 beta/gamma sensitivity 和 no-reset reward-origin switch。 | 跑 beta/gamma sweep；同一 stream 中途改变 reward shift；报告 policy probes。 | 增加 Proposal Template Answers；把 reward origin invariance 作为主问题，不只写 reward 更高。 |
-| Output-Controlled TD | 强；20-seed extended | true-online baseline 不公平；缺 no-reset feature-scale switch。 | max-stable-alpha audit；normalized true-online variant；scale switch without reset。 | 已重写第一版；下一版补 true-online fairness section 和 switch results。 |
+| Output-Controlled TD | 强；20-seed extended + fairness audit | true-online output control 仍需要更 principled 的推导；缺 no-reset feature-scale switch。 | max-stable-alpha audit；更严谨 true-online normalization；scale switch without reset。 | 保留 fairness evidence；后续有 switch result 再补。 |
 | GVF Predictive State | 负结果/重设计 | GVF question 和 downstream utility 连接弱。 | cue decodability probe；oracle-prediction control；GVF horizon ablation。 | 写成“GVF 不自动成为 useful state”的独立负结果。 |
 | Generate-and-Test Features | 负结果/重设计 | utility rule 不优于 random；任务贡献不清楚。 | downstream-error utility；feature budget sweep；delay drift/repeated switch。 | 明确当前失败机制，不把 generate-test 写成正结果。 |
 | Doorway Options | quarantine | primitive baseline 和 option accounting 不充分。 | fixed-goal sanity；SMDP duration accounting；goal-change transfer after sanity pass。 | 不通过 sanity 前只保留为暂停课题。 |
@@ -65,7 +65,7 @@ CPU task `core-rl-output-extended-fixed-46602102` 已经完成，状态为 `Succ
 | GVF Question Design | 支持性/重设计工具 | 只看 prediction error，不看 useful state。 | cue information、decodability、control ablation。 | 写清“easy to predict != useful to control”。 |
 | Nonstationary Bandit | dropped sanity | 太浅，没有 bootstrapping/state/planning。 | 不扩为主线；只作 intro sanity。 | 报告降级，避免冒充 Core RL 主课题。 |
 | Streaming Representation | 负结果 | auxiliary target 不 task-relevant。 | 设计 task-relevant auxiliary；feature utility analysis。 | 合并到 predictive-state program 或保留负结果。 |
-| Scale-Invariant Continuing Control | 强 integrated；pilot + unit-switch；extended running | full fixed-condition grid 仍未完成；abrupt unit switch recovery 仍弱。 | 监控 `core-rl-scale-invariant-extended-33723554`；完成后更新 heatmaps；设计 gradual unit drift。 | 写成 reward-unit 和 feature-unit invariance 的单一大问题。 |
+| Scale-Invariant Continuing Control | 强 integrated；fixed grid + unit-switch 已完成 | abrupt unit switch recovery 仍弱。 | 补 gradual unit drift、recovery AUC 和 policy-distance probes。 | 写成 reward-unit 和 feature-unit invariance 的单一大问题。 |
 | Continual Dyna Model Aging | 强 integrated；20-seed extended | abrupt deterministic change 过窄。 | stochastic/gradual drift；repeated changes；planning utility diagnostics。 | 把 claim 聚焦 stale-backup reduction/search-control freshness。 |
 | Predictive State Plasticity | 高价值负向 gate；20-seed extended | 题目大于当前成功证据。 | cue decodability；redesigned GVFs；limited feature budget; optional generate-test/TIDBD only after probe passes。 | 重写成 staged negative-to-redesign research program。 |
 
@@ -82,7 +82,7 @@ CPU task `core-rl-output-extended-fixed-46602102` 已经完成，状态为 `Succ
 | 保存本轮 revise plan 的中英文版本 | 已完成 | `final/indexes/revise_plan_20260709.md`、`final/indexes/revise_plan_20260709_zh.md` | 保持“原始用户需求”作为最后一个 section。 |
 | 修正误导性的 requirements/status 文档 | 第一轮已完成 | `final/indexes/requirements_audit.md`、`final/indexes/status.md` 及中文版本已改成 gap-tracking 口径。 | 后续每次实验和报告更新后继续同步。 |
 | 审计报告缺失章节 | 第一轮机械检查已完成 | `final/indexes/report_section_audit.md` 和 `_zh.md` 显示多数报告缺显式 Proposal Template、独立范围、证据等级、实验设计或审查信号。 | 用该审计作为 report rewrite checklist；修订后重新检查。 |
-| 监控 Scale-Invariant extended CPU task | 运行中 | `core-rl-scale-invariant-extended-33723554` 在 2026-07-09 14:40 HKT 为 RUNNING；`20260709T063128Z_extended` 已创建但没有 artifacts。 | 继续检查 job 状态和标准 artifacts；完成前不纳入 evidence。 |
+| 监控 Scale-Invariant extended CPU task | 已完成 | `core-rl-scale-invariant-extended-33723554` 已成功；`20260709T063128Z_extended` 包含标准 artifacts 并已纳入报告和索引。 | 继续做 gradual drift 和 recovery diagnostics。 |
 | 清理 `__pycache__` | 受权限阻塞 | `experiments/alberta_core_rl/` 下两个 `__pycache__` 目录由 `nobody:nogroup` 拥有，普通用户删除会 permission denied。 | 除非用户允许特权清理，否则只记录该问题。 |
 | 给所有报告补 Proposal Template Answers | 第一轮结构修复已完成 | 16 个英文报告和 16 个中文报告都已有显式 Proposal Template、独立范围、证据等级、实验设计依据和审查章节。 | 继续提升内容深度，并保持中英文 claim 同步。 |
 | 给每个 proposal 补 critique/action/risk 表 | 第一轮简洁版已完成 | 每个正式报告都有 reviewer-audit style 表或矩阵。 | 只在能改变研究决策时继续扩展，避免泛泛填充。 |

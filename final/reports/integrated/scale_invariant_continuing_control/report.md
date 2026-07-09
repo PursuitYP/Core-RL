@@ -7,7 +7,7 @@ Long-lived agents should not depend on arbitrary measurement units. In continuin
 
 ## Standalone Study Summary
 
-This study asks whether a continuing control agent can remain stable when two arbitrary units of the problem change: the zero point of reward and the scale of the feature vector. The RL problem is a continuing access-control queue with online accept/reject decisions. The implemented agents are discounted Sarsa, reward-centered Sarsa, normalized Sarsa, normalized reward-centered Sarsa, and normalized differential Sarsa. The fixed-condition pilot crosses reward shifts `-4, 0, 8` with feature scales `one, ten, hundred, uneven`; the no-reset unit-switching extension changes reward origin and/or feature scale halfway through the same stream. The main metrics are unshifted average reward, Q norm, prediction change, divergence, and policy probes. The current result shows that reward centering and feature normalization solve different failure modes and compose well in the combined normalized-centered variants, but abrupt feature-unit recovery remains incomplete. The key remaining experiments are the running full fixed-condition CPU sweep, policy-distance probes, and gradual unit drift.
+This study asks whether a continuing control agent can remain stable when two arbitrary units of the problem change: the zero point of reward and the scale of the feature vector. The RL problem is a continuing access-control queue with online accept/reject decisions. The implemented agents are discounted Sarsa, reward-centered Sarsa, normalized Sarsa, normalized reward-centered Sarsa, and normalized differential Sarsa. The completed fixed-condition extended sweep crosses reward shifts `-8, -4, 0, 4, 8`, feature scales `one, ten, hundred, uneven, lognormal`, and alphas `0.01, 0.03, 0.1`; the no-reset unit-switching extension changes reward origin and/or feature scale halfway through the same stream. The current result shows that reward centering and feature normalization solve different failure modes and compose well in normalized reward-centered and normalized differential variants, but abrupt feature-unit recovery remains incomplete. The key remaining experiments are policy-distance probes, gradual unit drift, and reward-baseline sensitivity rather than another fixed-condition confirmation run.
 
 ## Proposal Template Answers
 
@@ -19,7 +19,7 @@ Implemented comparison: The study compares discounted Sarsa, reward-centered Sar
 
 Observation or figure that answers the question: The proposal is supported only if a method preserves unshifted reward and policy probes while keeping Q norm, output-change magnitude, and divergence stable across both reward shifts and feature scales. The unit-switching figures are especially important because they test continual recovery rather than separate fixed-condition tuning.
 
-Compute need and fallback: The main pilot and unit-switching extension are complete. The fixed-condition 20-seed extended CPU sweep is running as `core-rl-scale-invariant-extended-33723554`; until its artifacts appear, the fallback is to present fixed-condition pilot evidence plus the stronger no-reset unit-switching evidence and state that full-grid confirmation is pending.
+Compute need and fallback: The main pilot, fixed-condition 20-seed extended sweep, and no-reset unit-switching extension are complete. The fixed-condition CPU task `core-rl-scale-invariant-extended-33723554` succeeded and wrote standard artifacts at `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`. The fallback is no longer an evidence gap; the remaining work is conceptual refinement through gradual drift and policy-distance diagnostics.
 
 ## Independent Research Scope
 
@@ -29,9 +29,9 @@ The report does not claim that unit invariance is solved in general. Its current
 
 ## Evidence Level
 
-Evidence level: strong independent evidence, but not final full-grid evidence. The completed fixed-condition pilot demonstrates the interaction between reward centering and update normalization. The completed 20-seed unit-switching run is stronger for continual-learning relevance because it changes units inside the same stream without resetting weights. The running `20260709T063128Z_extended` fixed-condition sweep has no artifacts yet and must not be cited as evidence.
+Evidence level: strong independent evidence. The completed fixed-condition extended sweep demonstrates the interaction between reward centering and update normalization across 375 condition groups and 7500 seed-conditions. The completed 20-seed unit-switching run is stronger for continual-learning relevance because it changes units inside the same stream without resetting weights. Together these experiments support the stability part of the proposal while preserving the harder recovery caveat.
 
-The current claim should be deliberately narrow: combined centering/normalization is necessary for stable unit changes, and it prevents severe numerical instability under no-reset switches, but it does not fully solve recovery after abrupt feature-scale changes. A mature final paper would add the running extended grid, gradual scale drift, beta sensitivity, and policy-distance probes.
+The current claim should be deliberately narrow: combined centering/normalization is necessary for stable unit changes, and it prevents severe numerical instability under no-reset switches, but it does not fully solve recovery after abrupt feature-scale changes. A mature final paper would add gradual scale drift, beta sensitivity, recovery AUC, and policy-distance probes.
 
 ## Paper-Style Contribution And Claim Boundaries
 
@@ -124,18 +124,26 @@ A result is meaningful only if it shows invariance across equivalent description
 
 ## Results
 
-The first completed experiment for this report is a combined continuing-control pilot:
+The primary fixed-condition evidence is the completed extended sweep:
 
-`experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`
+`experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`
 
-The combined run crosses reward shifts `-4, 0, 8` with feature scales `one, ten, hundred, uneven` in access-control Sarsa. It shows that the two invariance mechanisms are complementary:
+The extended run crosses reward shifts `-8, -4, 0, 4, 8`, feature scales `one`, `ten`, `hundred`, `uneven`, and `lognormal`, alphas `0.01`, `0.03`, and `0.1`, and 20 seeds. It shows that the two invariance mechanisms are complementary:
 
-- Reward-centered Sarsa alone is stable at scale `one`, but diverges or develops extremely large Q norms at uniform scales `ten` and `hundred`.
-- Normalized Sarsa controls feature scale but remains reward-shift sensitive, with tail unshifted reward falling to about `1.45` at shift `8`, scale `one`.
-- Normalized reward-centered Sarsa keeps tail unshifted reward near `2.41-2.51` across all tested shifts and scales with zero divergence.
-- Normalized differential Sarsa shows a similar robust pattern.
+- Discounted Sarsa and reward-centered Sarsa each diverge in `500/1500` seed-conditions, with failures concentrated at scale `hundred` and high-alpha scale `ten`.
+- Normalized Sarsa has `0/1500` divergent seed-conditions, which supports the feature-scale mechanism, but its average tail unshifted reward is lower (`1.965`) and more reward-shift sensitive than the combined variants.
+- Normalized reward-centered Sarsa has `0/1500` divergent seed-conditions and the highest mean tail unshifted reward (`2.556`), with condition-level reward range `2.493-2.609`.
+- Normalized differential Sarsa also has `0/1500` divergent seed-conditions and a very similar mean tail unshifted reward (`2.554`), with condition-level reward range `2.486-2.603`.
 
-The important pattern is interaction-specific: each single mechanism fails outside its own invariance dimension, while the combined mechanisms compose in the current pilot.
+The important pattern is interaction-specific: each single mechanism fails outside its own invariance dimension, while the combined mechanisms compose in the completed extended grid.
+
+| Algorithm | Mean tail unshifted reward | Reward range across conditions | Seed-conditions diverged | Median tail Q norm | Interpretation |
+|---|---:|---:|---:|---:|---|
+| discounted Sarsa | `1.501` | `0.100-2.403` | `500/1500` | `463.9` | Reward-origin and feature-unit sensitivity appear together. |
+| reward-centered Sarsa | `1.759` | `0.106-2.596` | `500/1500` | `42.0` | Centering helps reward offsets but not large feature-scale updates. |
+| normalized Sarsa | `1.965` | `1.570-2.414` | `0/1500` | `211.3` | Feature-scale stability improves, but reward-origin sensitivity remains. |
+| normalized reward-centered Sarsa | `2.556` | `2.493-2.609` | `0/1500` | `24.6` | Best combined stability and reward in this sweep. |
+| normalized differential Sarsa | `2.554` | `2.486-2.603` | `0/1500` | `24.4` | Similar robust pattern with an average-reward objective. |
 
 A stricter no-reset unit-switching experiment was then added:
 
@@ -145,19 +153,19 @@ This run uses seeds `0-19`, `20000` online steps, reward-origin and feature-scal
 
 Unit-switching summary figures:
 
-![Post-late reward after no-reset unit switches.](../../../../experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended/figures/report_unit_switch_reward_heatmap.png)
+![Post-late reward after no-reset unit switches.](figures/report_unit_switch_reward_heatmap.png)
 
-![Post-late Q norm after no-reset unit switches.](../../../../experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended/figures/report_unit_switch_q_norm_heatmap.png)
+![Post-late Q norm after no-reset unit switches.](figures/report_unit_switch_q_norm_heatmap.png)
 
-![Post-late divergence after no-reset unit switches.](../../../../experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended/figures/report_unit_switch_divergence_heatmap.png)
+![Post-late divergence after no-reset unit switches.](figures/report_unit_switch_divergence_heatmap.png)
 
-Main figures below use seed-tail condition summaries with 95% confidence intervals. They replace the earlier overloaded learning-curve plots whose legends compressed the plotting area.
+Fixed-condition extended figures below use seed-tail condition summaries with 95% confidence intervals. They replace the earlier overloaded learning-curve plots whose legends compressed the plotting area.
 
-![Tail unshifted reward by algorithm, reward shift, and feature scale.](../../../../experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main/figures/report_avg_unshifted_reward_by_scale.png)
+![Tail unshifted reward by algorithm, reward shift, and feature scale.](figures/report_avg_unshifted_reward_by_scale.png)
 
-![Tail Q norm by algorithm, reward shift, and feature scale.](../../../../experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main/figures/report_q_norm_by_scale.png)
+![Tail Q norm by algorithm, reward shift, and feature scale.](figures/report_q_norm_by_scale.png)
 
-![Tail output-change magnitude by algorithm, reward shift, and feature scale.](../../../../experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main/figures/report_prediction_change_by_scale.png)
+![Tail output-change magnitude by algorithm, reward shift, and feature scale.](figures/report_prediction_change_by_scale.png)
 
 ## Analysis
 
@@ -176,9 +184,9 @@ Per-proposal audit matrix:
 | Reviewer angle | Critique | Action taken | Remaining risk |
 |---|---|---|---|
 | Alberta Plan | Unit invariance must matter for continual agents, not only for synthetic stress tests. | Adds a no-reset unit-switching stream and frames the problem as temporal-uniform learning under changing measurement conventions. | Natural sensor drift is not yet modeled. |
-| Core RL | The study could be mistaken for a loose combination of two tricks. | The report defines a single combined invariance question and tests interaction failures inside one control setting. | Needs the running full-grid extended sweep for stronger coverage. |
+| Core RL | The study could be mistaken for a loose combination of two tricks. | The report defines a single combined invariance question and tests interaction failures inside one control setting with a completed full fixed-condition grid. | Needs gradual drift and policy-distance diagnostics for a richer continual-learning story. |
 | Stability | Avoiding divergence may not imply good control. | Reports unshifted reward, Q norm, output change, and divergence. | Policy-distance probes and recovery AUC remain missing. |
-| Statistics | Fixed-condition pilot is weaker than the unit-switch extension. | Separates pilot evidence from completed 20-seed unit-switch evidence. | The currently running extended fixed grid has no artifacts yet. |
+| Statistics | Fixed-condition pilot is weaker than the unit-switch extension. | Replaces pilot-only claims with the completed 20-seed fixed-condition extended grid and keeps no-reset switch evidence separate. | Recovery AUC and policy-distance intervals remain missing. |
 | Strict instructor | Do not claim unit invariance is solved. | Conclusion states that abrupt feature-scale recovery remains open. | Gradual drift and beta/gamma sensitivity are still needed. |
 
 ## Threats To Validity
@@ -187,7 +195,7 @@ The current evidence is stronger than the first pilot but still not a finished e
 
 ## Conclusion
 
-This proposal remains a strong independent Core-RL candidate because it has a clear invariance question, an interpretable continuing-control environment, and a nontrivial interaction: reward centering and output normalization solve different failure modes and compose in the fixed-condition pilot. The stricter unit-switching extension prevents the conclusion from becoming too strong. Combined variants prevent the catastrophic numerical instability seen in fixed discounted Sarsa, but abrupt no-reset feature-scale changes can still reduce long-run unshifted reward. The current claim is therefore: centering plus normalization is necessary for stable unit changes, but recovery after abrupt feature-unit changes is still an open Core RL problem. The next step is the full `scale_invariant_continuing_control/config_extended.json` grid plus gradual feature-scale drift, not a claim that unit invariance is solved.
+This proposal remains a strong independent Core-RL candidate because it has a clear invariance question, an interpretable continuing-control environment, and a nontrivial interaction: reward centering and output normalization solve different failure modes and compose in the completed fixed-condition extended grid. The stricter unit-switching extension prevents the conclusion from becoming too strong. Combined variants prevent the catastrophic numerical instability seen in fixed discounted Sarsa, but abrupt no-reset feature-scale changes can still reduce long-run unshifted reward. The current claim is therefore: centering plus normalization is necessary for stable unit changes, but recovery after abrupt feature-unit changes is still an open Core RL problem. The next step is gradual feature-scale drift, recovery AUC, and policy-distance probes, not another claim that unit invariance is solved.
 
 ## Reproduction
 
@@ -221,7 +229,7 @@ PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconf
   --config experiments/alberta_core_rl/configs/unit_switching_continuing_control/config_extended.json
 ```
 
-Regenerate fixed-condition report figures:
+Regenerate fixed-condition extended report figures:
 
 ```bash
 cd /mnt/shared-storage-user/yupeng/Core-RL
@@ -229,5 +237,18 @@ cd /mnt/shared-storage-user/yupeng/Core-RL
 PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
   /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_report_figures.py \
   --kind scale \
-  --result-dir experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main
+  --result-dir experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended \
+  --figure-dir final/reports/integrated/scale_invariant_continuing_control/figures
+```
+
+Regenerate unit-switching report figures:
+
+```bash
+cd /mnt/shared-storage-user/yupeng/Core-RL
+
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_report_figures.py \
+  --kind unit-switching \
+  --result-dir experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended \
+  --figure-dir final/reports/integrated/scale_invariant_continuing_control/figures
 ```

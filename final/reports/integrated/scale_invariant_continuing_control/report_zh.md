@@ -10,7 +10,7 @@
 
 ## 独立研究总结
 
-本研究测试 continuing control agent 是否能在两个任意问题单位改变时保持稳定：reward zero-point 和 feature vector scale。RL 问题是 continuing access-control queue，agent 在线决定 accept/reject。实现的 agents 包括 discounted Sarsa、reward-centered Sarsa、normalized Sarsa、normalized reward-centered Sarsa 和 normalized differential Sarsa。fixed-condition pilot 交叉 reward shifts `-4, 0, 8` 与 feature scales `one, ten, hundred, uneven`，主要指标包括 unshifted average reward、Q norm、prediction change、divergence 和 policy probes。新增 unit-switching extension 在同一条 stream 中途改变 reward origin 和/或 feature scale，不重置 weights、traces 或 reward baseline。当前证据显示 reward centering 和 feature normalization 解决不同失败模式，并且组合机制明显更稳；但 abrupt no-reset feature-scale switch 后 long-run reward 仍可能下降，所以不能声称 unit invariance 已完全解决。
+本研究测试 continuing control agent 是否能在两个任意问题单位改变时保持稳定：reward zero-point 和 feature vector scale。RL 问题是 continuing access-control queue，agent 在线决定 accept/reject。实现的 agents 包括 discounted Sarsa、reward-centered Sarsa、normalized Sarsa、normalized reward-centered Sarsa 和 normalized differential Sarsa。完成的 fixed-condition extended sweep 交叉 reward shifts `-8, -4, 0, 4, 8`、feature scales `one, ten, hundred, uneven, lognormal` 和 alphas `0.01, 0.03, 0.1`；新增 unit-switching extension 在同一条 stream 中途改变 reward origin 和/或 feature scale，不重置 weights、traces 或 reward baseline。当前证据显示 reward centering 和 feature normalization 解决不同失败模式，并且 normalized reward-centered 与 normalized differential variants 组合后明显更稳；但 abrupt no-reset feature-scale switch 后 long-run reward 仍可能下降，所以不能声称 unit invariance 已完全解决。
 
 ## Proposal Template Answers / 提案模板回答
 
@@ -22,7 +22,7 @@ Implemented comparison：比较 discounted Sarsa、reward-centered Sarsa、diffe
 
 Metric / figure：只有当方法在 reward shifts 和 feature scales 下同时保持 unshifted reward、policy probes、Q norm、output-change magnitude 和 divergence 稳定时，才支持本 proposal。unit-switching figures 尤其重要，因为它们测试 continual recovery，而不是只测试单独固定条件下的 tuning。
 
-Compute need / fallback：main pilot 和 unit-switching extension 已完成。fixed-condition 20-seed extended CPU sweep 作为 `core-rl-scale-invariant-extended-33723554` 正在运行；在 artifacts 写出前，fallback 是提交 fixed-condition pilot evidence 加更强的 no-reset unit-switching evidence，并明确 full-grid confirmation pending。
+Compute need / fallback：main pilot、fixed-condition 20-seed extended sweep 和 no-reset unit-switching extension 都已完成。fixed-condition CPU task `core-rl-scale-invariant-extended-33723554` 已成功，并在 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended` 写出标准 artifacts。fallback 现在不再是 evidence gap；剩余工作是通过 gradual drift、policy-distance diagnostics 和 reward-baseline sensitivity 做概念深化。
 
 ## 独立研究范围
 
@@ -32,9 +32,9 @@ Compute need / fallback：main pilot 和 unit-switching extension 已完成。fi
 
 ## 证据等级
 
-证据等级：强候选证据，但还不是 final full-grid evidence。已完成 fixed-condition pilot 展示 reward centering 和 update normalization 的 interaction；已完成 20-seed unit-switching run 对 continual-learning relevance 更强，因为它在同一 stream 中改变 units，不重置 weights。运行中的 `20260709T063128Z_extended` fixed-condition sweep 目前没有 artifacts，不能作为 evidence。
+证据等级：强独立证据。完成的 fixed-condition extended sweep 覆盖 375 个 condition groups 和 7500 个 seed-conditions，展示 reward centering 与 update normalization 的 interaction。完成的 20-seed unit-switching run 对 continual-learning relevance 更强，因为它在同一 stream 中改变 units，不重置 weights。这两个实验共同支持 stability 部分的 claim，同时保留更困难的 recovery caveat。
 
-当前 claim 必须收紧：combined centering/normalization 在当前测试 variants 和 access-control 设置中对 stable unit changes 是必要的，并且能在 no-reset switches 下避免严重数值不稳定；但它没有完全解决 abrupt feature-scale changes 后的 reward recovery。成熟最终论文还需要 running extended grid、gradual scale drift、beta sensitivity 和 policy-distance probes。
+当前 claim 必须收紧：combined centering/normalization 在当前测试 variants 和 access-control 设置中对 stable unit changes 是必要的，并且能在 no-reset switches 下避免严重数值不稳定；但它没有完全解决 abrupt feature-scale changes 后的 reward recovery。成熟最终论文还需要 gradual scale drift、beta sensitivity、recovery AUC 和 policy-distance probes。
 
 ## 论文式贡献与 Claim 边界
 
@@ -72,11 +72,11 @@ Alberta Plan 提供了 continuing agents、average reward、value functions 和 
 
 ## 实验设计
 
-fixed-condition pilot 使用 result path `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`。该 pilot 交叉 reward shifts `-4, 0, 8` 和 feature scales `one, ten, hundred, uneven`，评估 tail unshifted reward、Q norm、prediction change、divergence 和 policy probes。
+fixed-condition extended sweep 使用 result path `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`。该 sweep 交叉 reward shifts `-8, -4, 0, 4, 8`、feature scales `one, ten, hundred, uneven, lognormal`、alphas `0.01, 0.03, 0.1` 和 20 seeds，评估 tail unshifted reward、Q norm、prediction change、divergence 和 policy probes。
 
 unit-switching extension 使用 result path `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`。该 run 使用 seeds `0-19`、`20000` online steps、alpha values `0.01, 0.03, 0.1`，并在 stream 中途执行四类 switch：reward_shift_only、feature_scale_only、joint_reward_scale 和 joint_reward_lognormal。评价指标包括 recovery_window 中的 unshifted reward、Q norm、divergence 和 prediction_change。
 
-尚未完成的是 full fixed-condition `scale_invariant_continuing_control/config_extended.json`，它会进一步扩展 shifts/scales/alphas。unit-switching 已经回答了一个更严格的问题，但不能替代完整 fixed-condition grid。
+fixed-condition extended grid 和 unit-switching extension 回答的是两个互补问题：前者检查不同 reward/feature units 下的稳定区域，后者检查同一 stream 中不重置 agent 的恢复能力。两者都已完成；仍缺的是 gradual drift、policy-distance probes 和 recovery AUC。
 
 ## 实验设计依据
 
@@ -86,21 +86,29 @@ no-reset unit-switching extension 用来避免 fixed-condition sweep 隐含的 r
 
 ## 结果
 
-fixed-condition pilot 显示两个机制是互补的：reward-centered Sarsa 单独可以处理 reward shift，但在 feature scale `ten` 或 `hundred` 时会失败；normalized Sarsa 能控制 feature scale，但仍受 reward shift 影响；normalized reward-centered Sarsa 和 normalized differential Sarsa 在当前 sweep 中最稳，tail unshifted reward 大致保持 `2.4-2.5`，并且没有 divergence。
+fixed-condition extended sweep 显示两个机制是互补的：discounted Sarsa 和 reward-centered Sarsa 各自有 `500/1500` seed-conditions 发散，失败集中在 scale `hundred` 和高 alpha 的 scale `ten`；normalized Sarsa 有 `0/1500` divergent seed-conditions，说明 feature-scale stability 明显改善，但 mean tail unshifted reward 只有 `1.965`，仍有 reward-origin sensitivity；normalized reward-centered Sarsa 和 normalized differential Sarsa 在当前 sweep 中最稳，分别达到 mean tail unshifted reward `2.556` 和 `2.554`，并且都是 `0/1500` divergent seed-conditions。
 
-![Tail unshifted reward by algorithm, reward shift, and feature scale.](../../../../experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main/figures/report_avg_unshifted_reward_by_scale.png)
+| Algorithm | Mean tail unshifted reward | Reward range across conditions | Seed-conditions diverged | Median tail Q norm | Interpretation |
+|---|---:|---:|---:|---:|---|
+| discounted Sarsa | `1.501` | `0.100-2.403` | `500/1500` | `463.9` | reward-origin 和 feature-unit sensitivity 同时出现。 |
+| reward-centered Sarsa | `1.759` | `0.106-2.596` | `500/1500` | `42.0` | centering 能处理 reward offsets，但不能处理大 feature-scale updates。 |
+| normalized Sarsa | `1.965` | `1.570-2.414` | `0/1500` | `211.3` | feature-scale stability 改善，但 reward-origin sensitivity 仍在。 |
+| normalized reward-centered Sarsa | `2.556` | `2.493-2.609` | `0/1500` | `24.6` | 本 sweep 中 stability 和 reward 的最佳组合。 |
+| normalized differential Sarsa | `2.554` | `2.486-2.603` | `0/1500` | `24.4` | average-reward objective 下有非常接近的 robust pattern。 |
 
-![Tail Q norm by algorithm, reward shift, and feature scale.](../../../../experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main/figures/report_q_norm_by_scale.png)
+![Tail unshifted reward by algorithm, reward shift, and feature scale.](figures/report_avg_unshifted_reward_by_scale.png)
 
-![Tail output-change magnitude by algorithm, reward shift, and feature scale.](../../../../experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main/figures/report_prediction_change_by_scale.png)
+![Tail Q norm by algorithm, reward shift, and feature scale.](figures/report_q_norm_by_scale.png)
+
+![Tail output-change magnitude by algorithm, reward shift, and feature scale.](figures/report_prediction_change_by_scale.png)
 
 unit-switching extension 让结论更严格也更诚实。Fixed discounted Sarsa 在 feature-scale-only 或 joint_reward_scale switch 后可能出现巨大 Q norm，早期 post-change window 中 Q norm 可到约 `1e8` 并有非零 divergence。Normalized reward-centered 和 normalized differential variants 避免了 catastrophic divergence，支持核心 stability claim。但它们没有完全解决 abrupt `hundred`-scale no-reset recovery：在 feature-scale 或 joint-scale switch 后，late unshifted reward 经常降到约 `1.9-2.0`。相比之下，reward_shift_only 和 lognormal-scale switch 更容易恢复。
 
-![No-reset unit switches 后的 post-late reward。](../../../../experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended/figures/report_unit_switch_reward_heatmap.png)
+![No-reset unit switches 后的 post-late reward。](figures/report_unit_switch_reward_heatmap.png)
 
-![No-reset unit switches 后的 post-late Q norm。](../../../../experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended/figures/report_unit_switch_q_norm_heatmap.png)
+![No-reset unit switches 后的 post-late Q norm。](figures/report_unit_switch_q_norm_heatmap.png)
 
-![No-reset unit switches 后的 post-late divergence。](../../../../experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended/figures/report_unit_switch_divergence_heatmap.png)
+![No-reset unit switches 后的 post-late divergence。](figures/report_unit_switch_divergence_heatmap.png)
 
 ## 分析
 
@@ -121,14 +129,14 @@ unit-switching 进一步说明，稳定性和恢复性是两个层次。组合�
 | 审查角度 | 批评 | 已处理 | 剩余风险 |
 |---|---|---|---|
 | Alberta Plan | unit invariance 必须服务 continual agents，而不是 synthetic stress。 | 加入 no-reset unit-switching stream，并以 temporal-uniform learning 下 measurement conventions 改变为问题。 | 真实 sensor drift 尚未建模。 |
-| Core RL | 研究可能被误解成两个 tricks 的松散组合。 | 报告定义单一 combined invariance question，并在同一个 control setting 中测试 interaction failures。 | 仍需 running full-grid extended sweep。 |
+| Core RL | 研究可能被误解成两个 tricks 的松散组合。 | 报告定义单一 combined invariance question，并在同一个 control setting 中用 completed full fixed-condition grid 测试 interaction failures。 | 仍需 gradual drift 和 policy-distance diagnostics 让 continual-learning story 更丰富。 |
 | Stability | 避免 divergence 不等于 control 好。 | 报告 unshifted reward、Q norm、output change 和 divergence。 | 仍缺 policy-distance probes 和 recovery AUC。 |
-| 统计 | fixed-condition pilot 弱于 unit-switch extension。 | 分离 pilot evidence 和 completed 20-seed unit-switch evidence。 | running extended fixed grid 尚无 artifacts。 |
+| 统计 | fixed-condition pilot 弱于 unit-switch extension。 | 用 completed 20-seed fixed-condition extended grid 替代 pilot-only claims，并继续把 no-reset switch evidence 分开解读。 | 仍缺 recovery AUC 和 policy-distance intervals。 |
 | 严格老师 | 不要声称 unit invariance 已解决。 | 结论明确 abrupt feature-scale recovery 仍开放。 | 仍需 gradual drift 和 beta/gamma sensitivity。 |
 
 ## 结论
 
-Scale-Invariant Continuing Control 有清晰问题、可解释 continuing-control environment、非平凡机制交互和严格的 no-reset extension。当前最诚实的结论是：centering 和 normalization 分别处理不同的 unit sensitivity，组合机制显著提高稳定性；但 abrupt feature-unit switch 后的完全恢复仍未解决。下一步应等待 full `scale_invariant_continuing_control/config_extended.json` 结果，并设计 gradual unit drift 版本。
+Scale-Invariant Continuing Control 有清晰问题、可解释 continuing-control environment、非平凡机制交互、完成的 full fixed-condition extended grid 和严格的 no-reset extension。当前最诚实的结论是：centering 和 normalization 分别处理不同的 unit sensitivity，组合机制显著提高稳定性；但 abrupt feature-unit switch 后的完全恢复仍未解决。下一步应设计 gradual unit drift、recovery AUC 和 policy-distance probes，而不是声称 unit invariance 已完全解决。
 
 ## 复现
 
@@ -152,7 +160,7 @@ PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconf
   --config experiments/alberta_core_rl/configs/unit_switching_continuing_control/config_extended.json
 ```
 
-再生成 fixed-condition 报告图：
+再生成 fixed-condition extended 报告图：
 
 ```bash
 cd /mnt/shared-storage-user/yupeng/Core-RL
@@ -160,5 +168,18 @@ cd /mnt/shared-storage-user/yupeng/Core-RL
 PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
   /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_report_figures.py \
   --kind scale \
-  --result-dir experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main
+  --result-dir experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended \
+  --figure-dir final/reports/integrated/scale_invariant_continuing_control/figures
+```
+
+再生成 unit-switching 报告图：
+
+```bash
+cd /mnt/shared-storage-user/yupeng/Core-RL
+
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_report_figures.py \
+  --kind unit-switching \
+  --result-dir experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended \
+  --figure-dir final/reports/integrated/scale_invariant_continuing_control/figures
 ```

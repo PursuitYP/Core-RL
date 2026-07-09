@@ -22,7 +22,7 @@
 | 专业项目结构和独立环境 | 部分覆盖 | `conda-env-configs/README.md`、`experiments/alberta_core_rl/studies/`、`final/README.md` | 结构已明显改善，但 status/index 文件还要更严格保持 source-of-truth；两个 `__pycache__` 目录由 `nobody:nogroup` 拥有，普通用户无法删除。 |
 | 每个 proposal 独立 | 第一轮结构覆盖 | `final/reports/proposals/`、`final/reports/integrated/` | 每个 report 已写独立范围和证据等级；强报告仍需补深实验，弱报告仍需继续诚实保持 negative/quarantine framing。 |
 | 报告包含图表 | 强报告已覆盖，整体仍是部分覆盖 | `final/reports/**/figures/`、report PDFs | 一些 supporting/negative 报告仍需要更清晰的主表或机制图，并且每个图表要对应明确研究问题。 |
-| 当前 CPU task 追踪 | 状态层面已覆盖 | `final/indexes/status_zh.md`、`final/indexes/revise_plan_20260709_zh.md` | `core-rl-scale-invariant-extended-33723554` 在 2026-07-09 14:40 HKT 仍是 RUNNING；结果目录已创建但没有标准 artifacts，因此还不是 evidence。 |
+| 当前 CPU task 追踪 | 状态层面已覆盖 | `final/indexes/status_zh.md`、`final/indexes/revise_plan_20260709_zh.md` | Scale-Invariant 和 Output-Fairness extended jobs 已成功并作为 evidence；Reward-Sensitivity 和 Dyna-Drift reruns 仍在运行，在标准 artifacts 写出前不是 evidence。 |
 
 ## 当前交付结构
 

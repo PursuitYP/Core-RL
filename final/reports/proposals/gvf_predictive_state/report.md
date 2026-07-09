@@ -27,7 +27,7 @@ Compute need and fallback: The current result is a five-seed pilot. The fallback
 
 This proposal owns one narrow question: does the current recurrent GVF design become useful state in a T-maze? It does not evaluate broader representation-learning machinery beyond this GVF-state mechanism.
 
-The scope is intentionally limited because the result is negative. It should not be used to claim that GVFs cannot construct state. It should be used to motivate better GVF question design, direct cue-decodability probes, and a stricter useful-prediction evaluation.
+The scope is intentionally limited because the result is negative. It should not be used to claim that GVFs cannot construct state. It should be used to motivate better predictive questions, direct cue-decodability probes, and a stricter useful-prediction evaluation.
 
 ## Evidence Level
 

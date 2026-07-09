@@ -5,7 +5,7 @@
     "pages": 11,
     "pdf": "final/reports/integrated/continual_dyna_model_aging/report.pdf",
     "source": "final/reports/integrated/continual_dyna_model_aging/report.md",
-    "source_lines": 213
+    "source_lines": 217
   },
   {
     "images": 4,
@@ -13,7 +13,7 @@
     "pages": 10,
     "pdf": "final/reports/integrated/predictive_state_plasticity/report.pdf",
     "source": "final/reports/integrated/predictive_state_plasticity/report.md",
-    "source_lines": 237
+    "source_lines": 241
   },
   {
     "images": 6,
@@ -21,7 +21,7 @@
     "pages": 11,
     "pdf": "final/reports/integrated/scale_invariant_continuing_control/report.pdf",
     "source": "final/reports/integrated/scale_invariant_continuing_control/report.md",
-    "source_lines": 233
+    "source_lines": 254
   },
   {
     "images": 1,
@@ -96,12 +96,12 @@
     "source_lines": 131
   },
   {
-    "images": 4,
+    "images": 6,
     "missing_images": 0,
-    "pages": 8,
+    "pages": 10,
     "pdf": "final/reports/proposals/output_controlled_td/report.pdf",
     "source": "final/reports/proposals/output_controlled_td/report.md",
-    "source_lines": 197
+    "source_lines": 219
   },
   {
     "images": 5,

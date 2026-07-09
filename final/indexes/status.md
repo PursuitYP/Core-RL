@@ -29,20 +29,20 @@ The three current integrated proposal candidates are:
 2. Continual Dyna Model Aging.
 3. Predictive State Plasticity.
 
-Scale-Invariant Continuing Control has a completed main pilot:
+Scale-Invariant Continuing Control has a completed full fixed-condition extended sweep:
 
-`experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`
+`experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`
 
 It also has a completed no-reset unit-switch extension:
 
 `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
 
-The full fixed-condition extended sweep has been submitted as CPU task `core-rl-scale-invariant-extended-33723554` in namespace `ailab-safethm`. As of 2026-07-09 17:19 HKT, it is recorded as Running. The run has created `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`, but that directory currently has no standard artifacts, so it is not evidence yet.
+The full fixed-condition CPU task `core-rl-scale-invariant-extended-33723554` in namespace `ailab-safethm` succeeded by 2026-07-09 17:45 HKT and wrote standard artifacts. It is now citable evidence: 375 condition groups and 7500 seed-conditions show `0/1500` divergent seed-conditions for normalized Sarsa, normalized reward-centered Sarsa, and normalized differential Sarsa, versus `500/1500` for discounted Sarsa and reward-centered Sarsa.
 
 Three second-round extended sweeps were added after the latest reviewer-style critique:
 
 - Reward-centered beta/gamma/no-reset switch: smoke result `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke`; rerun CPU task `core-rl-reward-sensitivity-extended-rerun-28457861`, recorded Running at 2026-07-09 17:19 HKT; rerun directory `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended` exists but has no standard artifacts yet.
-- Output-controlled true-online fairness audit: smoke result `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`; rerun CPU task `core-rl-output-fairness-extended-rerun-29576456`, recorded Running at 2026-07-09 17:24 HKT; latest log reached condition `938/1500`, so the job is progressing; rerun directory `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended` exists but has no standard artifacts yet.
+- Output-controlled true-online fairness audit: smoke result `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`; rerun CPU task `core-rl-output-fairness-extended-rerun-29576456`, succeeded by 2026-07-09 17:41 HKT; extended result `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended` has standard artifacts and is now evidence. Seed-level divergence is `0/300` for normalized TD and trace-normalized TD(lambda), `81/300` for fixed TD and raw-alpha true-online TD(lambda), and `34/300` for naive normalized true-online TD(lambda), with the normalized true-online failures concentrated in lognormal feature scaling.
 - Dyna model-aging drift sweep: smoke result `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke`; rerun CPU task `core-rl-dyna-drift-extended-rerun-30016335`, recorded Running at 2026-07-09 17:19 HKT; rerun directory `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended` exists but has no standard artifacts yet.
 
 The first submissions for these three sweeps failed immediately because the command used the host-only Python path `/data/yupeng/conda_envs/core-rl/bin/python`, which does not exist inside the rjob container. Failed job IDs `21581151`, `20998802`, and `18940577` are audit-only records and must not be mixed into current evidence. They were resubmitted with container `python`; the rerun tasks listed above are the active ones.
@@ -76,14 +76,14 @@ Important current result directories:
 - TIDBD: `experiments/alberta_core_rl/results/tidbd_plasticity/20260708T154941Z_main`
 - Options: `experiments/alberta_core_rl/results/options_reusable_subtasks/20260708T161717Z_main`
 - Baird: `experiments/alberta_core_rl/results/baird_offpolicy_stability/20260708T161717Z_main`
-- Scale-Invariant Continuing Control: current evidence is `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`; running empty result directory is `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`
+- Scale-Invariant Continuing Control: fixed-condition evidence `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`; no-reset unit-switch evidence `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
 - Unit-Switching Continuing Control: `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
 - Continual Dyna Model Aging: `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`
 - Predictive State Plasticity: `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`
 - Reward-Centered Sensitivity smoke: `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke`
 - Reward-Centered Sensitivity pending extended directory: `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended` (no standard artifacts; not evidence)
 - Output TD Fairness smoke: `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`
-- Output TD Fairness pending extended directory: `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended` (no standard artifacts; not evidence)
+- Output TD Fairness extended evidence: `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended`
 - Dyna Drift smoke: `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke`
 - Dyna Drift pending extended directory: `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended` (no standard artifacts; not evidence)
 
@@ -139,9 +139,9 @@ Recent verification is mixed:
 
 ## Next Research Iteration
 
-1. Monitor CPU task `core-rl-scale-invariant-extended-33723554`; if it succeeds and writes all standard artifacts, incorporate the new Scale-Invariant Continuing Control extended sweep into reports, figures, PDFs, and indexes.
+1. Use the completed Scale-Invariant extended sweep as current evidence, while adding gradual drift, recovery AUC, and policy-distance probes for the next research iteration.
 2. Deepen the newly added Proposal Template, evidence-level, and reviewer-audit sections where they affect project decisions.
-3. Monitor the reward-sensitivity, output-fairness, and Dyna-drift rerun CPU tasks; if they finish, generate figures and incorporate only completed standard artifacts into the relevant reports.
+3. Monitor the reward-sensitivity and Dyna-drift rerun CPU tasks; if they finish, generate figures and incorporate only completed standard artifacts into the relevant reports.
 4. Extend Dyna aging beyond the current drift runner with repeated changes and planning-utility analysis.
 5. Redesign GVF predictive-state questions using the completed cue-decodability probe.
 6. Add fixed-goal sanity experiments for the Options proposal.

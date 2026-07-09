@@ -29,20 +29,20 @@
 2. Continual Dyna Model Aging。
 3. Predictive State Plasticity。
 
-Scale-Invariant Continuing Control 已有 main pilot：
+Scale-Invariant Continuing Control 已有完整 fixed-condition extended sweep：
 
-`experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`
+`experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`
 
 它还有 no-reset unit-switch extension：
 
 `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
 
-完整 fixed-condition extended sweep 已提交为 CPU task `core-rl-scale-invariant-extended-33723554`，namespace 是 `ailab-safethm`。截至 2026-07-09 17:19 HKT，该任务记录为 Running。它已经创建目录 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`，但该目录目前没有标准 artifacts，因此还不是 evidence。
+完整 fixed-condition CPU task `core-rl-scale-invariant-extended-33723554` 已在 2026-07-09 17:45 HKT 前成功，并写出标准 artifacts。它现在是可引用证据：375 个 condition groups、7500 个 seed-conditions 中，normalized Sarsa、normalized reward-centered Sarsa 和 normalized differential Sarsa 都是 `0/1500` divergent seed-conditions，而 discounted Sarsa 与 reward-centered Sarsa 都是 `500/1500`。
 
 最近一轮 reviewer-style critique 后新增了三个 second-round extended sweeps：
 
 - Reward-centered beta/gamma/no-reset switch：smoke result 是 `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke`；rerun CPU task 是 `core-rl-reward-sensitivity-extended-rerun-28457861`，截至 2026-07-09 17:19 HKT 记录为 Running；rerun 目录 `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended` 已存在，但还没有标准 artifacts。
-- Output-controlled true-online fairness audit：smoke result 是 `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`；rerun CPU task 是 `core-rl-output-fairness-extended-rerun-29576456`，截至 2026-07-09 17:24 HKT 记录为 Running；最新日志推进到 condition `938/1500`，说明该 job 在正常推进；rerun 目录 `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended` 已存在，但还没有标准 artifacts。
+- Output-controlled true-online fairness audit：smoke result 是 `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`；rerun CPU task `core-rl-output-fairness-extended-rerun-29576456` 已在 2026-07-09 17:41 HKT 前成功；extended result `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended` 已有标准 artifacts，现在是 evidence。Seed-level divergence 为：normalized TD 与 trace-normalized TD(lambda) 都是 `0/300`，fixed TD 与 raw-alpha true-online TD(lambda) 都是 `81/300`，naive normalized true-online TD(lambda) 是 `34/300`，且这些 normalized true-online failures 集中在 lognormal feature scaling。
 - Dyna model-aging drift sweep：smoke result 是 `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke`；rerun CPU task 是 `core-rl-dyna-drift-extended-rerun-30016335`，截至 2026-07-09 17:19 HKT 记录为 Running；rerun 目录 `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended` 已存在，但还没有标准 artifacts。
 
 这三个 sweep 的第一次提交立即失败，原因是命令使用了宿主机专用 Python 路径 `/data/yupeng/conda_envs/core-rl/bin/python`，该路径在 rjob 容器内不存在。失败 job IDs `21581151`、`20998802`、`18940577` 只作为 audit 记录，不能混入当前 evidence。它们已经改用容器内 `python` 重新提交；以上 rerun tasks 才是当前有效任务。
@@ -76,14 +76,14 @@ Predictive State Plasticity 已有 extended first-gate negative run：
 - TIDBD：`experiments/alberta_core_rl/results/tidbd_plasticity/20260708T154941Z_main`
 - Options：`experiments/alberta_core_rl/results/options_reusable_subtasks/20260708T161717Z_main`
 - Baird：`experiments/alberta_core_rl/results/baird_offpolicy_stability/20260708T161717Z_main`
-- Scale-Invariant Continuing Control：当前 evidence 是 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`；运行中的空目录是 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`
+- Scale-Invariant Continuing Control：fixed-condition evidence 是 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`；no-reset unit-switch evidence 是 `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
 - Unit-Switching Continuing Control：`experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
 - Continual Dyna Model Aging：`experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`
 - Predictive State Plasticity：`experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`
 - Reward-Centered Sensitivity smoke：`experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T084151Z_smoke`
 - Reward-Centered Sensitivity pending extended directory：`experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended`（无标准 artifacts，不是 evidence）
 - Output TD Fairness smoke：`experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T084151Z_smoke`
-- Output TD Fairness pending extended directory：`experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended`（无标准 artifacts，不是 evidence）
+- Output TD Fairness extended evidence：`experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended`
 - Dyna Drift smoke：`experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T084208Z_smoke`
 - Dyna Drift pending extended directory：`experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended`（无标准 artifacts，不是 evidence）
 
@@ -139,9 +139,9 @@ Predictive State Plasticity 已有 extended first-gate negative run：
 
 ## 下一轮研究迭代
 
-1. 继续监控 CPU task `core-rl-scale-invariant-extended-33723554`；如果成功完成并写出所有标准 artifacts，再把新的 Scale-Invariant Continuing Control extended sweep 纳入报告、图表、PDF 和索引。
+1. 使用已完成的 Scale-Invariant extended sweep 作为当前证据，同时在下一轮补 gradual drift、recovery AUC 和 policy-distance probes。
 2. 继续深化刚补上的 Proposal Template、证据等级和 reviewer-audit sections，尤其是会影响项目取舍的部分。
-3. 继续监控 reward-sensitivity、output-fairness 和 Dyna-drift rerun CPU tasks；如果完成，生成图表并只把已完成的标准 artifacts 纳入相应报告。
+3. 继续监控 reward-sensitivity 和 Dyna-drift rerun CPU tasks；如果完成，生成图表并只把已完成的标准 artifacts 纳入相应报告。
 4. Dyna aging 在当前 drift runner 之外继续补 repeated changes 和 planning-utility analysis。
 5. GVF predictive-state 方向基于已经完成的 cue-decodability probe 继续重设计问题。
 6. Options proposal 先补 fixed-goal sanity experiments。

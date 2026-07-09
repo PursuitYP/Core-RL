@@ -64,7 +64,7 @@ Action taken: `experiments/alberta_core_rl/results/README.md` now lists known in
 
 Main critique: the requirement audit and status documents still overclaimed completion after the user explicitly asked for a stricter check against the original requirements.
 
-Action taken: `final/indexes/requirements_audit.md` and `final/indexes/status.md` have been rewritten in a conservative gap-tracking form. They now distinguish structural coverage from completed research depth, identify missing Proposal Template sections, record weak/quarantined proposals honestly, and track `core-rl-scale-invariant-extended-33723554` as running rather than evidence.
+Action taken: `final/indexes/requirements_audit.md` and `final/indexes/status.md` have been rewritten in a conservative gap-tracking form. They now distinguish structural coverage from completed research depth, identify missing Proposal Template sections, and record weak/quarantined proposals honestly. After the later CPU completion, `core-rl-scale-invariant-extended-33723554` was upgraded from running status to completed evidence.
 
 Main critique: even after the indexes were corrected, the formal reports themselves still lacked explicit Proposal Template answers, independent research scope, evidence level, experiment-design rationale, and per-proposal critique records.
 
@@ -73,8 +73,8 @@ Action taken: all 16 English reports and all 16 Chinese reports now include the 
 ## Current Open Items
 
 - Deepen the newly added Proposal Template/evidence/reviewer sections where they change scientific decisions; the first structural pass is complete, but not every report is paper-perfect.
-- Continue the Output-Controlled TD follow-up: add a fair true-online TD(lambda) max-stable-alpha audit and a no-reset feature-scale switch experiment.
-- Continue monitoring `core-rl-scale-invariant-extended-33723554`; it was RUNNING at 2026-07-09 14:40 HKT, and `20260709T063128Z_extended` exists but has no standard artifacts yet.
+- Continue the Output-Controlled TD follow-up after the completed fairness audit: add a more principled true-online TD(lambda) output-control derivation, max-stable-alpha analysis, and a no-reset feature-scale switch experiment.
+- Continue the Scale-Invariant follow-up after the completed fixed-condition grid: add gradual unit drift, recovery AUC, and policy-distance probes.
 - Add beta/gamma and midstream reward-origin tests for `reward_centered_sarsa` if the standalone paper is selected as a final topic.
 - Add gradual/stochastic drift environments for Dyna aging before making general claims beyond abrupt changing gridworlds.
 - Add true-online TD(lambda) max-stable-alpha audit before treating that baseline as a strong negative comparison.

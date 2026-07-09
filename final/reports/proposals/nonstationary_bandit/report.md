@@ -6,7 +6,7 @@ Status: independent plasticity sanity diagnostic. The result is useful and repro
 
 This mini-report evaluates a drifting multi-armed bandit as the smallest possible test of continual adaptation. The focused question is whether an elementary online learner can keep enough plasticity to track changing action values without replay. The experiment confirms the expected pattern: constant-alpha action-value estimates adapt better than sample averages after the reward distribution changes.
 
-The result is a valid independent diagnostic, not an appendix to another proposal. It answers a narrow plasticity question and checks the experiment pipeline, plotting, and interpretation language. Its limitation is equally important: the task has no state, no temporal credit assignment, no bootstrapped value functions, no learned model, no planning, and no options. It should therefore be quarantined as a sanity diagnostic rather than promoted as a full Core RL project.
+The result is a valid independent diagnostic with a deliberately narrow scope. It answers a small plasticity question and checks the experiment pipeline, plotting, and interpretation language. Its limitation is equally important: the task has no state, no temporal credit assignment, no bootstrapped value functions, no learned model, no planning, and no options. It should therefore be treated as a sanity diagnostic rather than promoted as a full Core RL project.
 
 ## 1. Proposal Template Answers
 

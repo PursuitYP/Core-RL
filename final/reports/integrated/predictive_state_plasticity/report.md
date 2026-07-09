@@ -169,6 +169,10 @@ Main figures below use seed-tail condition summaries with 95% confidence interva
 
 ![Tail cue-decoding accuracy by state construction and maze length.](../../../../experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended/figures/report_cue_decodability_by_length.png)
 
+## Analysis
+
+The central interpretation is that information content and control usefulness are separable. The cue-GVF is not empty: the cue-decodability probe shows above-chance hidden-cue information. Yet the control learner still behaves near chance, which means the learned prediction is either too weakly scaled, too noisy, or too poorly aligned with the downstream action-value update to serve as state. Trace and oracle memory prevent a trivial impossibility interpretation because they solve the same task under the same linear-control constraint. The negative result therefore points to a concrete redesign path: first make cue information decodable and usable, then test whether limited-budget feature selection or step-size plasticity can maintain that information over longer delays or phase changes.
+
 ## Reviewer Critique And Revisions
 
 Strict reviewer challenge: "The GVF result is negative, so why continue?" Response: the negative result is exactly the design signal. It says current GVF questions do not carry the cue; the next experiment must measure cue information and downstream usefulness directly.

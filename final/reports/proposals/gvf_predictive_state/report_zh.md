@@ -22,7 +22,7 @@ Compute need / fallback：当前 result 是 five-seed pilot。诚实 fallback �
 
 本 proposal 只回答一个窄问题：当前 recurrent GVF design 是否能在 T-maze 中成为 useful state。它不评价这个 GVF-state mechanism 之外的更广泛 representation-learning machinery。
 
-范围之所以窄，是因为结果是负的。它不能用来宣称 GVFs 不能构造 state；它应该用于推动更好的 GVF question design、direct cue-decodability probes 和更严格 useful-prediction evaluation。
+范围之所以窄，是因为结果是负的。它不能用来宣称 GVFs 不能构造 state；它应该用于推动更好的 predictive questions、direct cue-decodability probes 和更严格 useful-prediction evaluation。
 
 ## 证据等级
 

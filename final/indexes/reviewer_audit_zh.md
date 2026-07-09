@@ -64,7 +64,7 @@
 
 主要批评：用户明确要求逐条核验原始需求后，`requirements_audit` 和 `status` 文档仍有过度完成表述。
 
-处理状态：`final/indexes/requirements_audit_zh.md` 和 `final/indexes/status_zh.md` 已改成保守的 gap-tracking 口径。现在会区分“结构上覆盖”和“研究深度完成”，明确记录缺少的 Proposal Template sections、弱/暂停 proposal 的真实状态，并把 `core-rl-scale-invariant-extended-33723554` 标成 running 而不是 evidence。
+处理状态：`final/indexes/requirements_audit_zh.md` 和 `final/indexes/status_zh.md` 已改成保守的 gap-tracking 口径。现在会区分“结构上覆盖”和“研究深度完成”，明确记录缺少的 Proposal Template sections、弱/暂停 proposal 的真实状态。后续 CPU 任务完成后，`core-rl-scale-invariant-extended-33723554` 已从 running 状态升级为 completed evidence。
 
 主要批评：即使索引修正后，正式报告本体仍缺显式 Proposal Template answers、独立研究范围、证据等级、实验设计依据和逐 proposal 审查记录。
 
@@ -73,8 +73,8 @@
 ## 当前待办
 
 - 继续深化刚补上的 Proposal Template、证据等级和 reviewer sections；第一轮结构修复已经完成，但不是每个报告都已经 paper-perfect。
-- 继续 Output-Controlled TD follow-up：补 true-online TD(lambda) 的 max-stable-alpha 公平审计，以及 no-reset feature-scale switch 实验。
-- 继续监控 `core-rl-scale-invariant-extended-33723554`；它在 2026-07-09 14:40 HKT 确认为 RUNNING，`20260709T063128Z_extended` 已创建但尚无标准 artifacts。
+- 继续 Output-Controlled TD follow-up：在已完成 fairness audit 后，补更 principled 的 true-online TD(lambda) output-control derivation、max-stable-alpha analysis，以及 no-reset feature-scale switch 实验。
+- 继续 Scale-Invariant follow-up：在已完成 fixed-condition grid 后，补 gradual unit drift、recovery AUC 和 policy-distance probes。
 - 如果 `reward_centered_sarsa` 被选为最终独立题目，需要补 beta/gamma sweep 和 midstream reward-origin switch。
 - Dyna aging 在做一般化结论前，需要加入 gradual/stochastic drift environments。
 - 在把 true-online TD(lambda) 作为强负 baseline 前，需要补 max-stable-alpha audit。

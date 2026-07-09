@@ -171,6 +171,10 @@ The bar-summary figures remain useful secondary checks because they show seed un
 
 ![Late model error by planning budget, model mode, and half-life.](../../../../experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended/figures/report_mean_model_error_post_late_by_budget.png)
 
+## Analysis
+
+The main interpretation is that planning value depends on both computation budget and model freshness. A high planning budget can amplify useful model knowledge before a change, but the same budget can amplify stale entries afterward. Recency aging and recency/error gating are therefore best read as search-control mechanisms: they change which model entries receive computation, not merely how many backups are performed. The strongest evidence is the divergence between stale-backup reduction and reward ranking. Very aggressive aging can make the stale-backup metric look clean while losing useful structure, whereas longer half-lives can preserve reward but allow some stale planning. This is why the report's claim is deliberately a tradeoff claim rather than a universal aging-rule winner.
+
 ## Reviewer Critique And Revisions
 
 Strict reviewer challenge: "This is just Dyna-Q with a changing maze." Response: the proposal must report model-freshness diagnostics and planning utility, not only reward.

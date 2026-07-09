@@ -62,7 +62,96 @@ def plot_output_td(result_dir: Path, figure_dir: Path | None = None) -> list[Pat
                 value_format=".2f",
             )
         )
+        outputs.append(
+            _save_output_td_panels(
+                rows,
+                result_dir,
+                fig_dir,
+                algorithms,
+                scales,
+                alphas,
+                divergence,
+                metric,
+                title,
+                cmap,
+                log10,
+                f"{Path(name).stem}_panels.png",
+                reducer,
+            )
+        )
     return outputs
+
+
+def _save_output_td_panels(
+    rows: list[dict],
+    result_dir: Path,
+    fig_dir: Path,
+    algorithms: list[str],
+    scales: list[str],
+    alphas: list[object],
+    divergence: dict[tuple[str, str, float], float],
+    metric: str,
+    title: str,
+    cmap: str,
+    log10: bool,
+    name: str,
+    reducer: str,
+) -> Path:
+    ensure_mpl_config(repo_root())
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    ncols = 2 if len(scales) > 1 else 1
+    nrows = math.ceil(len(scales) / ncols)
+    fig, axes_arr = plt.subplots(nrows, ncols, figsize=(5.4 * ncols, 3.6 * nrows), constrained_layout=True)
+    axes = list(axes_arr.flat) if hasattr(axes_arr, "flat") else [axes_arr]
+    cmap_obj = plt.get_cmap(cmap).copy()
+    cmap_obj.set_bad("#e8e8e8")
+    images = []
+    for ax, scale in zip(axes, scales):
+        raw = np.full((len(algorithms), len(alphas)), np.nan, dtype=float)
+        for i, alg in enumerate(algorithms):
+            for j, alpha in enumerate(alphas):
+                if metric == "seed_divergence":
+                    raw[i, j] = divergence.get((alg, scale, float(alpha)), math.nan)
+                else:
+                    matches = [
+                        row
+                        for row in rows
+                        if _condition(row, "algorithm") == alg
+                        and _condition(row, "scale") == scale
+                        and math.isclose(float(_condition(row, "alpha")), float(alpha))
+                    ]
+                    raw[i, j] = _mean_over(matches, metric, reducer=reducer)
+        data = np.log10(np.maximum(raw, 1e-12)) if log10 else raw
+        data = np.ma.masked_invalid(data)
+        im = ax.imshow(data, aspect="auto", cmap=cmap_obj)
+        images.append(im)
+        ax.set_title(f"scale: {scale}")
+        ax.set_xticks(range(len(alphas)))
+        ax.set_xticklabels([f"{float(alpha):g}" for alpha in alphas], rotation=35, ha="right")
+        ax.set_yticks(range(len(algorithms)))
+        ax.set_yticklabels([_short_label(alg) for alg in algorithms])
+        ax.set_xlabel("alpha")
+        for i in range(len(algorithms)):
+            for j in range(len(alphas)):
+                value = raw[i, j]
+                if not math.isfinite(float(value)):
+                    text = "n/a"
+                elif log10 and value >= 1e3:
+                    text = f"{value:.0e}"
+                else:
+                    text = f"{value:.2f}"
+                ax.text(j, i, text, ha="center", va="center", fontsize=6.5, color="white")
+    for ax in axes[len(scales) :]:
+        ax.axis("off")
+    fig.suptitle(title)
+    cbar = fig.colorbar(images[0], ax=axes[: len(scales)], shrink=0.78)
+    cbar.set_label("log10(value)" if log10 else "value")
+    out = fig_dir / name
+    fig.savefig(out, dpi=180)
+    plt.close(fig)
+    return out
 
 
 def _seed_divergence_rates(result_dir: Path) -> dict[tuple[str, str, float], float]:
@@ -81,12 +170,12 @@ def _seed_divergence_rates(result_dir: Path) -> dict[tuple[str, str, float], flo
     return {key: sum(values) / len(values) for key, values in grouped.items() if values}
 
 
-def plot_reward_centered(result_dir: Path) -> list[Path]:
+def plot_reward_centered(result_dir: Path, figure_dir: Path | None = None) -> list[Path]:
     ensure_mpl_config(repo_root())
     import matplotlib.pyplot as plt
 
     rows = _load_condition_summary(result_dir)
-    fig_dir = result_dir / "figures"
+    fig_dir = figure_dir or result_dir / "figures"
     fig_dir.mkdir(parents=True, exist_ok=True)
     algorithms = ["discounted_sarsa", "reward_centered_sarsa", "differential_sarsa"]
     shifts = _sorted_unique([_condition(row, "reward_shift") for row in rows])
@@ -145,7 +234,7 @@ def plot_reward_centered(result_dir: Path) -> list[Path]:
     return outputs
 
 
-def plot_reward_centered_sensitivity(result_dir: Path) -> list[Path]:
+def plot_reward_centered_sensitivity(result_dir: Path, figure_dir: Path | None = None) -> list[Path]:
     all_rows = _load_condition_summary(result_dir)
     rows = [
         row
@@ -154,7 +243,7 @@ def plot_reward_centered_sensitivity(result_dir: Path) -> list[Path]:
     ]
     if not rows:
         rows = [row for row in all_rows if int(float(_condition(row, "phase"))) == 1]
-    fig_dir = result_dir / "figures"
+    fig_dir = figure_dir or result_dir / "figures"
     fig_dir.mkdir(parents=True, exist_ok=True)
     alphas = [float(alpha) for alpha in _sorted_unique([_condition(row, "alpha") for row in rows])]
     target_alpha = min(alphas, key=lambda value: abs(value - 0.05)) if alphas else math.nan
@@ -203,13 +292,13 @@ def plot_reward_centered_sensitivity(result_dir: Path) -> list[Path]:
     return outputs
 
 
-def plot_onpolicy_atlas(result_dir: Path) -> list[Path]:
+def plot_onpolicy_atlas(result_dir: Path, figure_dir: Path | None = None) -> list[Path]:
     ensure_mpl_config(repo_root())
     import matplotlib.pyplot as plt
     import numpy as np
 
     rows = _load_condition_summary(result_dir)
-    fig_dir = result_dir / "figures"
+    fig_dir = figure_dir or result_dir / "figures"
     fig_dir.mkdir(parents=True, exist_ok=True)
     scales = ["one", "ten", "hundred", "uneven", "tabular"]
     scales = [scale for scale in scales if any(_condition(row, "scale") == scale for row in rows)]
@@ -259,13 +348,13 @@ def plot_onpolicy_atlas(result_dir: Path) -> list[Path]:
     return outputs
 
 
-def plot_unit_switching(result_dir: Path) -> list[Path]:
+def plot_unit_switching(result_dir: Path, figure_dir: Path | None = None) -> list[Path]:
     rows = [
         row
         for row in _load_condition_summary(result_dir)
         if _condition(row, "recovery_window") == "post_late" and int(float(_condition(row, "phase"))) == 1
     ]
-    fig_dir = result_dir / "figures"
+    fig_dir = figure_dir or result_dir / "figures"
     fig_dir.mkdir(parents=True, exist_ok=True)
     algorithms = [
         "discounted_sarsa",

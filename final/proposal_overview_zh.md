@@ -4,7 +4,7 @@
 
 ## 阅读路径
 
-- 三个更大的综合型独立课题在 `final/reports/integrated/`：其中 Scale-Invariant Continuing Control 和 Continual Dyna With Model Aging 是当前最强的正向候选，Predictive State Plasticity 是有价值但高风险的负向 gate / redesign 候选。
+- 三个更大的独立 Core-RL 课题在 `final/reports/integrated/`：其中 Scale-Invariant Continuing Control 和 Continual Dyna With Model Aging 是当前最强的正向候选，Predictive State Plasticity 是有价值但高风险的负向 gate / redesign 候选。
 - 十三个普通独立课题在 `final/reports/proposals/`，每个文件夹只保留一个主报告 `report.md`，旧的模板、结果摘要、批评记录和复现片段已归档到 `final/archive/`。
 - 当前可引用的结果路径集中在 `final/indexes/results.md`。
 - 运行和复现实验的统一说明在 `final/indexes/reproduction.md`。
@@ -43,13 +43,13 @@ Nonstationary Bandit 是最小 sanity-check 环境。它没有 state bootstrappi
 
 ### 强烈推荐
 
-1. Scale-Invariant Continuing Control：这是当前强综合型候选之一。它把 Reward-Centered Sarsa 和 Output-Controlled TD 的核心思想合并到一个 continuing control invariance 问题中，研究对象清楚：reward zero-point 和 feature scale 都是任务描述单位，不应改变 agent 的实质学习能力。当前 fixed-condition pilot 显示单独机制各有失败区间，而 combined normalized-centered / normalized-differential variants 更稳；新增 no-reset unit-switch extension 则给出更严格也更诚实的结论：组合方法能防止 catastrophic instability，但 abrupt feature-unit change 后 recovery 仍未解决。优化建议是补 full fixed-condition extended grid 和 gradual unit drift，而不是宣称 invariance 已完全解决。
+1. Scale-Invariant Continuing Control：这是当前强独立大课题之一。它把 reward centering 和 output-controlled TD/Sarsa 的核心思想放进一个 continuing control invariance 问题中，研究对象清楚：reward zero-point 和 feature scale 都是任务描述单位，不应改变 agent 的实质学习能力。完成的 fixed-condition extended grid 显示单独机制各有失败区间，而 combined normalized-centered / normalized-differential variants 更稳：组合 normalized variants 都是 `0/1500` divergent seed-conditions，mean tail unshifted reward 约 `2.55`；discounted 和 reward-centered-only Sarsa 都是 `500/1500` divergent seed-conditions。新增 no-reset unit-switch extension 则给出更严格也更诚实的结论：组合方法能防止 catastrophic instability，但 abrupt feature-unit change 后 recovery 仍未解决。优化建议是继续做 gradual unit drift，而不是宣称 invariance 已完全解决。
 
-2. Continual Dyna With Model Aging：这是 planning/model-based 方向最强候选。它不是泛泛地说 Dyna planning 有帮助，而是把问题改成“哪些 learned model entries 还值得 planning”。当前 20 seeds extended sweep 显示 freshness-aware sampling 稳定降低 stale-backup rate，尤其在 planning budget `20` 下，keep-model late stale-backup rate 为 `0.213 +/- 0.065`，较短 half-life 的 recency aging 或 recency/error gate 可以接近 0。优化建议是继续加入 stochastic/gradual drift，并把最终 claim 写成 search-control freshness tradeoff，而不是简单 reward superiority。
+2. Continual Dyna With Model Aging：这是 planning/model-based 方向最强候选。它不是泛泛地说 Dyna planning 有帮助，而是把问题改成“哪些 learned model entries 还值得 planning”。当前 20 seeds extended sweep 显示 freshness-aware sampling 稳定降低 stale-backup rate，尤其在 planning budget `20` 下，keep-model late stale-backup rate 为 `0.213 +/- 0.065`，较短 half-life 的 recency aging 或 recency/error gate 可以接近 0。stochastic/gradual drift extension 已实现并有 smoke result，extended CPU task 正在运行但尚无标准 artifacts；最终 claim 应写成 search-control freshness tradeoff，而不是简单 reward superiority。
 
-3. Reward-Centered Continuing Sarsa：这是最清楚的独立主 proposal 之一，问题简洁但不 shallow：continuing control 中 reward origin 不应改变 policy preference，但 ordinary discounted Sarsa 会产生 value-scale inflation。当前 access-control 结果很有说服力，reward-centered/differential variants 在 reward shifts 下保持更稳定 Q norm 和 unshifted reward。优化建议是补 alpha/beta/gamma sweep 与 midstream reward-origin switch，这会把它从强机制实验提升为更完整的 continual adaptation 研究。
+3. Reward-Centered Continuing Sarsa：这是最清楚的独立主 proposal 之一，问题简洁但不 shallow：continuing control 中 reward origin 不应改变 policy preference，但 ordinary discounted Sarsa 会产生 value-scale inflation。当前 access-control 结果很有说服力，reward-centered/differential variants 在 reward shifts 下保持更稳定 Q norm 和 unshifted reward。beta/gamma/no-reset midstream reward-origin switch 已实现并有 smoke result，extended CPU task 正在运行但尚无标准 artifacts；完成后它可以从强机制实验进一步提升为更完整的 continual adaptation 研究。
 
-4. Output-Controlled TD：这是 prediction/function approximation 方向最清楚的主 proposal。它把 step size 的单位从 parameter displacement 转到 prediction-output change，直接回应 streaming TD 在 feature scale 改变下的脆弱性。当前可引用证据已经切换为 20 seeds extended CPU-task run：`experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`。Seed-level divergence 统计显示 normalized TD 和 trace-normalized TD 都是 `0/400` seed-conditions 发散，而 fixed TD 和当前 raw-alpha true-online baseline 都是 `141/400` seed-conditions 发散。优化建议是继续审计 true-online TD(lambda) baseline、补 max-stable-alpha table，并加入同一 stream 中途 feature-scale shift 的无重置实验。
+4. Output-Controlled TD：这是 prediction/function approximation 方向最清楚的主 proposal。它把 step size 的单位从 parameter displacement 转到 prediction-output change，直接回应 streaming TD 在 feature scale 改变下的脆弱性。当前可引用 primary evidence 是 20 seeds extended CPU-task run：`experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`。Seed-level divergence 统计显示 normalized TD 和 trace-normalized TD 都是 `0/400` seed-conditions 发散，而 fixed TD 和 raw-alpha true-online baseline 都是 `141/400`。完成的 normalized true-online fairness audit `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended` 显示 normalized TD 与 trace-normalized TD(lambda) 都是 `0/300`，fixed 与 raw-alpha true-online 都是 `81/300`，naive normalized true-online 是 `34/300`，失败集中在 lognormal scaling。
 
 5. Dyna Planning Budget and Model Staleness：如果需要保留一个普通 proposal 作为 planning 方向的独立材料，它是最值得保留的。它的研究问题比很多支持性诊断更接近完整 RL 课题：planning budget 有 pre-change benefit，但 stale model backups 会损害 post-change recovery。优化建议是不要和 Continual Dyna Model Aging 重复提交；更合理的方式是把它作为 model-aging 大课题的前置实验或第一节 mechanism diagnosis。
 
@@ -83,7 +83,7 @@ Doorway Options 当前被 quarantine。Options 是重要 Core-RL topic，但当�
 
 最终如果需要少而强的提交组合，建议选择两个或三个强主线：`Scale-Invariant Continuing Control`、`Continual Dyna With Model Aging`、`Reward-Centered Continuing Sarsa` 或 `Output-Controlled TD`。如果希望形成一个更有雄心的 representation 方向，可以把 `Predictive State Plasticity`、`GVF Predictive State`、`GVF Question Design`、`Generate-and-Test`、`TIDBD-Lite` 合并成一个 staged research program，但必须明确当前主结论是 negative gate 和 redesign，不是成功结果。对于 weak proposal，不建议强行补大量实验来“凑齐十个强题目”；更专业的做法是诚实降级、合并或作为 appendix。
 
-## 三个综合型独立大课题
+## 三个更大的独立 Core-RL 课题
 
 ### 1. Scale-Invariant Continuing Control
 
@@ -95,11 +95,11 @@ Doorway Options 当前被 quarantine。Options 是重要 Core-RL topic，但当�
 
 方法与实现：实现了 scaled access-control queue 环境。比较 `discounted_sarsa`、`reward_centered_sarsa`、`normalized_sarsa`、`normalized_reward_centered_sarsa`、`normalized_differential_sarsa`。每个 agent 都在线交互、在线更新；不存 replay，不用神经网络。实现位置在 `experiments/alberta_core_rl/studies/reward_centering.py`，配置在 `experiments/alberta_core_rl/configs/scale_invariant_continuing_control/`。
 
-实验设计：fixed-condition pilot 交叉 reward shifts `-4, 0, 8` 和 feature scales `one, ten, hundred, uneven`，在 access-control queue 上评估 unshifted average reward、Q norm、TD-error scale、prediction change、divergence rate 和 policy probe。当前 fixed-condition main pilot 使用 5 seeds、5000 steps；另一个已完成的 no-reset unit-switch extension 使用 20 seeds、20000 steps，在同一条 stream 中途改变 reward origin 或 feature scale。`config_extended.json` 仍用于未来 full fixed-condition 20-seed 长 sweep。
+实验设计：fixed-condition extended sweep 交叉 reward shifts `-8, -4, 0, 4, 8`、feature scales `one, ten, hundred, uneven, lognormal` 和 alphas `0.01, 0.03, 0.1`，在 access-control queue 上评估 unshifted average reward、Q norm、TD-error scale、prediction change、divergence rate 和 policy probe。另一个已完成的 no-reset unit-switch extension 使用 20 seeds、20000 steps，在同一条 stream 中途改变 reward origin 或 feature scale。
 
-当前结果：主结果目录是 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`。结果显示 reward-centered Sarsa 单独能处理 reward shift，但在 feature scale 很大时会失败；normalized Sarsa 能控制 feature scale，但仍受 reward shift 影响；`normalized_reward_centered_sarsa` 和 `normalized_differential_sarsa` 在当前 sweep 中最稳健，tail unshifted reward 大致保持在 `2.41-2.51`，并且没有 divergence。
+当前结果：主结果目录是 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`。结果显示 reward-centered Sarsa 单独能处理 reward shift，但在 feature scale 很大时仍会失败；normalized Sarsa 能控制 feature scale，但仍受 reward shift 影响；`normalized_reward_centered_sarsa` 和 `normalized_differential_sarsa` 在当前 sweep 中最稳健，mean tail unshifted reward 分别约 `2.556` 和 `2.554`，并且都是 `0/1500` divergent seed-conditions。
 
-当前判断：这是强综合型课题之一，因为它把两个 Core-RL 更新机制放进同一个可解释的 invariance 问题里，而不是简单比较分数。当前 unit-switching 结果已经说明组合机制能防止灾难性数值不稳定，但 abrupt feature-scale switch 后 reward recovery 仍会变差。下一步应该跑 full fixed-condition extended grid，并设计 gradual unit drift，而不是继续强化“已经完全 invariant”的叙述。
+当前判断：这是强独立大课题之一，因为它把两个 Core-RL 更新机制放进同一个可解释的 invariance 问题里，而不是简单比较分数。当前 fixed-condition extended grid 已可作为 evidence；unit-switching 结果进一步说明组合机制能防止灾难性数值不稳定，但 abrupt feature-scale switch 后 reward recovery 仍会变差。下一步应该设计 gradual unit drift、recovery AUC 和 policy-distance probes，而不是继续强化“已经完全 invariant”的叙述。
 
 ### 2. Continual Dyna With Model Aging
 
@@ -115,7 +115,7 @@ Doorway Options 当前被 quarantine。Options 是重要 Core-RL topic，但当�
 
 当前结果：主结果目录是 `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`。在 planning budget `20` 时，`keep_model` 的 late post-change stale-backup rate 为 `0.213 +/- 0.065`；recency aging 可在较短 half-life 下把 stale rate 降到几乎 0，在 half-life `4000` 时仍只有约 `0.020 +/- 0.004`。同一 budget 下 late reward 最好约 `0.0925`，但 reward ranking 会随 half-life 和 model mode 改变，因此不能简单声称某个 aging rule 普遍最优。
 
-当前判断：这是 planning 方向最清楚的课题。它把 Dyna 的“更多 planning”改写成“哪些 model entry 值得 planning”的问题。下一步应跑 extended sweep，并加入 stochastic drift 或 queue-like transition drift，避免结论只依赖单个 abrupt gridworld change。
+当前判断：这是 planning 方向最清楚的课题。它把 Dyna 的“更多 planning”改写成“哪些 model entry 值得 planning”的问题。abrupt-change extended sweep 已完成，drift extension 已实现并在 CPU task 中运行；下一步应等待 artifacts 后更新 heatmaps 和报告，并继续设计 repeated-change 或 queue-like transition drift，避免结论只依赖单个 abrupt gridworld change。
 
 ### 3. Predictive State Plasticity
 
@@ -127,7 +127,7 @@ Doorway Options 当前被 quarantine。Options 是重要 Core-RL topic，但当�
 
 方法与实现：构造 T-maze cue 任务，比较 raw observation、trace memory、old recurrent GVF、redesigned cue-GVF 和 oracle memory。GVF 与 control learner 都在线更新。实现位置在 `experiments/alberta_core_rl/studies/predictive_state.py`，配置在 `experiments/alberta_core_rl/configs/predictive_state_plasticity/`。
 
-实验设计：跨 maze lengths `8, 12, 20` 评估 trial accuracy、average reward、GVF TD error、cue-alignment margin、hidden cue 信息是否进入控制 state。当前还没有把 generate-and-test/TIDBD 完整接入主实验，而是先做 first-gate：如果固定 cue-GVF 都不能成为有用 state，就不应直接上更复杂的 plasticity claim。
+实验设计：跨 maze lengths `8, 12, 20, 30` 评估 trial accuracy、average reward、GVF TD error、cue-alignment margin、hidden cue 信息是否进入控制 state，并补充 cue-decodability probe。当前还没有把 feature replacement / feature-wise plasticity 完整接入主实验，而是先做 first-gate：如果固定 cue-GVF 都不能成为有用 state，就不应直接上更复杂的 plasticity claim。
 
 当前结果：主结果目录已更新为 `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`。20 seeds、maze lengths `8/12/20/30` 下，cue-GVF 仍接近 chance，trial accuracy 约 `0.504/0.508/0.505/0.494`；oracle 保持约 `0.931-0.950`，trace memory 在 length `30` 仍约 `0.827 +/- 0.013`。这比早期 pilot 更清楚地说明：当前 learned GVF feature 不是足够有用的 state。
 
@@ -147,7 +147,7 @@ Doorway Options 当前被 quarantine。Options 是重要 Core-RL topic，但当�
 
 实验与指标：当前 extended evidence 跨 reward shifts `-8, -4, 0, 4, 8` 和 alphas `0.02, 0.05, 0.1`，记录 unshifted average reward、accept rate、high-priority accept、reward_bar、TD error、Q norm、divergence 和 policy probes。主配置在 `experiments/alberta_core_rl/configs/reward_centered_sarsa/config_extended.json`。
 
-结果与分析：当前主结果已更新为 `experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended`。20 seeds、20000 steps、reward shifts `-8/-4/0/4/8` 与 alphas `0.02/0.05/0.1` 下，reward-centered Sarsa 的 unshifted reward 基本保持在 `2.55-2.60`，Q norm 约 `22-35`；discounted Sarsa 在 shift `8`、alpha `0.1` 时 Q norm 约 `1876`，unshifted reward 约 `1.70`。该课题是主线候选，下一步需要 beta/gamma sensitivity 和 midstream reward-origin switch。
+结果与分析：当前主结果已更新为 `experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended`。20 seeds、20000 steps、reward shifts `-8/-4/0/4/8` 与 alphas `0.02/0.05/0.1` 下，reward-centered Sarsa 的 unshifted reward 基本保持在 `2.55-2.60`，Q norm 约 `22-35`；discounted Sarsa 在 shift `8`、alpha `0.1` 时 Q norm 约 `1876`，unshifted reward 约 `1.70`。该课题是主线候选；beta/gamma sensitivity 和 midstream reward-origin switch 已实现并处于 extended CPU run pending 状态，标准 artifacts 写出前不作为最终证据。
 
 ### 2. Output-Controlled TD
 
@@ -323,7 +323,7 @@ Doorway Options 当前被 quarantine。Options 是重要 Core-RL topic，但当�
 
 ### A1. Scale-Invariant Continuing Control 详细卡片
 
-核心定位：这是一个综合型主线候选，综合 Reward-Centered Sarsa 和 Output-Controlled TD 的思想，但研究对象不是两个方法的简单拼接，而是 continuing control 中“任务单位变化不应改变学习结论”的 invariance 问题。
+核心定位：这是一个更大的独立主线候选，综合 reward centering 和 output-controlled update 的思想，但研究对象不是两个方法的简单拼接，而是 continuing control 中“任务单位变化不应改变学习结论”的 invariance 问题。
 
 RL problem：环境是 continuing access-control queue。状态表示 free servers 与 customer priority 的组合；动作是 accept 或 reject；reward 是接受 customer 后的 priority-dependent payoff 加上可控 reward shift；目标是持续在线学习一个 accept/reject policy，使 unshifted long-run reward 稳定。没有 episode reset、没有 replay、没有 offline data。
 
@@ -333,7 +333,7 @@ Agent 与算法：固定 step-size Sarsa、reward-centered Sarsa、normalized Sa
 
 主要指标：`avg_unshifted_reward` 回答行为质量是否稳定；`q_norm` 回答 value scale 是否被 reward/feature units 放大；`prediction_change` 和 `step_size` 回答 update geometry 是否受控；`diverged` 回答算法是否进入数值失败区；policy probes 回答是否学到相似 accept/reject 决策。
 
-当前证据：结果目录 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`。单独 reward centering 在 feature scale 很大时不够；单独 normalization 仍然对 reward shift 敏感；combined normalized-centered 和 normalized-differential variants 在当前 sweep 中表现最稳。这个交互是该课题最有价值的 insight。
+当前证据：结果目录 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`。单独 reward centering 在 feature scale 很大时不够；单独 normalization 仍然对 reward shift 敏感；combined normalized-centered 和 normalized-differential variants 在当前 extended sweep 中表现最稳。这个交互是该课题最有价值的 insight。
 
 主要风险：当前环境仍是小型 synthetic queue，feature scaling 是人为 stress test；还需要一个 stream 中途改变 scale/reward-origin 的非平稳实验，以及 alpha sweep，避免结论只是某组超参数下成立。
 
@@ -397,9 +397,9 @@ Agent 与算法：比较 fixed TD、normalized TD、trace-normalized TD 和 true
 
 主要指标：`rmse` 衡量预测质量；`diverged` 和 `weight_norm` 衡量数值稳定；`prediction_change` 衡量单步输出扰动；`step_size` 记录 normalized update 的有效步长。
 
-当前证据：结果目录 `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`。normalized 和 trace-normalized TD 在 400 个 seed-conditions 中均没有发散；fixed TD 和当前 raw-alpha true-online baseline 各有 141/400 个 seed-conditions 发散。由于结果目录由 rjob 容器用户创建，正式报告图存放在 `final/reports/proposals/output_controlled_td/figures/`。
+当前证据：primary result 目录 `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`；fairness audit 目录 `experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended`。primary run 中 normalized 和 trace-normalized TD 在 400 个 seed-conditions 中均没有发散；fixed TD 和 raw-alpha true-online baseline 各有 141/400 个 seed-conditions 发散。fairness audit 中 normalized TD 和 trace-normalized TD(lambda) 仍为 `0/300`，fixed 与 raw-alpha true-online 为 `81/300`，naive normalized true-online 为 `34/300`。由于结果目录由 rjob 容器用户创建，正式报告图存放在 `final/reports/proposals/output_controlled_td/figures/` 和 `final/reports/proposals/output_controlled_td/fairness_figures/`。
 
-主要风险：true-online baseline 实现需要继续审计，避免把实现问题当成算法问题；需要 extended sweep 和更清楚的 alpha-normalization fairness。
+主要风险：true-online baseline 需要继续谨慎解释，避免把 raw-alpha 单位不公平写成算法本身失败；已完成的 normalized true-online fairness audit 说明 naive normalization 能修复 uniform-scale failures，但在 lognormal scaling 下仍不完整。
 
 ### B3. GVF Predictive State 详细卡片
 
@@ -587,7 +587,7 @@ Options、Nonstationary Bandit、Streaming Representation 当前不适合作为�
 
 ## 下一步建议
 
-1. 当前真正未完成的重点不再是 Output-Controlled TD extended run；它已经完成并纳入 evidence。接下来需要处理的是 `scale_invariant_continuing_control/config_extended.json` full fixed-condition grid，以及 Output-Controlled TD 的 true-online audit / no-reset feature-scale switch。`reward_centered_sarsa`、`output_controlled_td`、`continual_dyna_model_aging`、`dyna_planning_budget`、`predictive_state_plasticity` 和 `unit_switching_continuing_control` 已有 20-seed extended evidence，后续重点是分析深化和图表/报告一致性。
+1. 当前真正未完成的重点不再是 Output-Controlled TD extended run、Scale-Invariant fixed-condition grid 或 Output-Controlled TD fairness audit；这三项已经完成并纳入 evidence。接下来需要处理的是 Reward-Centered sensitivity 和 Dyna drift 两个仍在运行的 rerun，以及 Output-Controlled TD 的 no-reset feature-scale switch、Scale-Invariant 的 gradual unit drift。`reward_centered_sarsa`、`output_controlled_td`、`output_controlled_td_fairness_audit`、`scale_invariant_continuing_control`、`continual_dyna_model_aging`、`dyna_planning_budget`、`predictive_state_plasticity` 和 `unit_switching_continuing_control` 已有 extended evidence，后续重点是分析深化和图表/报告一致性。
 2. 对 report 继续做中文/英文双语梳理，确保每个 report 单独打开就能看懂环境、agent、指标、结果和结论。
 3. 对 Predictive State Plasticity 先做 stronger oracle-prediction control 和 cue information metric，再决定是否接入 generate-and-test/TIDBD。
 4. 对 Options 先修 fixed-goal sanity case；如果 fixed-goal 都不成立，不继续讨论 transfer。

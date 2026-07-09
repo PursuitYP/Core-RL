@@ -22,7 +22,7 @@ This audit is deliberately conservative. It maps the user's original and follow-
 | Professional project structure and clean environment | Partially covered | `conda-env-configs/README.md`, `experiments/alberta_core_rl/studies/`, `final/README.md` | The final structure is improved, but status/index files still need stricter source-of-truth discipline. Two `__pycache__` directories are owned by `nobody:nogroup` and cannot be removed by the normal user. |
 | Each proposal independent | First structural pass covered | `final/reports/proposals/`, `final/reports/integrated/` | Every report now states independent scope and evidence level; strong reports still need deeper experiments and weak reports need continued honest framing. |
 | Reports include figures/tables | Covered for several strong reports; partial overall | `final/reports/**/figures/`, report PDFs | Some weak/supporting reports still need clearer primary tables or diagnostic figures tied to named research questions. |
-| Current CPU-task tracking | Covered for status only | `final/indexes/status.md`, `final/indexes/revise_plan_20260709.md` | `core-rl-scale-invariant-extended-33723554` is RUNNING as of 2026-07-09 14:40 HKT; its result directory exists but has no standard artifacts yet, so it is not evidence. |
+| Current CPU-task tracking | Covered for status only | `final/indexes/status.md`, `final/indexes/revise_plan_20260709.md` | Scale-Invariant and Output-Fairness extended jobs have succeeded and are evidence; Reward-Sensitivity and Dyna-Drift reruns are still running and are not evidence until standard artifacts appear. |
 
 ## Current Deliverable Structure
 

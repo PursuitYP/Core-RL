@@ -21,7 +21,7 @@ The report deliberately does not claim:
 - that the tested GVFs already solve T-maze control;
 - that one cumulant/discount pair is universally best;
 - that TD error is the main success metric;
-- that GVF predictive state has been validated without downstream probes.
+- that predictive-state construction has been validated without downstream probes.
 
 ## Research Motivation/Question/Method
 
