@@ -50,7 +50,7 @@ The experiment should be presented with seed-level statistics, exact result dire
 
 ## Archive Status And Specific Reviewer Notes
 
-Canonical report: `final/reports/proposals/reward_centered_sarsa/report.md`. Current result: `experiments/alberta_core_rl/results/reward_centered_sarsa/20260708T153802Z_main`. This template is archived because the current report now states the continuing-control question, TD equations, evidence, and reproduction command.
+Canonical report: `final/reports/proposals/reward_centered_sarsa/report.md`. Current result: `experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended`; older `results.md` fragments in this archive preserve pilot evidence only. This template is archived because the current report now states the continuing-control question, TD equations, evidence, and reproduction command.
 
 Current status: main proposal. The result supports the claim that reward centering and differential Sarsa reduce reward-origin sensitivity in continuing access-control control, especially in value scale and unshifted reward stability.
 

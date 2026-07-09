@@ -59,7 +59,7 @@ Primary environment:
 
 Secondary environment:
 
-- Planned, not yet implemented: a continuing queue variant with nonstationary feature scaling midway through the stream, used to test recovery without a reset.
+- Implemented as `unit_switching_continuing_control`: the same continuing access-control stream changes reward origin and/or feature scale halfway through the run without resetting weights, traces, or reward baselines.
 
 Metrics:
 
@@ -101,6 +101,20 @@ The combined run crosses reward shifts `-4, 0, 8` with feature scales `one, ten,
 
 This is stronger than a portfolio synthesis: each single mechanism fails outside its own invariance dimension, while the combined mechanisms compose in the current pilot.
 
+A stricter no-reset unit-switching experiment was then added:
+
+`experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
+
+This run uses seeds `0-19`, `20000` online steps, reward-origin and feature-scale switches halfway through the stream, and alpha values `0.01`, `0.03`, and `0.1`. It changes the interpretation in an important way. Fixed discounted Sarsa can become numerically unstable after a feature-scale or joint reward/scale switch, with post-switch Q norms reaching about `1e8` and nonzero divergence in the early post-change window. Normalized reward-centered and normalized differential variants avoid divergence, which supports the core stability claim. However, they do not fully solve recovery after the harsh `hundred`-scale switch: late unshifted reward for normalized-centered and normalized-differential variants often falls to about `1.9-2.0` under feature-scale or joint-scale switches, even though reward-shift-only and lognormal-scale switches recover much better. The stronger conclusion is therefore not "unit invariance is solved"; it is that combined centering/normalization is necessary for stability, but no-reset recovery under abrupt feature-unit changes remains an open design problem.
+
+Unit-switching summary figures:
+
+![Post-late reward after no-reset unit switches.](../../../../experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended/figures/report_unit_switch_reward_heatmap.png)
+
+![Post-late Q norm after no-reset unit switches.](../../../../experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended/figures/report_unit_switch_q_norm_heatmap.png)
+
+![Post-late divergence after no-reset unit switches.](../../../../experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended/figures/report_unit_switch_divergence_heatmap.png)
+
 Main figures below use seed-tail condition summaries with 95% confidence intervals. They replace the earlier overloaded learning-curve plots whose legends compressed the plotting area.
 
 ![Tail unshifted reward by algorithm, reward shift, and feature scale.](../../../../experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main/figures/report_avg_unshifted_reward_by_scale.png)
@@ -113,15 +127,15 @@ Main figures below use seed-tail condition summaries with 95% confidence interva
 
 Strict reviewer challenge: "You are just combining two tricks." Response: the scientific object is not the trick but invariance under arbitrary problem units. The combined experiment is valuable if it reveals whether independently plausible normalizations compose or interfere.
 
-Strict reviewer challenge: "Access-control is still small." Response: small is acceptable for Core RL if the manipulation is sharp and the diagnostics expose mechanism. The secondary nonstationary representation shift should be added before promoting the proposal as a full paper.
+Strict reviewer challenge: "Access-control is still small." Response: small is acceptable for Core RL if the manipulation is sharp and the diagnostics expose mechanism. The added unit-switching experiment now tests a harder no-reset adaptation case, and its mixed result prevents the report from overstating the fixed-condition pilot.
 
 ## Threats To Validity
 
-The current evidence is a first main pilot, not a finished empirical paper. The access-control queue is larger and more meaningful than a two-state toy problem, but it is still a compact synthetic control task. The scale manipulation is also artificial by design: it tests whether the algorithm respects equivalent feature units, not whether natural sensors drift in exactly this way. The current sweep uses tenable but limited hyperparameters; a stricter version should include an alpha sweep for each update rule and a second environment where feature scales change during a single continuing stream rather than being fixed per run.
+The current evidence is stronger than the first pilot but still not a finished empirical paper. The access-control queue is larger and more meaningful than a two-state toy problem, but it is still a compact synthetic control task. The scale manipulation is artificial by design: it tests whether the algorithm respects equivalent feature units, not whether natural sensors drift in exactly this way. The unit-switching run adds a no-reset adaptation test, but it uses abrupt changes; a stricter version should include gradual feature-scale drift, beta sensitivity for reward baselines, and policy-distance probes over all access-control states.
 
 ## Conclusion
 
-This proposal is one of the strongest current integrated Core-RL topics. It gives a clear research question, an interpretable continuing-control environment, a meaningful stress test, and a nontrivial interaction: reward centering and output normalization solve different invariance failures, and the combined variants are strongest in the current pilot. The next step is a longer CPU-task sweep using `config_extended.json`, followed by a second nonstationary feature-scale experiment.
+This proposal remains a strong integrated Core-RL candidate because it has a clear invariance question, an interpretable continuing-control environment, and a nontrivial interaction: reward centering and output normalization solve different failure modes and compose in the fixed-condition pilot. The stricter unit-switching extension prevents the conclusion from becoming too strong. Combined variants prevent the catastrophic numerical instability seen in fixed discounted Sarsa, but abrupt no-reset feature-scale changes can still reduce long-run unshifted reward. The current claim is therefore: centering plus normalization is necessary for stable unit changes, but recovery after abrupt feature-unit changes is still an open Core RL problem. The next step is the full `scale_invariant_continuing_control/config_extended.json` grid plus gradual feature-scale drift, not a claim that unit invariance is solved.
 
 ## Reproduction
 
@@ -143,4 +157,25 @@ cd /mnt/shared-storage-user/yupeng/Core-RL
 PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
   /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
   --config experiments/alberta_core_rl/configs/scale_invariant_continuing_control/config_extended.json
+```
+
+No-reset unit-switching extension:
+
+```bash
+cd /mnt/shared-storage-user/yupeng/Core-RL
+
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
+  --config experiments/alberta_core_rl/configs/unit_switching_continuing_control/config_extended.json
+```
+
+Regenerate fixed-condition report figures:
+
+```bash
+cd /mnt/shared-storage-user/yupeng/Core-RL
+
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/plot_report_figures.py \
+  --kind scale \
+  --result-dir experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main
 ```

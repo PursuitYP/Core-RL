@@ -24,7 +24,7 @@ def run_random_walk_td(
     rows = []
     x = env.reset()
     true_values = env.true_values()
-    eval_period = 20 if representation == "tile" else 1
+    eval_period = 200 if representation == "tile" and steps >= 20000 else 20 if representation == "tile" else 1
     rmse = float("nan")
     for t in range(steps):
         x_next, reward, done = env.step()

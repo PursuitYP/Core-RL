@@ -80,9 +80,11 @@ Metrics:
 - divergence;
 - weight norm.
 
-Primary figure:
+Primary report figures:
 
-![TD(lambda) stability atlas by scale, alpha, and lambda.](../../../../experiments/alberta_core_rl/results/onpolicy_stability_atlas/20260708T160958Z_main/figures/rmse_by_scale-alpha-lambda_curve.png)
+![TD(lambda) tail RMSE atlas by scale, alpha, and lambda.](../../../../experiments/alberta_core_rl/results/onpolicy_stability_atlas/20260708T160958Z_main/figures/report_log_rmse_atlas.png)
+
+![TD(lambda) divergence atlas by scale, alpha, and lambda.](../../../../experiments/alberta_core_rl/results/onpolicy_stability_atlas/20260708T160958Z_main/figures/report_divergence_atlas.png)
 
 ## Results
 
@@ -104,7 +106,7 @@ The atlas does not implement a new method. It should be judged as a diagnostic, 
 
 Only on-policy prediction is studied. Off-policy traces can be more fragile.
 
-The current plot is dense and should be converted to heatmaps for a polished paper.
+The original learning-curve plot was too dense for a polished paper. The current report uses heatmaps so the atlas claim is visually inspectable.
 
 ## Reviewer Critique And Revisions
 

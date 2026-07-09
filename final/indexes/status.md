@@ -35,17 +35,17 @@ Scale-Invariant Continuing Control now has a completed main pilot:
 
 The pilot shows a meaningful interaction: reward centering alone fails under high feature scale, normalized Sarsa alone remains reward-shift sensitive, and combined normalized-centered/differential variants are robust across tested shifts and scales.
 
-Continual Dyna Model Aging now also has a completed main pilot:
+Continual Dyna Model Aging now has a completed extended half-life/budget sweep:
 
-`experiments/alberta_core_rl/results/continual_dyna_model_aging/20260708T174237Z_main`
+`experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`
 
-This pilot shows that recency aging can sharply reduce stale backups without oracle change detection. At planning budget `20`, late stale-backup rate falls from about `0.336` for keep-model to about `0.0064` for recency aging, with better late reward in the current pilot.
+This extended run shows that freshness-aware sampling can sharply reduce stale backups without oracle change detection. At planning budget `20`, keep-model late stale-backup rate is `0.213 +/- 0.065`; recency and recency/error methods can reduce it to near zero under shorter half-lives. Reward ranking depends on budget and half-life.
 
-Predictive State Plasticity now has a first-gate main pilot:
+Predictive State Plasticity now has a completed extended first-gate run:
 
-`experiments/alberta_core_rl/results/predictive_state_plasticity/20260708T174842Z_main`
+`experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`
 
-The redesigned cue-GVF carries positive cue-alignment margin, but trial accuracy remains near chance, while trace/oracle memory solve the task. This is a useful negative gate: weak hidden-cue information is not enough to become useful state.
+The extended run covers maze lengths `8/12/20/30`. Cue-GVF remains near chance, while trace and oracle memory remain far stronger. This is a useful negative gate: weak hidden-cue information is not enough to become useful state.
 
 ## Current Result Index
 
@@ -55,17 +55,17 @@ Final-facing result index:
 
 Important current result directories:
 
-- Reward-Centered Sarsa: `experiments/alberta_core_rl/results/reward_centered_sarsa/20260708T153802Z_main`
-- Output-Controlled TD: `experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main`
-- Dyna Planning Budget: `experiments/alberta_core_rl/results/dyna_planning_budget/20260708T154815Z_main`
+- Reward-Centered Sarsa: `experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended`
+- Output-Controlled TD: current indexed evidence remains `experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main`; the extended CPU task `core-rl-output-extended-fixed-46602102` is running, with expected output under `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`.
+- Dyna Planning Budget: `experiments/alberta_core_rl/results/dyna_planning_budget/20260709T024602Z_extended`
 - GVF Predictive State: `experiments/alberta_core_rl/results/useful_gvfs_state/20260708T155740Z_main`
 - Generate-and-Test: `experiments/alberta_core_rl/results/generate_test_features/20260708T154941Z_main`
 - TIDBD: `experiments/alberta_core_rl/results/tidbd_plasticity/20260708T154941Z_main`
 - Options: `experiments/alberta_core_rl/results/options_reusable_subtasks/20260708T161717Z_main`
 - Baird: `experiments/alberta_core_rl/results/baird_offpolicy_stability/20260708T161717Z_main`
 - Scale-Invariant Continuing Control: `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260708T172151Z_main`
-- Continual Dyna Model Aging: `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260708T174237Z_main`
-- Predictive State Plasticity: `experiments/alberta_core_rl/results/predictive_state_plasticity/20260708T174842Z_main`
+- Continual Dyna Model Aging: `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`
+- Predictive State Plasticity: `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`
 
 ## Evidence Quality Summary
 
@@ -111,7 +111,7 @@ Environment:
 
 ## Next Research Iteration
 
-1. Run longer CPU sweeps for Reward-Centered Sarsa, Output-Controlled TD, and Scale-Invariant Continuing Control.
+1. Finish and incorporate the CPU-task extended sweep for Output-Controlled TD; then update result indexes, figures, and reports.
 2. Extend Dyna aging to gradual drift, repeated changes, and planning-utility analysis.
 3. Redesign GVF predictive-state questions with cue-decodability probes.
 4. Add fixed-goal sanity experiments for the Options proposal.

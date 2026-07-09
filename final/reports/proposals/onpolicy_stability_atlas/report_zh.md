@@ -1,39 +1,69 @@
 # On-Policy TD(lambda) Stability Atlas 中文报告
 
-英文原文：`report.md`
+状态：独立诊断研究；支撑 Output-Controlled TD，但不能替代它。
 
-## 定位
+## 摘要
 
-supporting diagnostic atlas
+本 proposal 绘制 on-policy TD(lambda) 在 feature scaling、step-size changes 和 eligibility traces 共同作用下的 practical stability region。它不是 intervention study，而是一个 atlas，用来说明 ordinary fixed-alpha TD 在什么条件下变得脆弱。当前 main run 发现 scale `one` 大多稳定，而更大或 uneven feature scale 会明显缩小稳定 alpha/lambda 区域。这个 diagnostic 强化了 Output-Controlled TD 的动机：feature-scale robustness 不是 cosmetic issue，而是 streaming value learning 的基础稳定性问题。
 
 ## 研究动机
 
-这个 proposal 关注一个具体 Core-RL 问题，而不是简单比较分数。它遵守项目约束：streaming/continual online learning，不使用 replay buffer，不使用 deep network，不使用离线训练循环。研究价值在于把 Alberta Plan 中关于 ordinary experience、value functions、稳定在线更新、预测知识或有限计算的主题落到一个可复现实验上。
+TD(lambda) 把 bootstrapping 和 multi-step credit assignment 结合起来。在 linear prediction 中，它的稳定性依赖 alpha、lambda 和 feature geometry。一个 learner 在某个 representation 下稳定，并不意味着在同一 state information 被重新缩放后仍然稳定。
 
-## RL 问题
+对 continual agent 来说，这很重要。Representation scale 可能来自 sensors、tile coders、learned features 或 normalization choices。Agent 不应该每次 feature scale 改变都重新做 exhaustive alpha sweep。Stability atlas 的作用是展示 fixed alpha 的脆弱性，从而为 output-controlled updates 提供背景证据。
 
-环境/任务：linear on-policy prediction under feature scaling。agent 与环境持续交互，在线更新，没有特殊训练/测试分割。这个设置用于检验一个明确机制，而不是追求大 benchmark 分数。
+## 研究问题
 
-## Agent 与 Baseline
+主问题：alpha、lambda 和 representation scale 如何共同决定 on-policy TD 的 stable region？
 
-比较对象：TD(lambda) stability sweep。所有方法都在同一 stream 上在线更新；关键差异是 proposal 要研究的机制，而不是额外数据或更大模型。
+假设是：增大 feature scale 和 trace length 会缩小 fixed-alpha stable region。这个 atlas 只问 failures 出现在哪里，不直接提供新算法。
+
+## Alberta Plan 关联
+
+该 proposal 连接 value prediction、online TD learning、eligibility traces、representation sensitivity 和 streaming agents 的 diagnostic process metrics。它是独立 study，因为 stability map 对任何后续 continual value-function method 都有参考价值。
+
+## 环境与方法
+
+环境是 random-walk prediction problem，使用 scaled tabular features。它比 Output-Controlled TD 的 tile-coded main experiment 简单，因此适合做 dense alpha/lambda/scale atlas。Learner 在线从一个 transition 更新一次，预测 random-walk value function。
+
+Diagnostic sweep 改变 feature scale、alpha 和 lambda。当前没有引入新算法，因此它的贡献是描述稳定边界，而不是提出干预方法。
 
 ## 实验设计
 
-主要变量：alpha, lambda, feature scale。主要指标：RMSE, divergence, weight norm。这些指标直接回答研究问题，例如稳定性、invariance、useful prediction、model freshness 或 adaptation，而不只是最终 reward。
+当前 main diagnostic 使用 scales `one/ten/uneven`，alphas `0.001/0.01/0.05/0.1/0.2`，lambdas `0/0.5/0.8/0.95`，seeds `0-4`，steps `5000`。结果路径是 `experiments/alberta_core_rl/results/onpolicy_stability_atlas/20260708T160958Z_main`。主要指标包括 RMSE、divergence 和 weight norm。
 
-## 当前结果
+![TD(lambda) tail RMSE atlas by scale, alpha, and lambda.](../../../../experiments/alberta_core_rl/results/onpolicy_stability_atlas/20260708T160958Z_main/figures/report_log_rmse_atlas.png)
 
-结果路径：`experiments/alberta_core_rl/results/onpolicy_stability_atlas/20260708T160958Z_main`。关键证据：scale `one` 多数组合稳定；较大/不均匀 feature scale 缩小稳定 alpha/lambda 区域。
+![TD(lambda) divergence atlas by scale, alpha, and lambda.](../../../../experiments/alberta_core_rl/results/onpolicy_stability_atlas/20260708T160958Z_main/figures/report_divergence_atlas.png)
 
-## 可以声称与不能声称
+## 结果
 
-支持 Output-Controlled TD。它是 atlas，不是 intervention proposal。
+Scale `one` 在大多数测试 grid 中保持稳定。Scale `ten` 在较大 alpha 和高 lambda 下开始不稳定。`uneven` scale 更脆弱，许多条件出现大 RMSE 或非零 divergence。这个 pattern 支持假设：fixed alpha 不能跨 representation scale 和 trace accumulation 直接迁移。
 
-## 下一步
+## 分析
 
-优先补强 seed/step sweep、关键 baseline audit 和更直接的机制诊断。对于 negative/supporting proposal，下一步不是强行包装成正结果，而是说明失败暴露了哪个 Core-RL 设计约束。
+如果 alpha 是一种 representation-independent learning-progress unit，那么相同 alpha/lambda grid 在不同 scale 下应表现相似。但结果并非如此。特别是 lambda 的交互很重要，因为 eligibility traces 会放大实际 update direction norm，即使当前 feature vector 本身不大。
+
+这个 atlas 的价值是解释 Output-Controlled TD 为什么需要。Normalized 或 intentional update 的目标就是让 alpha 更接近 prediction/output change，而不是 raw parameter displacement。Atlas 本身不解决问题，但清楚指出 fixed-alpha TD(lambda) 的危险区域。
+
+## 有效性威胁
+
+Representation 比主 Output-Controlled TD 的 tile coding 简单。Atlas 没有实现新方法，因此不应被当作 algorithmic contribution。这里只研究 on-policy prediction，off-policy traces 可能更脆弱。早期 learning-curve plot 过密，当前报告已改用 heatmap，避免图例压缩主要信息。
+
+## 审稿式批评与回应
+
+Stability reviewer 会说：atlas 只有在能指导方法设计时才有价值。回应是：报告明确把 atlas failures 连接到 Output-Controlled TD 的 normalization 动机。
+
+Strict reviewer 会说：没有 intervention 的 study 不能作为主贡献。回应是：报告将其定位为 independent diagnostic appendix-style study，并完整保留复现路径。
+
+## 结论
+
+On-Policy TD(lambda) Stability Atlas 是聚焦的诊断 proposal。它展示 feature scale 和 trace length 会实质改变 fixed-alpha stability。结果支持 output-control argument，同时作为 TD(lambda) failure regions 的独立地图保留下来。
 
 ## 复现
 
-统一复现命令见 `final/indexes/reproduction_zh.md`；当前可引用证据见 `final/indexes/results_zh.md` 与英文 `final/indexes/results.md`。
+```bash
+cd /mnt/shared-storage-user/yupeng/Core-RL
+
+PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/onpolicy_stability_atlas/config_main.json
+```

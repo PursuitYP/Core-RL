@@ -8,7 +8,7 @@ This log records the current multi-reviewer critique cycle for the Core-RL proje
 
 Main critique: the strongest reports were still written around 5-seed, 5000-step pilot evidence, while several conclusions used language stronger than the evidence justified. The reviewer recommended demoting current results to pilot evidence until extended sweeps are available.
 
-Action taken: extended local runs were launched for `reward_centered_sarsa`, `output_controlled_td`, `predictive_state_plasticity`, `continual_dyna_model_aging`, `dyna_planning_budget`, and `unit_switching_continuing_control`. `dyna_planning_budget` completed first and was renamed to an `_extended` result directory after verifying that it came from `config_extended.json`.
+Action taken: extended runs were launched for `reward_centered_sarsa`, `output_controlled_td`, `predictive_state_plasticity`, `continual_dyna_model_aging`, `dyna_planning_budget`, and `unit_switching_continuing_control`. Completed extended evidence has been incorporated for Reward-Centered Sarsa, Dyna Planning Budget, Continual Dyna Model Aging, Predictive State Plasticity, and Unit-Switching Continuing Control. Output-Controlled TD is now running as CPU task `core-rl-output-extended-fixed-46602102` after a successful CPU smoke validation.
 
 Main critique: `scale_invariant_continuing_control` needs an in-stream unit-change experiment, not only separate fixed-condition sweeps.
 
@@ -26,7 +26,7 @@ Action taken: future report edits will keep this framing. The extended run now a
 
 Main critique: Chinese `report_zh.md` files are short quick-review notes, not true counterparts to the English reports, and they do not include figures.
 
-Action pending: expand final-facing Chinese reports so they mirror the English report structure, including motivation, environment, methods, experimental design, results, threats, critique response, figures, and reproduction commands.
+Action taken: all `final/reports/**/report_zh.md` files have been expanded from quick-review notes into standalone Chinese review reports with motivation, RL setting, method, experiment design, results, interpretation, threats, critique response, figures where available, and reproduction commands. The strongest reports now have fuller Chinese counterparts; supporting and negative proposals are also written as honest independent studies rather than generic summaries.
 
 Main critique: `proposal_overview.md` was much shorter than `proposal_overview_zh.md`.
 
@@ -34,7 +34,7 @@ Action taken: both overview files now include a dedicated RL environment catalog
 
 Main critique: integrated reports show report-ready figures, but reproduction sections do not include `plot_report_figures.py` commands.
 
-Action pending: add figure regeneration commands to integrated report reproduction sections and the Chinese counterparts.
+Action taken: figure regeneration commands were added to the updated integrated reports where report figures are used, and the reproduction indexes now include report-figure commands. `dyna_planning_budget` also received new readable average-reward and stale-backup plots from the 20-seed extended run.
 
 Main critique: `config_extended.json` outputs were confusing because they used `suite: main` and therefore created `_main` directories.
 
@@ -42,9 +42,17 @@ Action taken: `run_proposal` now labels outputs from `config_extended.json` with
 
 ## Current Open Items
 
-- Finish all launched extended runs and extract seed-tail summaries.
-- Run or decide scope for `scale_invariant_continuing_control/config_extended.json`; it is the largest sweep and should be scheduled after current jobs finish.
-- Update English reports with executed extended evidence and more conservative claims.
-- Expand Chinese reports into true counterparts, including figures.
-- Update `final/indexes/results.md`, `results_zh.md`, `reproduction.md`, and `reproduction_zh.md` with new result paths and commands.
-- Re-run markdown pairing and figure-link checks.
+- Finish the still-running CPU-task extended job: `output_controlled_td/config_extended.json`. The expected result directory is `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`; verify `config_used.json`, `condition_summary.json`, and generated figures before citing it.
+- Run or decide scope for `scale_invariant_continuing_control/config_extended.json`; it is the largest fixed-condition sweep and should be scheduled after current jobs finish or moved to a verified CPU-task queue.
+- Update `output_controlled_td` report, result indexes, reproduction indexes, and overview text once its extended summary is available.
+- Add beta/gamma and midstream reward-origin tests for `reward_centered_sarsa` if the standalone paper is selected as a final topic.
+- Add gradual/stochastic drift environments for Dyna aging before making general claims beyond abrupt changing gridworlds.
+- Add true-online TD(lambda) max-stable-alpha audit before treating that baseline as a strong negative comparison.
+- Add cue-decodability and downstream-control ablations before attempting a positive GVF predictive-state claim.
+
+## Verification After This Revision
+
+- Markdown image-link check passed for all files under `final/`.
+- `python -m compileall experiments/alberta_core_rl` completed without errors.
+- Generated `__pycache__` directories were cleaned after the compile check.
+- Python source files remain under the 500-line guidance; `envs.py` is the largest at 474 lines.

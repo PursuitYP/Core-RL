@@ -20,7 +20,7 @@ Testbed：changing continuing gridworld。该设置遵守 no replay buffer、no 
 
 ## 看什么指标
 
-指标：avg_reward, stale_backup_rate, model_size, recovery window。当前结果路径：`experiments/alberta_core_rl/results/dyna_planning_budget/20260708T154815Z_main`。当前关键结论：planning budget `1` keep-model late stale rate 约 `0.844 +/- 0.0158`，显示 stale planning 是真实问题。
+指标：avg_reward, stale_backup_rate, model_size, recovery window。当前结果路径已更新为 `experiments/alberta_core_rl/results/dyna_planning_budget/20260709T024602Z_extended`；本 archive 中的 `results.md` 仍保留早期 pilot 证据。当前关键结论：20 seeds larger-grid run 中 planning budget `20` 的 keep-model late stale-backup rate 仍约 `0.294`，flush 为 `0`，但 late reward 对 keep/flush 相近，因此它更适合作为 model-aging 的前置诊断。
 
 ## 当前判断
 
@@ -29,3 +29,7 @@ Testbed：changing continuing gridworld。该设置遵守 no replay buffer、no 
 ## 还缺什么
 
 正式提交前需要补清楚 update equation、baseline fairness、seed-tail statistics、结果图和 falsifier。对于 negative/supporting proposal，应明确说明失败暴露了什么设计问题，而不是强行写成正结果。
+
+## 归档模板审阅补充
+
+阅读这个历史模板时，应先定位它回答的 focused RL question，而不是只看算法名字。一个合格 proposal template 需要说明环境为什么能暴露该机制，agent 在线观察什么、采取什么动作或预测什么、reward/cumulant 是什么，以及哪些变量被有意改变。还需要写清楚 baseline 是否公平，指标如何直接回答问题，什么结果会支持 proposal，什么结果会推翻 proposal。当前正式报告已经承担这些职责；本归档模板用于追踪早期设计如何演化，不应作为最终提交文本引用。

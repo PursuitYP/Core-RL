@@ -78,16 +78,23 @@ Minimal runs are preliminary sanity checks. Main conclusions should use current 
 
 ## CPU Task Runs
 
-Longer CPU sweeps can be submitted to cluster CPU task partitions. Cluster jobs run inside the rjob image, so do not assume the local `/data/yupeng/conda_envs/core-rl` environment is mounted there unless the job image or launch command explicitly provides it.
+Longer CPU sweeps can be submitted to cluster CPU task partitions. Cluster jobs run inside the rjob image, so do not assume the local `/data/yupeng/conda_envs/core-rl` environment is mounted there unless the job image or launch command explicitly provides it. The default wrapper path was verified with `core-rl-cpu-smoke-fixed-50275254` on 2026-07-09; keep `PRIVATE_MACHINE` and `USE_FUSE` unset unless a queue administrator asks for them.
 
 ```bash
-PARTITION=safethm_cpu_task CPU=32 MEM=128000 \
+PARTITION=safethm_cpu_task CPU=8 MEM=16000 \
   bash experiments/alberta_core_rl/scripts/run_cpu_task.sh \
-  core-rl-output-main \
-  "PYTHONNOUSERSITE=1 MPLCONFIGDIR=/tmp/core-rl-mplconfig python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/output_controlled_td/config_main.json"
+  core-rl-output-extended-fixed \
+  "PYTHONNOUSERSITE=1 python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/output_controlled_td/config_extended.json"
 ```
 
 Supported `PARTITION` values:
 
 - `safethm_cpu_task` for namespace `ailab-safethm`.
 - `safer2ai_cpu_task` for namespace `ailab-safer2ai`.
+
+Optional queue constraints:
+
+- `PRIVATE_MACHINE=group` adds `--private-machine=group`.
+- `USE_FUSE=1` adds `--custom-resources brainpp.cn/fuse=1`.
+
+These options can make CPU jobs unschedulable on ordinary CPU task nodes, so use them only when a specific cluster path requires them.

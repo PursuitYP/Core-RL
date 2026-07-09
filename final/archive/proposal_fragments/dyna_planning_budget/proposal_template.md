@@ -50,7 +50,7 @@ The experiment should be presented with seed-level statistics, exact result dire
 
 ## Archive Status And Specific Reviewer Notes
 
-Canonical report: `final/reports/proposals/dyna_planning_budget/report.md`. Current result: `experiments/alberta_core_rl/results/dyna_planning_budget/20260708T154815Z_main`. This template is archived because the proposal has been rewritten as a standalone report and partly superseded by `final/reports/integrated/continual_dyna_model_aging/report.md`.
+Canonical report: `final/reports/proposals/dyna_planning_budget/report.md`. Current result: `experiments/alberta_core_rl/results/dyna_planning_budget/20260709T024602Z_extended`; older `results.md` fragments in this archive preserve pilot evidence only. This template is archived because the proposal has been rewritten as a standalone report and partly superseded by `final/reports/integrated/continual_dyna_model_aging/report.md`.
 
 Current status: conditional/precursor proposal. It demonstrates that model staleness is a real planning problem, but it does not yet offer a realistic freshness mechanism beyond keep-model and oracle-style flushing.
 

@@ -341,7 +341,10 @@ Revision:
 - Added `experiments/alberta_core_rl/scripts/summarize_results.py` for reproducible
   condition-level result audits.
 - Added `experiments/alberta_core_rl/scripts/run_cpu_task.sh` for CPU cluster runs on
-  `safethm_cpu_task` or `safer2ai_cpu_task`.
+  `safethm_cpu_task` or `safer2ai_cpu_task`. On 2026-07-09, the wrapper was revised so
+  `--private-machine=group` and `brainpp.cn/fuse=1` are optional rather than default;
+  those constraints made the CPU task unschedulable even though the bare
+  `safethm_cpu_task` queue had available nodes.
 
 Cluster note:
 
@@ -351,6 +354,13 @@ Cluster note:
   `ailab-safer2ai`.
 - Based on `verl` project notes, rjob runs should use gpfs-mounted project paths and should
   not depend on `/data`.
+- Verified `core-rl-cpu-smoke-fixed-50275254` on `ailab-safethm/safethm_cpu_task`; it
+  completed the full project smoke suite from the rjob image using container `python`.
+- Stopped old unschedulable jobs `core-rl-infra-smoke-968081` and
+  `core-rl-output-extended-131257-78853482`.
+- Submitted active Output-Controlled TD extended run
+  `core-rl-output-extended-fixed-46602102`; expected result directory is
+  `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`.
 
 ## Main-Pilot Audit Revision
 

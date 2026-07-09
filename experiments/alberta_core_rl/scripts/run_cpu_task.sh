@@ -2,10 +2,10 @@
 # Submit a CPU-only Core-RL experiment to the cluster rjob CPU task queues.
 #
 # Examples:
-#   PARTITION=safethm_cpu_task bash experiments/alberta_core_rl/scripts/run_cpu_task.sh \
-#     core-rl-output-main "python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/output_controlled_td/config_main.json"
+#   PARTITION=safethm_cpu_task CPU=8 MEM=16000 bash experiments/alberta_core_rl/scripts/run_cpu_task.sh \
+#     core-rl-output-extended-fixed "PYTHONNOUSERSITE=1 python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/output_controlled_td/config_extended.json"
 #
-#   PARTITION=safer2ai_cpu_task CPU=32 MEM=128000 bash experiments/alberta_core_rl/scripts/run_cpu_task.sh \
+#   PARTITION=safer2ai_cpu_task CPU=8 MEM=16000 bash experiments/alberta_core_rl/scripts/run_cpu_task.sh \
 #     core-rl-all-main "python experiments/alberta_core_rl/scripts/run_all.py --suite main --seeds 0 1 2 3 4"
 set -eo pipefail
 
@@ -21,6 +21,8 @@ PARTITION="${PARTITION:-safethm_cpu_task}"
 CPU="${CPU:-16}"
 MEM="${MEM:-64000}"
 IMG="${IMG:-registry.h.pjlab.org.cn/ailab/pytorch2.7.0-cuda12.8-cudnn9:v5}"
+PRIVATE_MACHINE="${PRIVATE_MACHINE:-}"
+USE_FUSE="${USE_FUSE:-0}"
 
 case "$PARTITION" in
   safethm_cpu_task) NS=ailab-safethm; CG=safethm_cpu_task ;;
@@ -28,12 +30,20 @@ case "$PARTITION" in
   *) echo "unknown PARTITION=$PARTITION"; exit 2 ;;
 esac
 
-echo "[submit-cpu] partition=$PARTITION ns=$NS charged=$CG cpu=$CPU mem=$MEM name=$NAME"
+EXTRA_RJOB_ARGS=()
+if [[ -n "$PRIVATE_MACHINE" ]]; then
+  EXTRA_RJOB_ARGS+=(--private-machine="$PRIVATE_MACHINE")
+fi
+if [[ "$USE_FUSE" == "1" ]]; then
+  EXTRA_RJOB_ARGS+=(--custom-resources brainpp.cn/fuse=1)
+fi
+
+echo "[submit-cpu] partition=$PARTITION ns=$NS charged=$CG cpu=$CPU mem=$MEM private=${PRIVATE_MACHINE:-none} fuse=$USE_FUSE name=$NAME"
 rjob submit --name="$NAME" \
   --gpu=0 --cpu="$CPU" --memory="$MEM" \
-  --charged-group="$CG" --namespace="$NS" --private-machine=group \
+  --charged-group="$CG" --namespace="$NS" \
   --image="$IMG" --image-pull-policy=IfNotPresent --priority=9 \
   --mount=gpfs://gpfs1/yupeng:/mnt/shared-storage-user/yupeng \
-  --custom-resources brainpp.cn/fuse=1 \
+  "${EXTRA_RJOB_ARGS[@]}" \
   "$@" \
   -- bash -exc "cd /mnt/shared-storage-user/yupeng/Core-RL && export MPLCONFIGDIR=/tmp/core-rl-mplconfig && mkdir -p \$MPLCONFIGDIR && $CMD"

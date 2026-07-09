@@ -9,13 +9,13 @@ This audit maps the original and follow-up user requirements to current project 
 | Requirement | Current status | Artifact |
 |---|---|---|
 | Read course/project sources and Alberta Plan materials | Done; source map maintained | `AGENTS.md`, `resources/alberta_plan_related/README.md`, `draft/iterative_research_record.md` |
-| Prioritize Reward-Centered Sarsa and Output-Controlled TD | Done; both implemented, rerun, and expanded into independent reports | `final/reports/proposals/reward_centered_sarsa/`, `final/reports/proposals/output_controlled_td/` |
+| Prioritize Reward-Centered Sarsa and Output-Controlled TD | Done; both implemented and expanded into independent reports. Reward-Centered Sarsa has completed extended evidence; Output-Controlled TD extended run is still running. | `final/reports/proposals/reward_centered_sarsa/`, `final/reports/proposals/output_controlled_td/` |
 | Analyze other proposals and design new angles | Done and continuing; all canonical proposals have independent folders and reports | `final/reports/proposals/` |
 | Search Alberta Plan and follow-up work | Done and continuing; 2024-2026 reward-centering, intentional-update, streaming, GVF, continual-RL work cached | `resources/alberta_plan_related/README.md` |
 | Complete Proposal Template questions for each proposal | Done for all 13 canonical proposals inside the current standalone reports; earlier template drafts are archived for audit | `final/reports/proposals/*/report.md`, `final/archive/proposal_fragments/*/proposal_template.md` |
 | At least five reference/course-derived proposals | Covered: reward centering, output control, GVF state, generate-and-test, options | `final/reports/proposals/` |
 | At least five self-designed or extended proposals | Covered: TIDBD, Baird, Dyna, centered TD, on-policy atlas, GVF question design, bandit, streaming representation | `final/reports/proposals/` |
-| New larger integrated Core RL proposals | Three independent larger proposals created; all three now have main/first-gate pilots | `final/reports/integrated/` |
+| New larger integrated Core RL proposals | Three independent larger proposals created; Scale-Invariant has pilot plus unit-switch extension, Dyna Aging has completed extended half-life/budget evidence, Predictive State has completed extended negative gate | `final/reports/integrated/` |
 | No replay buffer and no deep network | Enforced in implementations and manifests | `experiments/alberta_core_rl/`, `final/indexes/reproduction.md` |
 | Use richer environments beyond toy-only | Main studies use access-control, tile random walk, changing gridworld, long T-maze; diagnostics are clearly bounded | `final/indexes/results.md` |
 | Continual improvement with critic rounds | Done; multiple critique rounds recorded, including independent-study gap audit | `draft/critique_round_9_independent_study_gap_matrix.md` |
@@ -36,6 +36,7 @@ This audit maps the original and follow-up user requirements to current project 
 ## Remaining Risks
 
 - Several proposals are still negative or diagnostic rather than strong positive studies. They are independent, but their conclusions must remain honest.
-- Most existing main runs use five seeds. Longer CPU sweeps would strengthen final statistics.
-- The three large integrated proposals now have at least first-gate pilots. Predictive State Plasticity is currently a negative gate result rather than a positive learned-state result.
-- The overview paper may still use older two-main-study wording and should be revised after the per-proposal materials stabilize.
+- Several strong lines now have 20-seed extended evidence. Output-Controlled TD still needs its running extended sweep incorporated.
+- Many supporting or negative proposals remain 5-seed pilots. That is acceptable only because they are explicitly framed as diagnostics, redesign targets, or dropped sanity checks.
+- Predictive State Plasticity is currently an extended negative gate result rather than a positive learned-state result.
+- Scale-Invariant Continuing Control still needs the full fixed-condition extended grid or a deliberately scoped replacement sweep.

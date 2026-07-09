@@ -68,11 +68,11 @@ Report: `final/reports/integrated/scale_invariant_continuing_control/report.md`.
 
 ### Continual Dyna With Model Aging
 
-Report: `final/reports/integrated/continual_dyna_model_aging/report.md`. The study asks when a continual Dyna agent should distrust old model entries after a world change. Current result: `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260708T174237Z_main`. At planning budget `20`, keep-model late stale-backup rate is about `0.336`, while recency aging reduces it to about `0.0064`.
+Report: `final/reports/integrated/continual_dyna_model_aging/report.md`. The study asks when a continual Dyna agent should distrust old model entries after a world change. Current result: `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`. At planning budget `20`, keep-model late stale-backup rate is `0.213 +/- 0.065`; freshness-aware sampling reduces it to near zero for shorter aging half-lives, while reward ranking depends on budget and half-life.
 
 ### Predictive State Plasticity
 
-Report: `final/reports/integrated/predictive_state_plasticity/report.md`. The study asks whether learned predictions can become useful state under partial observability. Current result: `experiments/alberta_core_rl/results/predictive_state_plasticity/20260708T174842Z_main`. Trace and oracle memory solve the T-maze with trial accuracy around `0.93-0.96`; cue-GVF remains near chance despite positive cue alignment.
+Report: `final/reports/integrated/predictive_state_plasticity/report.md`. The study asks whether learned predictions can become useful state under partial observability. Current result: `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`. In the 20-seed extended gate over maze lengths `8/12/20/30`, cue-GVF remains near chance, while oracle memory stays near `0.93-0.95` trial accuracy and trace memory remains above chance even at length `30`.
 
 ## Canonical Proposals
 
@@ -80,4 +80,4 @@ Reward-Centered Sarsa and Output-Controlled TD are the strongest canonical propo
 
 ## Current Evidence Standard
 
-All current main results use online interaction and seed-aware tail summaries in `condition_summary.json`. Most current runs are 5 seeds and 5000 steps, so stronger final claims require extended CPU sweeps. Report-ready integrated figures are generated with `experiments/alberta_core_rl/scripts/plot_report_figures.py` and stored as `figures/report_*.png` to avoid the old crowded legends.
+All current results use online interaction and seed-aware tail summaries in `condition_summary.json`. Several main candidates now have 20-seed, 20000-step extended evidence, while Output-Controlled TD, Scale-Invariant Continuing Control, and Continual Dyna Model Aging still need final extended-result incorporation. Report-ready integrated figures are generated with `experiments/alberta_core_rl/scripts/plot_report_figures.py` and stored as `figures/report_*.png` to avoid the old crowded legends.

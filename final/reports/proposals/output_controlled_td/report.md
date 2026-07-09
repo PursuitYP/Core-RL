@@ -1,6 +1,6 @@
 # Output-Controlled TD
 
-Status: independent main proposal with completed main pilot and required baseline audit.
+Status: independent main proposal with completed main pilot. A 20-seed CPU-task extended run is currently active as `core-rl-output-extended-fixed-46602102`; the incomplete directory `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended` must not be cited until `condition_summary.json` and figures are present.
 
 ## Abstract
 
@@ -9,7 +9,7 @@ This proposal studies a practical instability in streaming temporal-difference l
 
 ## Standalone Study Summary
 
-This study tests feature-scale robustness in online TD prediction. The RL problem is tile-coded random-walk value prediction, where the same underlying process can be represented with different feature magnitudes. The implemented learners are fixed-step TD, normalized TD, trace-normalized TD, and a true-online TD(lambda) baseline. The experiment crosses feature scales, alphas, and trace settings; the main metrics are RMSE, divergence, weight norm, prediction change, and effective step size. The current evidence shows that normalized updates are much more robust to large feature scales, while fixed-step methods can diverge or require retuning. The next step is a stronger baseline audit, especially for true-online TD(lambda), and a longer CPU sweep.
+This study tests feature-scale robustness in online TD prediction. The RL problem is tile-coded random-walk value prediction, where the same underlying process can be represented with different feature magnitudes. The implemented learners are fixed-step TD, normalized TD, trace-normalized TD, and a true-online TD(lambda) baseline. The experiment crosses feature scales, alphas, and trace settings; the main metrics are RMSE, divergence, weight norm, prediction change, and effective step size. The current citable evidence is the 5-seed main pilot, which shows that normalized updates are much more robust to large feature scales, while fixed-step methods can diverge or require retuning. The next step is to incorporate the running 20-seed CPU sweep and audit the true-online TD(lambda) baseline.
 
 ## Research Motivation
 
@@ -96,17 +96,23 @@ Primary metrics:
 
 The decision rule is not simply lowest RMSE at one alpha. A method is considered more streaming-compatible if the same alpha range remains stable across feature scales and if prediction-change magnitudes stay comparable when features are multiplied by `10`, `100`, or uneven per-feature constants. A method that can be made stable only by retuning alpha separately for each scale is treated as less robust.
 
-Planned extended CPU sweep:
+Active extended CPU sweep:
 
 - Scales: `one`, `ten`, `hundred`, `uneven`, and a lognormal scale pattern.
 - Alphas: include smaller values for fixed and true-online baselines to estimate max stable alpha rather than only showing divergence.
 - Lambda values: `0`, `0.8`, `0.95` for trace-aware methods.
 - Seeds: `0-19`; steps: `20000`.
-- Nonstationary extension: feature scale changes midway through the same prediction stream, with no reset of weights or traces.
+- CPU task: `core-rl-output-extended-fixed-46602102`.
+- Expected output directory: `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`.
+- Current status: running/incomplete; do not cite as evidence until standard artifacts are present.
 
-Primary figure:
+Primary report figures:
 
-![Tile-random-walk RMSE by algorithm, scale, and alpha.](../../../../experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main/figures/rmse_by_algorithm-scale-alpha_curve.png)
+![Tail RMSE stability atlas by algorithm, scale, and alpha.](../../../../experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main/figures/report_log_rmse_heatmap.png)
+
+![Divergence-rate atlas by algorithm, scale, and alpha.](../../../../experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main/figures/report_divergence_heatmap.png)
+
+![Tail output-change atlas by algorithm, scale, and alpha.](../../../../experiments/alberta_core_rl/results/output_controlled_td/20260708T153802Z_main/figures/report_prediction_change_heatmap.png)
 
 ## Results
 
@@ -118,7 +124,7 @@ The current true-online TD(lambda) baseline performs well in easy scale conditio
 
 ## Analysis
 
-The most important figure is not a single learning curve but the stability atlas across scale and alpha. A method that is stable only after retuning alpha for every scale is less useful for streaming agents than one whose alpha has a consistent output-level meaning.
+The most important figure is the heatmap stability atlas across scale and alpha, not a spaghetti learning curve. A method that is stable only after retuning alpha for every scale is less useful for streaming agents than one whose alpha has a consistent output-level meaning.
 
 Normalized TD's advantage comes from changing the denominator of the update. In one-hot or low-scale settings, fixed TD and normalized TD can behave similarly. Under large or uneven scales, normalized TD prevents the same TD error from producing a much larger prediction change simply because the feature vector is larger.
 
@@ -166,12 +172,13 @@ PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconf
   --config experiments/alberta_core_rl/configs/output_controlled_td/config_main.json
 ```
 
-Longer seed/step sweep:
+Longer seed/step sweep, currently running through the CPU task wrapper:
 
 ```bash
 cd /mnt/shared-storage-user/yupeng/Core-RL
 
-PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
-  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
-  --config experiments/alberta_core_rl/configs/output_controlled_td/config_extended.json
+PARTITION=safethm_cpu_task CPU=8 MEM=16000 \
+  bash experiments/alberta_core_rl/scripts/run_cpu_task.sh \
+  core-rl-output-extended-fixed \
+  "PYTHONNOUSERSITE=1 python experiments/alberta_core_rl/scripts/run_experiment.py --config experiments/alberta_core_rl/configs/output_controlled_td/config_extended.json"
 ```

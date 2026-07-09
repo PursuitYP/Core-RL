@@ -45,7 +45,7 @@ Nonstationary Bandit 是最小 sanity-check 环境。它没有 state bootstrappi
 
 1. Scale-Invariant Continuing Control：这是当前最值得作为最终主提交方向的综合型课题之一。它把 Reward-Centered Sarsa 和 Output-Controlled TD 的核心思想合并到一个 continuing control invariance 问题中，研究对象清楚：reward zero-point 和 feature scale 都是任务描述单位，不应改变 agent 的实质学习能力。当前实验已经显示单独机制各有失败区间，而 combined normalized-centered / normalized-differential variants 更稳。优化建议是优先跑 extended sweep，补 20 seeds、20000 steps、broader shifts/scales/alphas，并加入同一 stream 中途改变 reward origin 或 feature scale 的 no-reset 实验。这个课题的故事线最像一篇完整 Core-RL paper：从基本 invariance 原则出发，到两个机制的互补失败，再到组合机制的证据。
 
-2. Continual Dyna With Model Aging：这是 planning/model-based 方向最强候选。它不是泛泛地说 Dyna planning 有帮助，而是把问题改成“哪些 learned model entries 还值得 planning”。当前结果中 recency aging 显著降低 stale-backup rate，尤其在 planning budget `20` 下从 keep-model 的约 `0.336` 降到约 `0.0064`，这个机制证据很清楚。优化建议是优先提交 extended CPU sweep，因为代码实际会扩展 budgets 和 half-life grid；后续再加入 stochastic/gradual drift，避免只依赖 abrupt gridworld change。
+2. Continual Dyna With Model Aging：这是 planning/model-based 方向最强候选。它不是泛泛地说 Dyna planning 有帮助，而是把问题改成“哪些 learned model entries 还值得 planning”。当前 20 seeds extended sweep 显示 freshness-aware sampling 稳定降低 stale-backup rate，尤其在 planning budget `20` 下，keep-model late stale-backup rate 为 `0.213 +/- 0.065`，较短 half-life 的 recency aging 或 recency/error gate 可以接近 0。优化建议是继续加入 stochastic/gradual drift，并把最终 claim 写成 search-control freshness tradeoff，而不是简单 reward superiority。
 
 3. Reward-Centered Continuing Sarsa：这是最清楚的独立主 proposal 之一，问题简洁但不 shallow：continuing control 中 reward origin 不应改变 policy preference，但 ordinary discounted Sarsa 会产生 value-scale inflation。当前 access-control 结果很有说服力，reward-centered/differential variants 在 reward shifts 下保持更稳定 Q norm 和 unshifted reward。优化建议是补 alpha/beta/gamma sweep 与 midstream reward-origin switch，这会把它从强机制实验提升为更完整的 continual adaptation 研究。
 
@@ -113,7 +113,7 @@ Doorway Options 当前被 quarantine。Options 是重要 Core-RL topic，但当�
 
 实验设计：环境在 stream 中途改变 layout/hazard/goal dynamics，agent 继续学习不重置。实验交叉 planning budgets `0, 1, 5, 20` where applicable 和四种 model handling 策略。核心指标包括 real-step average reward、stale-backup rate、model one-step error、planning TD magnitude、model size、post-change recovery window。
 
-当前结果：主结果目录是 `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260708T174237Z_main`。在 planning budget `20` 时，`keep_model` 的 late post-change stale-backup rate 约 `0.336`，`recency_aging` 降到约 `0.0064`；同一条件下 recency aging 的 late reward 也优于 keep-model 和 oracle flush。budget `1` 和 `5` 下 stale backup 也能降低，但 reward recovery 较弱，说明 freshness control 需要足够 planning budget 才能转化为行为收益。
+当前结果：主结果目录是 `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`。在 planning budget `20` 时，`keep_model` 的 late post-change stale-backup rate 为 `0.213 +/- 0.065`；recency aging 可在较短 half-life 下把 stale rate 降到几乎 0，在 half-life `4000` 时仍只有约 `0.020 +/- 0.004`。同一 budget 下 late reward 最好约 `0.0925`，但 reward ranking 会随 half-life 和 model mode 改变，因此不能简单声称某个 aging rule 普遍最优。
 
 当前判断：这是 planning 方向最清楚的课题。它把 Dyna 的“更多 planning”改写成“哪些 model entry 值得 planning”的问题。下一步应跑 extended sweep，并加入 stochastic drift 或 queue-like transition drift，避免结论只依赖单个 abrupt gridworld change。
 
@@ -129,7 +129,7 @@ Doorway Options 当前被 quarantine。Options 是重要 Core-RL topic，但当�
 
 实验设计：跨 maze lengths `8, 12, 20` 评估 trial accuracy、average reward、GVF TD error、cue-alignment margin、hidden cue 信息是否进入控制 state。当前还没有把 generate-and-test/TIDBD 完整接入主实验，而是先做 first-gate：如果固定 cue-GVF 都不能成为有用 state，就不应直接上更复杂的 plasticity claim。
 
-当前结果：主结果目录是 `experiments/alberta_core_rl/results/predictive_state_plasticity/20260708T174842Z_main`。trace memory 和 oracle memory 可以解决任务，trial accuracy 约 `0.93-0.96`；raw 和 old recurrent GVF 接近 chance；redesigned cue-GVF 有正的 cue-alignment margin，说明确实有一些 cue 信号，但 control accuracy 仍接近 chance，约 `0.47-0.49`。
+当前结果：主结果目录已更新为 `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`。20 seeds、maze lengths `8/12/20/30` 下，cue-GVF 仍接近 chance，trial accuracy 约 `0.504/0.508/0.505/0.494`；oracle 保持约 `0.931-0.950`，trace memory 在 length `30` 仍约 `0.827 +/- 0.013`。这比早期 pilot 更清楚地说明：当前 learned GVF feature 不是足够有用的 state。
 
 当前判断：这是一个有价值但高风险的 negative gate。它明确说明“GVF 有一点预测信号”不等于“GVF 是有用 state”。下一步应加入更强的 oracle-prediction control、更直接的 cue information metric，并分阶段接入 feature selection 和 TIDBD，而不是直接宣称 predictive-state plasticity 成功。
 
@@ -147,7 +147,7 @@ Doorway Options 当前被 quarantine。Options 是重要 Core-RL topic，但当�
 
 实验与指标：跨 reward shifts `-4, 0, 4, 8`，记录 unshifted average reward、accept rate、high-priority accept、reward_bar、TD error、Q norm 和 policy probes。主配置在 `experiments/alberta_core_rl/configs/reward_centered_sarsa/config_main.json`。
 
-结果与分析：当前主结果 `experiments/alberta_core_rl/results/reward_centered_sarsa/20260708T153802Z_main` 显示 ordinary discounted Sarsa 的 Q norm 随 reward shift 明显增大，而 reward-centered 和 differential variants 的 value scale 更稳定，并保持更一致的 unshifted reward。该课题是主线候选，下一步需要 extended sweep 和 alpha sensitivity。
+结果与分析：当前主结果已更新为 `experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended`。20 seeds、20000 steps、reward shifts `-8/-4/0/4/8` 与 alphas `0.02/0.05/0.1` 下，reward-centered Sarsa 的 unshifted reward 基本保持在 `2.55-2.60`，Q norm 约 `22-35`；discounted Sarsa 在 shift `8`、alpha `0.1` 时 Q norm 约 `1876`，unshifted reward 约 `1.70`。该课题是主线候选，下一步需要 beta/gamma sensitivity 和 midstream reward-origin switch。
 
 ### 2. Output-Controlled TD
 
@@ -243,7 +243,7 @@ Doorway Options 当前被 quarantine。Options 是重要 Core-RL topic，但当�
 
 方法与实现：实现 continuing gridworld，中途改变 phase；比较不同 planning_steps 和 keep/flush model handling。实现位于 `experiments/alberta_core_rl/studies/planning_offpolicy.py`。
 
-实验与指标：评估 avg reward、stale_backup_rate、model_size、q_norm、recovery windows。当前主结果是 `experiments/alberta_core_rl/results/dyna_planning_budget/20260708T154815Z_main`。
+实验与指标：评估 avg reward、stale_backup_rate、model_size、q_norm、recovery windows。当前主结果已更新为 `experiments/alberta_core_rl/results/dyna_planning_budget/20260709T024602Z_extended`。
 
 结果与分析：planning 能改善 pre-change reward，但 keep-model 在 change 后 stale backups 高，可能拖慢恢复。该 proposal 是 Dyna model aging 综合课题的直接基础。
 
@@ -349,7 +349,7 @@ Agent 与算法：基础 Dyna-Q control 使用真实 step 更新 Q，再从 lear
 
 主要指标：`avg_reward` 衡量真实行为；`stale_backup_rate` 是核心机制指标，直接测 planning 是否浪费在旧 phase entry 上；`mean_model_error` 衡量模型预测质量；`planning_abs_td` 衡量 backup 强度；`recovery_window` 支持 pre/post 分段解释。
 
-当前证据：结果目录 `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260708T174237Z_main`。在 planning budget `20` 时，recency aging 把 late stale-backup rate 从 keep-model 的约 `0.336` 降到约 `0.0064`，late reward 也更好。budget 小时 freshness control 的 reward benefit 不明显，说明“减少 stale backup”需要足够 computation 才能转化为行为收益。
+当前证据：结果目录 `experiments/alberta_core_rl/results/continual_dyna_model_aging/20260709T024602Z_extended`。在 planning budget `20` 时，freshness-aware methods 把 keep-model 的 `0.213 +/- 0.065` late stale-backup rate 降到接近 0 或约 `0.020`；reward 差异依赖 half-life 和 budget，说明“减少 stale backup”与“提高 reward”之间存在 search-control tradeoff。
 
 主要风险：当前是 abrupt gridworld change，staleness 定义清楚但也偏理想化；需要 stochastic/gradual drift 环境和 half-life sweep。`oracle_flush` 只能作为诊断上界，不能作为现实方法宣传。
 
@@ -365,7 +365,7 @@ Agent 与算法：比较 raw observation、trace memory、old recurrent GVF、re
 
 主要指标：`trial_accuracy` 是最终 control 指标；`cue_alignment_margin` 衡量 learned GVF output 是否朝正确 hidden cue 方向分离；`gvf_abs_td_error` 衡量预测学习本身；`avg_reward` 和 `control_td_error` 支持学习动态分析。
 
-当前证据：结果目录 `experiments/alberta_core_rl/results/predictive_state_plasticity/20260708T174842Z_main`。trace/oracle memory 能解任务，raw/old recurrent GVF 近似 chance；redesigned cue-GVF 有正 cue-alignment margin，但 control accuracy 仍接近 chance。这说明当前 GVF 有信号但不是足够有用的 state。
+当前证据：结果目录 `experiments/alberta_core_rl/results/predictive_state_plasticity/20260709T024517Z_extended`。trace/oracle memory 明显优于 chance，cue-GVF 在 maze lengths `8/12/20/30` 下仍约 `0.50`，说明当前 GVF 有局部信号但不是足够有用的 state。
 
 主要风险：negative result 的解释空间很大，可能是 GVF question 不对、GVF output scale 不对、control learner 不会利用小 margin、或者 memory mechanism 结构不够。下一步必须加 oracle-prediction control、cue information metric 和 representation ablation。
 
@@ -381,7 +381,7 @@ Agent 与算法：`discounted_sarsa` 使用 gamma 接近 1 的 ordinary action-v
 
 主要指标：`avg_unshifted_reward` 是任务表现；`q_norm` 是 reward-origin sensitivity 的核心诊断；`reward_bar` 观察 centering baseline 是否跟踪；`high_priority_accept` 和 policy probes 检查策略是否被 shift 干扰。
 
-当前证据：结果目录 `experiments/alberta_core_rl/results/reward_centered_sarsa/20260708T153802Z_main`。ordinary discounted Sarsa 的 value norm 随 reward shift 大幅增长；centered/differential variants 保持更稳定 value scale 和 unshifted reward。
+当前证据：结果目录 `experiments/alberta_core_rl/results/reward_centered_sarsa/20260709T024517Z_extended`。ordinary discounted Sarsa 的 value norm 随 reward shift 大幅增长；centered/differential variants 在 20-seed extended sweep 中保持更稳定 value scale 和 unshifted reward。
 
 主要风险：需要更长 seeds/steps 和 alpha sweep。当前结论主要是机制稳定性，不应过度包装成所有 continuing tasks 上的性能提升。
 
@@ -493,7 +493,7 @@ Agent 与算法：Dyna-Q with planning budget。比较 planning steps `0, 1, 5` 
 
 主要指标：average reward、stale-backup rate、model size、q norm、recovery window。stale-backup rate 是该 proposal 最重要的机制指标。
 
-当前证据：结果目录 `experiments/alberta_core_rl/results/dyna_planning_budget/20260708T154815Z_main`。planning 有 pre-change benefit，但 keep-model 在 change 后 stale backup 高。
+当前证据：结果目录 `experiments/alberta_core_rl/results/dyna_planning_budget/20260709T024602Z_extended`。20-seed larger-grid run 显示 planning 有 pre-change benefit；在 budget `20` 时 keep-model late stale-backup rate 仍约 `0.294`，flush 为 `0`，但 late reward 对 keep/flush 相近，因此它更适合作为 model-aging 前置诊断，而不是单独夸大 reward superiority。
 
 主要风险：基础版本 model handling 太粗；需要 recency aging / model-error gating，这已经在综合课题中实现。
 
@@ -591,4 +591,4 @@ Options、Nonstationary Bandit、Streaming Representation 当前不适合作为�
 2. 对 report 继续做中文/英文双语梳理，确保每个 report 单独打开就能看懂环境、agent、指标、结果和结论。
 3. 对 Predictive State Plasticity 先做 stronger oracle-prediction control 和 cue information metric，再决定是否接入 generate-and-test/TIDBD。
 4. 对 Options 先修 fixed-goal sanity case；如果 fixed-goal 都不成立，不继续讨论 transfer。
-5. CPU task 通道已经提交了一个 `core-rl-infra-smoke-968081` 作业到 `ailab-safethm/safethm_cpu_task`，但截至 2026-07-09 10:23 仍处于 Inqueue/STARTING，尚未产生可用日志。不要在报告中把 cpu_task 当成已验证通过；等 smoke 成功后再提交 extended sweep。
+5. CPU task 通道已经重新验证：旧的 `core-rl-infra-smoke-968081` 和 `core-rl-output-extended-131257-78853482` 使用过强节点约束，已停止；修正后的 `core-rl-cpu-smoke-fixed-50275254` 在 `ailab-safethm/safethm_cpu_task` 成功跑完整个 smoke suite。新的 Output-Controlled TD extended run 是 `core-rl-output-extended-fixed-46602102`，目标结果目录为 `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`；在 summary 和 figures 生成前仍应标为 running。
