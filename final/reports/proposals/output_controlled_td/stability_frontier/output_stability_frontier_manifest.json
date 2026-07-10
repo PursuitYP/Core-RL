@@ -1,0 +1,22 @@
+{
+  "primary": {
+    "result_dir": "experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended",
+    "condition_rows": 80,
+    "frontier_rows": 20,
+    "outputs": [
+      "primary_condition_stability.csv",
+      "primary_max_stable_alpha_frontier.csv",
+      "report_primary_max_stable_alpha_frontier.png"
+    ]
+  },
+  "fairness": {
+    "result_dir": "experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended",
+    "condition_rows": 150,
+    "frontier_rows": 25,
+    "outputs": [
+      "fairness_condition_stability.csv",
+      "fairness_max_stable_alpha_frontier.csv",
+      "report_fairness_max_stable_alpha_frontier.png"
+    ]
+  }
+}

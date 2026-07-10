@@ -26,7 +26,7 @@ Compute need / fallback：extended first-gate run 已完成。如果不继续跑
 
 ## 独立研究范围
 
-本 proposal 是独立的 representation/partial-observability study。当前范围是 T-maze partial observability 下的 fixed predictive state；limited-budget feature replacement、generated traces 和 feature-wise step-size adaptation 是同一研究计划内的后续阶段，必须等 useful predictive feature gate 更清楚后再推进。当前 claim 只基于 fixed predictive-state gate、trial accuracy 和 cue-decodability evidence。
+本 proposal 是独立的 representation/partial-observability study。当前范围是 T-maze partial observability 下的 fixed predictive state；limited-budget feature replacement、generated traces 和 feature-wise step-size adaptation 都是 future-work mechanisms，必须等 useful predictive feature gate 更清楚后再推进。当前 negative claim 不依赖这些后续机制，只基于 fixed predictive-state gate、trial accuracy 和 cue-decodability evidence。
 
 本 proposal 明确不声称 GVFs 一般失败。它只说明当前 cue-GVF 和 recurrent-GVF constructions 在这个 setting 中没有强到足以被 downstream linear control 使用。这个边界很重要，因为它把负结果变成设计约束，而不是对 predictive knowledge 的泛化否定。
 
@@ -34,7 +34,7 @@ Compute need / fallback：extended first-gate run 已完成。如果不继续跑
 
 证据等级：高价值 negative gate，并有 20-seed extended evidence。完成 run 覆盖 maze lengths `8, 12, 20, 30`、5 种 representation modes，每个 condition 20000 online steps。证据足以说明当前 learned GVF features 没有在这个 T-maze 中成为 useful state。
 
-证据还不是 positive plasticity result。当前已经加入 cue-decodability probe，但还没有 oracle-prediction control、GVF output normalization、feature ablations、phase switches、limited-budget feature replacement 或完整定义的 feature-wise step-size adaptation baseline。这些不是小细节，而是把负结果推进成完整研究计划所需的 next gates。
+证据还不是 positive plasticity result。当前已经加入 cue-decodability probe，但还没有 oracle-prediction control、GVF output normalization、feature ablations、phase switches、limited-budget feature replacement 或完整定义的 feature-wise step-size adaptation baseline。这些是 future work，不是当前 claim 的隐藏支撑。
 
 ## 论文式贡献与 Claim 边界
 
@@ -102,7 +102,7 @@ cue-GVF 的 cue-alignment margin 在较短长度上有一些正信号，但随 m
 
 这个结果应被视为 negative gate，而不是失败后放弃。cue-decodability probe 缩小了失败原因：当前 cue-GVF 确实携带弱 hidden-cue information，但该信息没有成为有效 control state。可能原因包括：GVF cumulant/horizon 设计不对；GVF output scale 不适合 Sarsa control；control step size 没有针对 predictive feature 调整；cue signal 虽然存在但不够 linearly separable；或者 cheap trace memory 本身就是这个任务的强 baseline。
 
-因此，下一个严谨版本应先加入 oracle-prediction control、GVF output normalization、feature ablation，再考虑有限 feature budget 下的 candidate-feature replacement 和 feature-wise step-size adaptation。
+因此，下一个严谨版本应先加入 oracle-prediction control、GVF output normalization、feature ablation。只有当固定 predictive feature 能产生 control benefit 后，才应进入有限 feature budget 下的 candidate-feature replacement 和 feature-wise step-size adaptation。
 
 ## 局限
 
@@ -110,7 +110,7 @@ cue-GVF 的 cue-alignment margin 在较短长度上有一些正信号，但随 m
 
 ## 审稿式批评与修订
 
-严格审稿人可能会问：“GVF 是负结果，为什么还继续？”回答是：负结果正是设计信号，说明当前 GVF question 没有把 cue 信息变成可用控制 state。另一个批评是课题太大。对此，proposal 应分层推进：先验证 fixed useful GVF questions，再做 limited-budget selection，最后做 step-size plasticity；不能在第一层没通过时直接宣传 combined plasticity 成功。当前修订已经把报告明确定位为 negative/redesign gate，并通过 20-seed extended run 加强证据。
+严格审稿人可能会问：“GVF 是负结果，为什么还继续？”回答是：负结果正是设计信号，说明当前 GVF question 至多携带弱 cue information，但没有把它变成可用 control state。另一个批评是课题太大。对此，当前报告只保留 fixed predictive-state gate；limited-budget selection 和 step-size plasticity 都是 future work，不作为当前 claim 的证据。当前修订已经把报告明确定位为 negative/redesign gate，并通过 20-seed extended run 加强证据。
 
 逐 proposal 审查矩阵：
 

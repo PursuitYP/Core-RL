@@ -8,6 +8,20 @@
 
 当前 pilot 只支持这个故事中的机制部分。TIDBD-lite 在 switch 后展示了可解释的 feature-wise alpha dynamics，但 normalized TD 的 late prediction error 略低。因此本 proposal 是 mechanism diagnostic，不是 performance victory。它的价值在于区分“learner 以合理方式改变 internal learning rates”和“learner 改善 prediction objective”。
 
+## Evidence Summary / 证据摘要
+
+本报告是 adaptive step sizes 的机制研究。它不声称简化的 TIDBD-lite learner 已经是更好的 predictor，而是分开考察 continual-learning 讨论中经常混在一起的两个问题：learner 是否以合理方向移动 feature-wise step sizes，以及这种移动是否改善 downstream TD prediction objective。当前证据对第一个问题是部分肯定，对第二个问题是否定。
+
+| 项目 | 当前证据 |
+|---|---|
+| RL question | Per-feature step-size adaptation 能否在 online TD prediction 中追踪 changing feature relevance？ |
+| Testbed | Nonstationary sensor prediction stream，包含 old-relevant、new-relevant 和 distractor feature groups；stream 中点发生 relevance switch。 |
+| Compared learners | Fixed-alpha TD（`0.01`、`0.03`、`0.1`）、normalized TD 和简化 TIDBD-lite。 |
+| Seeds and horizon | 五个 seeds，每个 learner `5000` online steps。 |
+| Primary metric | Post-change absolute TD error；group-wise alpha trajectories 是机制诊断。 |
+| Headline result | TIDBD-lite 把 new-feature alpha 从 switch 前约 `0.0068` 提高到 switch 后 late window 约 `0.0093`，同时 distractor alpha 接近 `0.0068`；但 normalized TD 的 late post-change absolute TD error（`0.4419 +/- 0.0085`）低于 TIDBD-lite（`0.4493 +/- 0.0119`）。 |
+| Conclusion boundary | 证据支持可见 adaptive-step-size dynamics，但不支持 performance advantage。更强 claim 需要 canonical TIDBD/AutoStep、repeated switches、recovery AUC 和 alpha-utility correlation。 |
+
 ## Claim 边界
 
 本报告只提出一个受限 claim：

@@ -92,18 +92,26 @@ The scale conditions are not meant to be realistic sensor models by themselves. 
 
 ## Results
 
+Read the heatmaps as stability atlases, not as scoreboards. The divergence panels determine which cells are valid. In RMSE and output-change panels, a diverged cell is a failure case even if its color is clipped or based on the last available logged values; it should not be interpreted as a meaningful final-performance value. Blank or `n/a` cells mean the plotted aggregate is undefined, usually because no non-diverged stable tail is available for that condition or because that algorithm variant was not part of that sweep.
+
 ![Tail RMSE stability atlas shown as readable panels by algorithm, scale, and alpha.](figures/report_log_rmse_heatmap_panels.png)
 
 ![Seed-level divergence-rate atlas shown as readable panels by algorithm, scale, and alpha.](figures/report_divergence_heatmap_panels.png)
 
 ![Tail output-change atlas shown as readable panels by algorithm, scale, and alpha.](figures/report_prediction_change_heatmap_panels.png)
 
-| Algorithm | Lambda | Seed-conditions diverged | Non-diverged final RMSE mean | Interpretation |
-|---|---:|---:|---:|---|
-| fixed TD | 0.0 | `141/400` (`35.2%`) | `0.551` | Stable in easy scales but catastrophically scale-sensitive. |
-| normalized TD | 0.0 | `0/400` (`0.0%`) | `0.461` | Stable across every tested scale and alpha. |
-| trace-normalized TD(lambda) | 0.8 | `0/400` (`0.0%`) | `0.497` | Stable with traces when the trace direction is normalized. |
-| true-online TD(lambda), raw alpha | 0.8 | `141/400` (`35.2%`) | `0.382` | Low RMSE on surviving easy conditions, but many high-scale conditions diverge. |
+The max-stable-alpha frontier below compresses the primary sweep into the question a practitioner would ask first: for each algorithm and feature scale, how large can alpha be before any seed-level divergence appears? In the primary grid, normalized TD and trace-normalized TD(lambda) remain stable up to the largest tested alpha `0.3` for every scale. Fixed TD and raw-alpha true-online TD(lambda) have no fully stable `hundred`-scale cell and shrink to alpha `0.03` under `uneven` scaling.
+
+![Primary-sweep max-stable-alpha frontier by algorithm and feature scale.](stability_frontier/report_primary_max_stable_alpha_frontier.png)
+
+The compact table below uses the artifact's seed-tail summaries and condition-level stable cells for the best-RMSE entry: a stable cell means zero diverged seeds for that algorithm, scale, and alpha. This avoids ranking an algorithm by survivors from a condition that has already shown seed-level failure.
+
+| Algorithm | Stable region | Best stable tail RMSE (log10; cell) | Divergence count/risk | Prediction-change behavior | Interpretation |
+|---|---|---:|---|---|---|
+| fixed TD | `12/20` cells: all `one`; `ten` through alpha `0.1`; `uneven` through `0.03`; `lognormal` through `0.1`; no `hundred` cell. | `0.184` (`-0.736`; `ten`, alpha `0.1`) | `141/400` (`35.2%`); full failure at `hundred`, `ten` alpha `0.3`, and `uneven` alpha `0.1/0.3`; small `lognormal` alpha `0.3` risk. | Stable-cell tail change mean `0.010`, max `0.103`; diverged cells are outside valid output-change comparison. | Raw alpha can learn in easy units, but stability is tied to feature scale. |
+| normalized TD | `20/20` cells: every tested scale and alpha. | `0.264` (`-0.578`; `uneven`, alpha `0.3`) | `0/400` (`0.0%`); no observed seed-level divergence. | Stable-cell tail change mean `9.51e-4`, max `0.003`. | Feature normalization turns the alpha grid into a stable output-change range. |
+| trace-normalized TD(lambda) | `20/20` cells: every tested scale and alpha. | `0.388` (`-0.412`; `lognormal`, alpha `0.3`) | `0/400` (`0.0%`); no observed seed-level divergence. | Stable-cell tail change mean `2.78e-4`, max `0.002`. | Normalizing the eligibility-trace direction preserves stability with lambda `0.8`. |
+| true-online TD(lambda), raw alpha | `12/20` cells: same stable region as fixed TD. | `0.149` (`-0.826`; `ten`, alpha `0.03`) | `141/400` (`35.2%`); same failed scale/alpha cells as fixed TD. | Stable-cell tail change mean `0.002`, max `0.006`; failures appear when raw alpha meets high feature scale. | Strong when stable, but this raw-alpha baseline is not a fair final ranking of true-online TD(lambda). |
 
 Fixed TD diverges for all seeds at scale `hundred` for every tested alpha, at scale `ten` for alpha `0.3`, and at scale `uneven` for alphas `0.1` and `0.3`. It also has a small but real divergence rate under `lognormal` at alpha `0.3`.
 
@@ -119,19 +127,25 @@ Extended result path: `experiments/alberta_core_rl/results/output_controlled_td_
 
 CPU task: `core-rl-output-fairness-extended-rerun-29576456`, succeeded on 2026-07-09 17:41 HKT.
 
+The same visual rule applies to the fairness-audit panels. The normalized true-online variant is included only here, so primary-sweep absences are design gaps rather than negative evidence. For RMSE and output-change, cells with divergence or `n/a` should be read as outside the valid comparison region; the divergence panel and the table below state the failure risk directly.
+
 ![Fairness-audit tail RMSE panels by scale, algorithm, and alpha.](fairness_figures/report_log_rmse_heatmap_panels.png)
 
 ![Fairness-audit seed-level divergence panels by scale, algorithm, and alpha.](fairness_figures/report_divergence_heatmap_panels.png)
 
 ![Fairness-audit output-change panels by scale, algorithm, and alpha.](fairness_figures/report_prediction_change_heatmap_panels.png)
 
-| Algorithm | Lambda | Fairness-audit seed-conditions diverged | Main interpretation |
-|---|---:|---:|---|
-| fixed TD | 0.0 | `81/300` (`27.0%`) | Fails under large uniform feature scale and also under high-alpha uneven/ten-scale settings. |
-| normalized TD | 0.0 | `0/300` (`0.0%`) | Stable across all tested scales and alphas in this prediction audit. |
-| trace-normalized TD(lambda) | 0.8 | `0/300` (`0.0%`) | The trace-normalized update direction remains stable across the wider grid. |
-| true-online TD(lambda), raw alpha | 0.8 | `81/300` (`27.0%`) | Matches fixed TD's seed-level failure count under feature-scale stress. |
-| true-online TD(lambda), normalized audit | 0.8 | `34/300` (`11.3%`) | Removes the uniform-scale failures but still fails under lognormal feature scaling, so naive normalization is not a complete true-online answer. |
+The fairness-audit frontier adds two important details. First, the wider alpha grid finds a tiny stable alpha `0.001` for fixed TD and raw-alpha true-online TD(lambda) under uniform `hundred` scaling, showing that raw-alpha methods can be rescued by scale-specific tuning. Second, the naive normalized true-online audit variant is stable up to `0.3` on `one`, `ten`, `hundred`, and `uneven`, but has no fully stable `lognormal` alpha. This is the clearest visual reason for the report's bounded conclusion: output control helps true-online traces, but heterogeneous feature scaling still needs a more principled derivation.
+
+![Fairness-audit max-stable-alpha frontier by algorithm and feature scale.](stability_frontier/report_fairness_max_stable_alpha_frontier.png)
+
+| Algorithm | Stable region | Best stable tail RMSE (log10; cell) | Divergence count/risk | Prediction-change behavior | Interpretation |
+|---|---|---:|---|---|---|
+| fixed TD | `21/30` cells: all `one`; `ten` through alpha `0.1`; `hundred` only alpha `0.001`; `uneven` through `0.03`; `lognormal` through `0.1`. | `0.173` (`-0.763`; `hundred`, alpha `0.001`) | `81/300` (`27.0%`); high-alpha and large-scale failures remain. | Stable-cell tail change mean `0.003`, max `0.027`; unstable cells are not valid RMSE comparisons. | A wider alpha grid finds a tiny safe `hundred` step, but raw alpha remains scale-fragile. |
+| normalized TD | `30/30` cells: every tested scale and alpha. | `0.253` (`-0.596`; `uneven`, alpha `0.3`) | `0/300` (`0.0%`); no observed seed-level divergence. | Stable-cell tail change mean `6.62e-4`, max `0.004`. | The ordinary normalized update remains stable on the wider audit grid. |
+| trace-normalized TD(lambda) | `30/30` cells: every tested scale and alpha. | `0.389` (`-0.411`; `lognormal`, alpha `0.3`) | `0/300` (`0.0%`); no observed seed-level divergence. | Stable-cell tail change mean `1.90e-4`, max `0.001`. | Trace normalization gives the most conservative output changes and the broadest stable trace region. |
+| true-online TD(lambda), raw alpha | `21/30` cells: same stable region as fixed TD. | `0.134` (`-0.874`; `ten`, alpha `0.03`) | `81/300` (`27.0%`); same seed-level failure count as fixed TD. | Stable-cell tail change mean `0.002`, max `0.007`. | Good stable-cell RMSE does not remove the raw-alpha fairness problem. |
+| true-online TD(lambda), normalized audit | `24/30` cells: all non-`lognormal` cells; no `lognormal` alpha is fully stable. | `0.135` (`-0.868`; `hundred`, alpha `0.3`) | `34/300` (`11.3%`); all failures are under `lognormal`, ranging from `1/10` to `10/10` seeds by alpha. | Stable-cell tail change mean `0.001`, max `0.005`. | Simple normalization fixes uniform-scale failure but not the heterogeneous lognormal trace-correction interaction. |
 
 ## Analysis
 
@@ -145,7 +159,7 @@ The task is prediction-only. That makes the feature-scale mechanism clean, but a
 
 Feature scaling is synthetic. This is appropriate for an invariance test, but real sensor streams may have drifting scale, changing relevance, and partial observability. A no-reset feature-scale switch remains the most important next experiment.
 
-The divergence metric is now seed-level, which is more interpretable than logged-row averages, but final RMSE is still measured at the last logged point rather than as an area-under-learning-curve statistic. Future analysis should report both stability and learning speed.
+The divergence metric is now seed-level, which is more interpretable than logged-row averages, but RMSE is still summarized near the end of the run rather than as an area-under-learning-curve statistic. Future analysis should report both stability and learning speed.
 
 ## Reviewer Critique And Revisions
 
@@ -155,7 +169,7 @@ Function-approximation reviewer: true-online TD(lambda) should not be treated un
 
 Reproducibility reviewer: the CPU job looked stuck because the old runner wrote results only at the end. Response: the job succeeded; future Output-Controlled TD runs now print condition-level progress. The report also records the rjob ownership issue and stores figures in the report folder.
 
-Per-proposal audit matrix:
+Reviewer Audit Matrix:
 
 | Reviewer angle | Critique | Action taken | Remaining risk |
 |---|---|---|---|
@@ -216,4 +230,10 @@ PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconf
   --kind output-td \
   --result-dir experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended \
   --figure-dir final/reports/proposals/output_controlled_td/fairness_figures
+
+PYTHONNOUSERSITE=1 PYTHONPYCACHEPREFIX=/tmp/core-rl-pycache MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/analyze_output_stability_frontier.py \
+  --primary-result-dir experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended \
+  --fairness-result-dir experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended \
+  --out-dir final/reports/proposals/output_controlled_td/stability_frontier
 ```

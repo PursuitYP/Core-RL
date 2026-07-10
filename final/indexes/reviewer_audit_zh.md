@@ -52,7 +52,7 @@
 
 主要批评：多个报告仍使用过载 learning-curve 图，图例挤压主图，不能支撑最终报告结论。
 
-处理状态：已为 Output-Controlled TD、Reward-Centered Sarsa、On-policy Stability Atlas、Dyna Planning Budget、Unit-Switching Continuing Control、Scale-Invariant Continuing Control、Dyna Aging 和 Predictive State Plasticity 生成 report-ready summary figures 或 heatmaps，并替换正式报告引用。
+处理状态：已为 Output-Controlled TD、Reward-Centered Sarsa、On-policy Stability Atlas、Dyna Planning Budget、Unit-Switching Continuing Control、Scale-Invariant Continuing Control、Dyna Aging、Predictive State Plasticity 和 Useful Predictive Knowledge 生成 report-ready summary figures 或 heatmaps，并替换正式报告引用。
 
 主要批评：Predictive State Plasticity 题目大于当前证据。
 
@@ -64,27 +64,33 @@
 
 主要批评：用户明确要求逐条核验原始需求后，`requirements_audit` 和 `status` 文档仍有过度完成表述。
 
-处理状态：`final/indexes/requirements_audit_zh.md` 和 `final/indexes/status_zh.md` 已改成保守的 gap-tracking 口径。现在会区分“结构上覆盖”和“研究深度完成”，明确记录缺少的 Proposal Template sections、弱/暂停 proposal 的真实状态。后续 CPU 任务完成后，`core-rl-scale-invariant-extended-33723554` 已从 running 状态升级为 completed evidence。
+处理状态：`final/indexes/requirements_audit_zh.md` 和 `final/indexes/status_zh.md` 已改成保守的 gap-tracking 口径。现在会区分“结构上覆盖”和“研究深度完成”，并诚实记录弱/暂停 proposal 的真实状态。后续 CPU 任务完成后，Scale-Invariant、Reward Sensitivity、Output Fairness 和 Dyna Drift 都已从 running/status 记录升级为 completed evidence。
 
 主要批评：即使索引修正后，正式报告本体仍缺显式 Proposal Template answers、独立研究范围、证据等级、实验设计依据和逐 proposal 审查记录。
 
-处理状态：16 个英文报告和 16 个中文报告现在都已经包含必要结构章节。强 proposal 按强证据但仍需补实验处理；弱 proposal 明确写成 supporting、negative、dropped 或 quarantined。结构审计记录在 `final/indexes/report_section_audit_zh.md`。
+处理状态：17 个英文报告和 17 个中文报告现在都已经包含必要结构章节。强 proposal 按强证据但仍需补实验处理；弱 proposal 明确写成 supporting、negative、dropped 或 quarantined。结构审计记录在 `final/indexes/report_section_audit_zh.md`。
+
+### 并行独立性与过度 claim 审查
+
+主要批评：只读并行审查没有发现严重的跨报告依赖，但发现几个剩余 overclaim 风险。`GVF Predictive State` 在缺少 direct cue-decodability probe 的情况下，说 learned GVF 没有携带 cue information，证据只能支持“没有成为 usable control state”。`Nonstationary Bandit` 在只有五个 seeds 且置信区间很宽时使用了“确认”语言。`Reward-Centered Sarsa` 和 `Scale-Invariant Continuing Control` 的 “necessary” 表述听起来超过了当前 access-control grids 能证明的范围。`Predictive State Plasticity` 仍多次提到 limited-budget replacement 和 feature-wise plasticity，可能被误读成当前 evidence，而不是 future work。
+
+处理状态：相关英文和中文报告已修订。`GVF Predictive State` 现在写成 recurrent GVF 没有成为 usable control state，并明确 direct cue information 在该 pilot 中尚未测量。`Nonstationary Bandit` 改用“提示”和 “sanity-check observation” 口径。`Reward-Centered Sarsa` 与 `Scale-Invariant Continuing Control` 把最强表述限制在 tested access-control variants 和 combinations 中。`Predictive State Plasticity` 明确 limited-budget replacement、generated traces 和 feature-wise step-size adaptation 是 future-work mechanisms，不是当前 fixed predictive-state gate 的证据。
 
 ## 当前待办
 
 - 继续深化刚补上的 Proposal Template、证据等级和 reviewer sections；第一轮结构修复已经完成，但不是每个报告都已经 paper-perfect。
-- 继续 Output-Controlled TD follow-up：在已完成 fairness audit 后，补更 principled 的 true-online TD(lambda) output-control derivation、max-stable-alpha analysis，以及 no-reset feature-scale switch 实验。
+- 继续 Output-Controlled TD follow-up：在已完成 fairness audit 和 max-stable-alpha frontier 后，补更 principled 的 true-online TD(lambda) output-control derivation，以及 no-reset feature-scale switch 实验。
 - 继续 Scale-Invariant follow-up：在已完成 fixed-condition grid 后，补 gradual unit drift、recovery AUC 和 policy-distance probes。
-- 如果 `reward_centered_sarsa` 被选为最终独立题目，需要补 beta/gamma sweep 和 midstream reward-origin switch。
-- Dyna aging 在做一般化结论前，需要加入 gradual/stochastic drift environments。
+- Reward-Centered 已完成 beta/gamma/no-reset switch 和 early recovery score；下一步应补 matched-seed recovery analysis、policy-distance probes 和 natural reward drift。
+- Dyna aging 已完成 abrupt/gradual/stochastic drift sweep 和 reward/staleness frontier；下一步应补 repeated changes 和 true per-backup planning-utility logging。
 - 在把 true-online TD(lambda) 作为强负 baseline 前，需要补 max-stable-alpha audit。
-- 在尝试把 GVF predictive-state 写成正结果前，需要补 cue-decodability 和 downstream-control ablations。
+- Useful Predictive Knowledge 在已完成 feature-budget gate 之后，下一步应补 oracle-prediction scaling、GVF-output normalization、prediction-to-policy coupling、downstream-control ablations 和后续 plasticity stages，然后才能尝试正向 predictive-state claim。
 
 ## 本轮验证记录
 
 - `final/` 下所有 Markdown 图片链接检查通过。
 - 本轮修复后 `final/reports/**/report*.md` 图片检查通过，缺失图片为 0。
-- 16 个英文 `report.pdf` 已重新生成，PDF 导出输出中 `missing_images=0`。
+- 本轮修改后 17 个英文 `report.pdf` 都已重新导出；`final/indexes/english_report_pdf_manifest.json` 记录每个 report 的 `missing_images=0`。
 - `python -m compileall experiments/alberta_core_rl` 已完成且无报错。
 - 编译检查生成的 `__pycache__` 没有完全清理：`experiments/alberta_core_rl/` 下两个目录由 `nobody:nogroup` 拥有，普通用户删除时会 permission denied。
 - 拆分 report plotting utilities 后，Python 源文件仍满足每个文件低于 500 行的维护建议；当前最大文件是 `envs.py`，474 行。

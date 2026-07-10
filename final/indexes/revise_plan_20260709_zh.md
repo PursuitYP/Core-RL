@@ -1,26 +1,28 @@
 # 2026-07-09 全量 Revise Plan
 
-本文档保存本轮大版本优化计划，方便后续继续执行、审阅和追踪。范围按用户确认执行：覆盖全部 16 个正式研究对象，包括 13 个 ordinary proposal 和 3 个 integrated proposal。每个 Proposal 都作为独立研究课题维护，不用总论文替代，不强行混杂；integrated proposal 继续作为更大、更综合但仍然独立的大 Proposal。
+本文档保存本轮大版本优化计划，方便后续继续执行、审阅和追踪。范围按用户确认执行：当前覆盖全部 17 个正式研究对象，包括 13 个 ordinary proposal 和 4 个 integrated proposal。每个 Proposal 都作为独立研究课题维护，不用总论文替代，不强行混杂；integrated proposal 继续作为更大、更综合但仍然独立的大 Proposal。
 
 ## 当前状态
 
 CPU task `core-rl-output-extended-fixed-46602102` 已经完成，状态为 `Succeeded`。输出目录为 `experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended`，已经写出 `metrics.csv`、`summary.json`、`condition_summary.json`、`config_used.json`、`manifest.json`。`summary.json` 记录 `elapsed_sec` 约为 `2505`，`n_rows = 2672969`，`n_condition_groups = 80`。这份结果必须从 incomplete/running 状态改为 current evidence，并纳入 Output-Controlled TD 的报告、图表、索引和 PDF。
 
-当前正式材料结构是：`final/reports/proposals/` 下有 13 个 ordinary proposal 报告，`final/reports/integrated/` 下有 3 个 integrated proposal 报告；每个正式报告目录应以 `report.md`、`report_zh.md`、`report.pdf` 为主入口。`final/archive/` 只保留历史碎片和审计材料，不作为当前结论来源。
+当前正式材料结构是：`final/reports/proposals/` 下有 13 个 ordinary proposal 报告，`final/reports/integrated/` 下有 4 个 integrated proposal 报告；每个正式报告目录应以 `report.md`、`report_zh.md`、`report.pdf` 为主入口。`final/archive/` 只保留历史碎片和审计材料，不作为当前结论来源。
 
 长 CPU task `core-rl-scale-invariant-extended-33723554` 已成功。它在 `ailab-safethm/safethm_cpu_task` 上运行 `scale_invariant_continuing_control/config_extended.json`，并把标准 artifacts 写到 `experiments/alberta_core_rl/results/scale_invariant_continuing_control/20260709T063128Z_extended`。该目录现在已经是 evidence，并已纳入 Scale-Invariant report、figures 和 indexes。
 
+第二轮 Reward-Centered sensitivity 和 Dyna drift CPU reruns 也已经写出标准 artifacts，现在是 evidence。Reward sensitivity 路径为 `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended`，包含 10 seeds、`8,112,150` 行 metrics 和 `1,575` 个 condition groups。Dyna drift 路径为 `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended`，配置 10 seeds，写出 `1,800,900` 行 metrics 和 `690` 个 condition groups。新的 Useful Predictive Knowledge integrated proposal 已完成第一轮 gate，报告路径为 `final/reports/integrated/useful_predictive_knowledge/report.md`，结果路径为 `experiments/alberta_core_rl/results/useful_predictive_knowledge/20260709T102402Z_main`。
+
 ## 诚实缺口声明
 
-上一轮实际完成的是一部分基础清理和 Output-Controlled TD extended evidence 的纳入，而不是完成了用户原始需求中的“大幅重构每个 Proposal”。当前仍然存在明显缺口：多数 proposal 的研究动机、研究问题和实验设计仍偏短；很多弱 proposal 只有 5-seed pilot 或 single diagnostic figure；Proposal Template answers 没有在所有报告中以一致结构呈现；中英文虽然成对存在，但并非每一处都逐段完全一致；多角色审查主要在索引层记录，还没有逐个 proposal 形成系统的审查-修订闭环；新的更大综合课题还没有形成完整 proposal/report/实验计划。因此，后续不能把当前状态称为完成，只能称为一个经过初步证据同步和索引修复后的中间状态。
+前几轮已经完成重要基础清理、证据同步和若干 targeted extended sweeps。本轮补上了 Useful Predictive Knowledge 的第一轮 feature-budget stage，因此 representation 方向现在同时有 decodability/control-usefulness evidence 和 two-feature budget-selection gate。但仍不能说已经完成用户原始需求中的“每个 Proposal 都达到论文级深度”：很多弱 proposal 只有 5-seed pilot 或 single diagnostic figure；中英文虽然成对存在，但并非每一处都逐段完全一致；多角色审查已进入每个 report，但仍较简洁；Useful Predictive Knowledge 仍缺 oracle-prediction scaling、explicit prediction-to-policy coupling 和 phase-switch plasticity。因此，当前状态是显著改进的中间状态，不是最终完成版。
 
 ## 原始需求逐条执行矩阵
 
 | 原始需求 | 当前真实状态 | 缺口 | 必须完成的动作 | 验收标准 |
 |---|---|---|---|---|
-| 0. 每个 Proposal 独立研究全流程 | 目录上已分为 13 个 ordinary + 3 个 integrated，每个有独立 report。 | 许多 report 仍像 mini-report，缺少完整 proposal-template answers、独立实验闭环和独立审查记录。 | 为 16 个 proposal 统一补 `Proposal Template Answers`、`Independent Research Scope`、`Evidence Level`、`Required Next Experiments`、`Reviewer Audit`。 | 单独打开任意 `report.md` 不依赖 overview 就能判断做了什么、为什么做、证据强弱和下一步。 |
+| 0. 每个 Proposal 独立研究全流程 | 目录上已分为 13 个 ordinary + 4 个 integrated，每个有独立 report。 | 部分 report 仍需更强论文式故事线和更丰富证据，但已经有显式 template/scope/evidence/audit 结构。 | 继续深化 17 个 report 的 `Proposal Template Answers`、`Independent Research Scope`、`Evidence Level`、`Required Next Experiments`、`Reviewer Audit`。 | 单独打开任意 `report.md` 不依赖 overview 就能判断做了什么、为什么做、证据强弱和下一步。 |
 | 1. 重构动机、问题、方案、实验和结果分析 | Reward-Centered 和 Output-Controlled 较清楚；Dyna Aging 和 Scale-Invariant 有较强主线；其他多为短报告。 | 许多 proposal 的故事线、研究问题、实验设计和失败分析仍不够论文级。 | 逐个 proposal 做 gap review：保留、补强、降级或 quarantine；为强 proposal 补实验；弱 proposal 写清失败机制和升级条件。 | 每个 report 至少包含明确 hypothesis、environment rationale、baseline rationale、metric rationale、result interpretation、threats。 |
-| 2. 组合成更大问题但不拼凑 | 已有三个 integrated proposal。 | Integrated 还没有全部达到“更大但自洽”的论文深度；弱 representation 线尚未被组织成一个 coherent larger topic。 | 保留三个 integrated；新增一个候选大题 `Useful Predictive Knowledge Under Partial Observability and Resource Limits`，把 GVF Predictive State、GVF Question Design、Generate-Test、TIDBD 的共同问题收束为“prediction 何时成为 useful state”。 | 新大题必须有单一研究动机、统一环境族、分阶段实验和明确成功/失败判据，不是把多个旧结果拼接。 |
+| 2. 组合成更大问题但不拼凑 | 现在已有四个 integrated proposal，包括 Useful Predictive Knowledge。 | 新 representation 大题已有 Gate-1/Gate-2 evidence 和 Gate-3 feature-budget selection result，但 plasticity 和 oracle-prediction scaling 仍未完成。 | 保留四个 integrated；继续深化 Useful Predictive Knowledge 的 oracle-prediction scaling、prediction-to-policy coupling 和 plasticity experiments。 | 新大题必须有单一研究动机、统一环境族、分阶段实验和明确成功/失败判据，不是把多个旧结果拼接。 |
 | 3. 深入 Alberta Plan/Core RL 并提出更综合大问题 | 已有 Alberta Plan lens 和若干文献列表。 | 文献还没有充分进入每个 proposal 的动机和实验设计；新综合问题还没有完整落地。 | 在每个强 proposal 中嵌入相关文献：reward centering、intentional updates、GVF/Horde、Dyna/search-control、emphatic/off-policy、options、average reward。 | 每个 report 的 related work 不只是列文献，而是解释该文献如何改变研究问题或实验设计。 |
 | 4. 图表多样且清晰 | 部分图已换成 heatmap/summary figure；Output-Controlled 已有新图。 | 弱 proposal 图仍少，部分结果缺表，图表和结论的对应关系不够强。 | 为每个 proposal 指定 1-3 个主图/表：heatmap、seed-level table、recovery-window plot、mechanism diagnostic plot 或 negative result table。 | 每张图都有明确回答的问题；不使用挤压图例的 spaghetti plot 作为主证据。 |
 | 5. 起码十多个角度审阅并完善 | `reviewer_audit` 有总体审查。 | 缺少每个 proposal 的 12-role audit matrix 和修订状态。 | 建立逐 proposal 审查表，角色包括 Alberta Plan、Core RL、average reward、stability、GVF、planning、continual learning、statistics、reproducibility、code、writing、strict instructor。 | 每个 proposal report 或 companion audit 中有“批评-处理-剩余风险”。 |
@@ -36,13 +38,13 @@ CPU task `core-rl-output-extended-fixed-46602102` 已经完成，状态为 `Succ
 
 ## 实施计划
 
-1. Evidence and index cleanup：修正 `experiments/alberta_core_rl/results/README.md` 中重复的 incomplete section；移除所有关于 Output-Controlled TD extended run 仍在运行或不可引用的旧说法；同步更新 `final/indexes/results.md`、`results_zh.md`、`status.md`、`status_zh.md`、`reviewer_audit.md`、`reviewer_audit_zh.md`、`proposal_overview.md`、`proposal_overview_zh.md`。
+1. Evidence and index cleanup：移除所有关于 Output-Controlled TD、Reward Sensitivity、Dyna Drift 或 Scale-Invariant 仍在运行或不可引用的旧说法；每当 result directory 成为 evidence 时，同步更新 `final/indexes/results.md`、`results_zh.md`、`status.md`、`status_zh.md`、`reviewer_audit.md`、`reviewer_audit_zh.md`、`proposal_overview.md`、`proposal_overview_zh.md`。
 
 2. Output-Controlled TD immediate incorporation：从 `20260709T051934Z_extended` 生成新的 report-ready heatmaps 和 seed-level divergence table；更新 `final/reports/proposals/output_controlled_td/report.md`、`report_zh.md` 和同目录 `report.pdf`。报告中必须说明 RuntimeWarning 是高 scale/high alpha 发散条件的 evidence，不是 job failure；并且 true-online TD(lambda) 的负面结果只评价当前 raw-alpha baseline，不作为对算法本身的泛化否定。
 
 3. Per-proposal deep revise：`reward_centered_sarsa` 和 `output_controlled_td` 是最强 ordinary standalone proposal；`scale_invariant_continuing_control` 和 `continual_dyna_model_aging` 是最强 integrated proposal；`predictive_state_plasticity` 是高价值 negative gate，需要重写为 “learned predictions do not automatically become useful state” 的 representation/GVF 研究。`centered_td_diagnostics`、`onpolicy_stability_atlas`、`dyna_planning_budget`、`gvf_question_design`、`baird_offpolicy_stability` 保持独立但定位为 supporting/diagnostic。`nonstationary_bandit`、`streaming_representation`、`options_reusable_subtasks`、`generate_test_features`、`tidbd_plasticity` 需要诚实标注为 weak/negative/quarantined 或待 redesign。
 
-4. Experiment expansion：Reward-Centered Sarsa 补 beta/gamma sweep、midstream reward-origin switch 和 policy-probe stability；Output-Controlled TD 补 true-online audit、max-stable-alpha table 和 no-reset feature-scale switch；Scale-Invariant Control 补 full fixed-condition extended grid 和 gradual unit drift；Dyna Aging 补 stochastic/gradual drift、repeated changes 和 planning utility diagnostics；Predictive State 补 cue decodability、oracle-prediction control、GVF horizon/cumulant ablation；Options 先做 fixed-goal sanity 和 SMDP duration accounting；TIDBD 实现 canonical TIDBD/AutoStep 或明确降级为 TIDBD-lite diagnostic；Generate-Test 将 utility 改成 downstream error/control contribution。
+4. Experiment expansion：Reward-Centered beta/gamma/no-reset switch、Reward-Centered early recovery analysis、Output-Controlled fairness audit 加 max-stable-alpha frontier、Scale-Invariant full fixed-condition grid、Dyna abrupt/gradual/stochastic drift 加 reward/staleness frontier、Useful Predictive Knowledge feature-budget selection 已完成第一轮扩展。剩余 targeted experiments 是 Reward-Centered matched-seed recovery / policy-distance probes、Output-Controlled no-reset feature-scale switch 和 principled true-online derivation、Scale-Invariant gradual unit drift、Dyna repeated changes 和 true per-backup planning-utility logging、Useful Predictive Knowledge oracle-prediction scaling/prediction-to-policy coupling/plasticity gates、Options fixed-goal sanity，以及 canonical TIDBD/AutoStep 或明确降级。
 
 5. Multi-reviewer audit：每个 proposal 至少经 12 个角度审查：Alberta Plan、Core RL theory、average reward、function approximation stability、GVF/predictive knowledge、planning/model-based RL、continual learning、nonstationarity、experimental statistics、reproducibility、code architecture、strict course instructor。每个报告加入“主要批评、已经修订、仍未解决”的明确记录。
 
@@ -52,8 +54,8 @@ CPU task `core-rl-output-extended-fixed-46602102` 已经完成，状态为 `Succ
 
 | Proposal | 当前证据级别 | 主要缺口 | 下一轮实验/分析 | 报告重构要求 |
 |---|---|---|---|---|
-| Reward-Centered Sarsa | 强；20-seed extended | 缺 beta/gamma sensitivity 和 no-reset reward-origin switch。 | 跑 beta/gamma sweep；同一 stream 中途改变 reward shift；报告 policy probes。 | 增加 Proposal Template Answers；把 reward origin invariance 作为主问题，不只写 reward 更高。 |
-| Output-Controlled TD | 强；20-seed extended + fairness audit | true-online output control 仍需要更 principled 的推导；缺 no-reset feature-scale switch。 | max-stable-alpha audit；更严谨 true-online normalization；scale switch without reset。 | 保留 fairness evidence；后续有 switch result 再补。 |
+| Reward-Centered Sarsa | 强；20-seed fixed-shift extended + 已完成 10-seed sensitivity/no-reset switch + early recovery analysis | 还缺 paired recovery 和 policy-use analysis，不能只停留在 value-scale diagnostics。 | 补 matched-seed recovery、policy-distance probes 和 natural reward drift。 | 增加 Proposal Template Answers；把 reward origin invariance 作为主问题，不只写 reward 更高。 |
+| Output-Controlled TD | 强；20-seed extended + fairness audit + max-stable-alpha frontier | true-online output control 仍需要更 principled 的推导；缺 no-reset feature-scale switch。 | 更严谨 true-online normalization；scale switch without reset。 | 保留 fairness evidence；后续有 switch result 再补。 |
 | GVF Predictive State | 负结果/重设计 | GVF question 和 downstream utility 连接弱。 | cue decodability probe；oracle-prediction control；GVF horizon ablation。 | 写成“GVF 不自动成为 useful state”的独立负结果。 |
 | Generate-and-Test Features | 负结果/重设计 | utility rule 不优于 random；任务贡献不清楚。 | downstream-error utility；feature budget sweep；delay drift/repeated switch。 | 明确当前失败机制，不把 generate-test 写成正结果。 |
 | Doorway Options | quarantine | primitive baseline 和 option accounting 不充分。 | fixed-goal sanity；SMDP duration accounting；goal-change transfer after sanity pass。 | 不通过 sanity 前只保留为暂停课题。 |
@@ -66,14 +68,15 @@ CPU task `core-rl-output-extended-fixed-46602102` 已经完成，状态为 `Succ
 | Nonstationary Bandit | dropped sanity | 太浅，没有 bootstrapping/state/planning。 | 不扩为主线；只作 intro sanity。 | 报告降级，避免冒充 Core RL 主课题。 |
 | Streaming Representation | 负结果 | auxiliary target 不 task-relevant。 | 设计 task-relevant auxiliary；feature utility analysis。 | 合并到 predictive-state program 或保留负结果。 |
 | Scale-Invariant Continuing Control | 强 integrated；fixed grid + unit-switch 已完成 | abrupt unit switch recovery 仍弱。 | 补 gradual unit drift、recovery AUC 和 policy-distance probes。 | 写成 reward-unit 和 feature-unit invariance 的单一大问题。 |
-| Continual Dyna Model Aging | 强 integrated；20-seed extended | abrupt deterministic change 过窄。 | stochastic/gradual drift；repeated changes；planning utility diagnostics。 | 把 claim 聚焦 stale-backup reduction/search-control freshness。 |
+| Continual Dyna Model Aging | 强 integrated；fixed-change extended + 已完成 abrupt/gradual/stochastic drift + reward/staleness frontier | stochastic drift 削弱 universal aging claim；repeated natural changes 仍未做。 | 补 repeated changes、更清楚的 stochastic transition family 和 true per-backup planning-utility logging。 | 把 claim 聚焦 conditional stale-backup reduction/search-control freshness。 |
 | Predictive State Plasticity | 高价值负向 gate；20-seed extended | 题目大于当前成功证据。 | cue decodability；redesigned GVFs；limited feature budget; optional generate-test/TIDBD only after probe passes。 | 重写成 staged negative-to-redesign research program。 |
+| Useful Predictive Knowledge | 新 integrated gate；已完成 Gate-1/Gate-2 T-maze result 和 Gate-3 feature-budget result | learned cue predictions 可解码，并能在 two-feature budget 下被选中，但尚未 control-useful；plasticity 和 oracle-prediction scaling 未实现。 | 补 oracle-prediction control、GVF-output normalization、explicit policy-use ablations，之后再补 plasticity。 | 把 prediction usefulness 写成 staged gates，不写成泛泛 GVF 成功。 |
 
-## 新综合大题候选
+## 新综合大题候选已激活
 
-新增候选：`Useful Predictive Knowledge Under Partial Observability and Resource Limits`。这个题目不替代 16 个当前报告，而是作为一个后续 integrated proposal 候选，用来满足“突破现有框架但不拼凑”的要求。核心问题是：在部分可观测的 continuing/episodic stream 中，哪些 learned predictions 真正能成为 agent state，而不仅是低 TD-error 的 auxiliary quantities？
+已激活候选：`Useful Predictive Knowledge Under Partial Observability and Resource Limits`。这个题目不替代其他 16 个当前报告，而是作为第四个 integrated proposal，用来满足“突破现有框架但不拼凑”的要求。核心问题是：在部分可观测的 continuing/episodic stream 中，哪些 learned predictions 真正能成为 agent state，而不仅是低 TD-error 的 auxiliary quantities？
 
-统一环境族：T-maze cue stream + delayed-cue trace-conditioning stream。统一研究对象：隐藏 cue 信息如何被 GVF、trace features、utility-selected features 或 per-feature step-size adaptation 保留到 control-relevant time。统一指标：cue decodability、junction action accuracy、trial reward、feature budget usage、prediction TD error、post-switch recovery。分阶段实验：先做 oracle/trace/GVF decodability gate；通过后再做 generate-test feature selection；最后再接 TIDBD/AutoStep plasticity。失败判据同样重要：如果 prediction error 降低但 decodability/control 不提高，则结论是 prediction accuracy 不足以定义 useful state。
+统一环境族：T-maze cue stream + delayed-cue trace-conditioning stream。统一研究对象：隐藏 cue 信息如何被 GVF、trace features、utility-selected features 或 per-feature step-size adaptation 保留到 control-relevant time。统一指标：cue decodability、junction action accuracy、trial reward、feature budget usage、prediction TD error、post-switch recovery。第一轮 T-maze gate 已完成，路径为 `experiments/alberta_core_rl/results/useful_predictive_knowledge/20260709T102402Z_main`：learned cue predictions 的 decodability 高于 chance，但尚未改善 control。剩余 staged experiments 是 generate-test feature selection 和 TIDBD/AutoStep plasticity，并且应先补 stronger oracle-prediction control。失败判据同样重要：如果 prediction error 降低但 decodability/control 不提高，则结论是 prediction accuracy 不足以定义 useful state。
 
 ## 执行追踪
 
@@ -84,10 +87,10 @@ CPU task `core-rl-output-extended-fixed-46602102` 已经完成，状态为 `Succ
 | 审计报告缺失章节 | 第一轮机械检查已完成 | `final/indexes/report_section_audit.md` 和 `_zh.md` 显示多数报告缺显式 Proposal Template、独立范围、证据等级、实验设计或审查信号。 | 用该审计作为 report rewrite checklist；修订后重新检查。 |
 | 监控 Scale-Invariant extended CPU task | 已完成 | `core-rl-scale-invariant-extended-33723554` 已成功；`20260709T063128Z_extended` 包含标准 artifacts 并已纳入报告和索引。 | 继续做 gradual drift 和 recovery diagnostics。 |
 | 清理 `__pycache__` | 受权限阻塞 | `experiments/alberta_core_rl/` 下两个 `__pycache__` 目录由 `nobody:nogroup` 拥有，普通用户删除会 permission denied。 | 除非用户允许特权清理，否则只记录该问题。 |
-| 给所有报告补 Proposal Template Answers | 第一轮结构修复已完成 | 16 个英文报告和 16 个中文报告都已有显式 Proposal Template、独立范围、证据等级、实验设计依据和审查章节。 | 继续提升内容深度，并保持中英文 claim 同步。 |
+| 给所有报告补 Proposal Template Answers | 第一轮结构修复已完成 | 17 个英文报告和 17 个中文报告都已有显式 Proposal Template、独立范围、证据等级、实验设计依据和审查章节。 | 继续提升内容深度，并保持中英文 claim 同步。 |
 | 给每个 proposal 补 critique/action/risk 表 | 第一轮简洁版已完成 | 每个正式报告都有 reviewer-audit style 表或矩阵。 | 只在能改变研究决策时继续扩展，避免泛泛填充。 |
-| 深化强 proposal 的实验 | 部分完成 | Output-Controlled extended evidence 已纳入；Reward-Centered、Dyna、Predictive State 有 extended evidence；但多个 follow-up sweep 未完成。 | 优先做能改变结论的 targeted sweeps，而不是盲目扩大 grid。 |
-| 新的 predictive-knowledge 大题 | 仅计划 | 上文已定义候选问题、环境族和 staged gates；当前 Predictive State Plasticity 仍是 negative gate，不等于完整新大题。 | 先写 report skeleton、gate experiments 和验收标准，再实现。 |
+| 深化强 proposal 的实验 | 部分完成 | Output-Controlled extended evidence、Reward-Centered sensitivity、Dyna drift、Scale-Invariant fixed grid 和 Useful Predictive Knowledge Gate-1/Gate-2/Gate-3 已纳入。 | 优先做能改变结论的 targeted sweeps，而不是盲目扩大 grid。 |
+| 新的 predictive-knowledge 大题 | 第一轮和 budget gate 已激活并完成 | `final/reports/integrated/useful_predictive_knowledge/`、`experiments/alberta_core_rl/results/useful_predictive_knowledge/20260709T102402Z_main` 和 `experiments/alberta_core_rl/results/useful_predictive_knowledge_budget/20260709T132025Z_main` 已存在。 | 补 oracle-prediction scaling、GVF-output normalization、prediction-to-policy coupling 和后续 plasticity stages。 |
 
 ## 新调研资料与作用
 

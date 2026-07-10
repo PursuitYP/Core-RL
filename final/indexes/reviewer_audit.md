@@ -52,7 +52,7 @@ Action taken: `plot_report_figures.py` was split into smaller modules and the Dy
 
 Main critique: several report figures were overloaded learning-curve plots rather than publication-quality evidence.
 
-Action taken: report-ready summary figures were added for Output-Controlled TD, Reward-Centered Sarsa, On-policy Stability Atlas, Dyna Planning Budget, Unit-Switching Continuing Control, Scale-Invariant Continuing Control, Dyna Aging, and Predictive State Plasticity. Reports now prefer heatmaps or tail-summary figures over old spaghetti plots.
+Action taken: report-ready summary figures were added for Output-Controlled TD, Reward-Centered Sarsa, On-policy Stability Atlas, Dyna Planning Budget, Unit-Switching Continuing Control, Scale-Invariant Continuing Control, Dyna Aging, Predictive State Plasticity, and Useful Predictive Knowledge. Reports now prefer heatmaps or tail-summary figures over old spaghetti plots where current data support them.
 
 Main critique: Predictive State Plasticity sounded broader than the evidence supported.
 
@@ -64,27 +64,33 @@ Action taken: `experiments/alberta_core_rl/results/README.md` now lists known in
 
 Main critique: the requirement audit and status documents still overclaimed completion after the user explicitly asked for a stricter check against the original requirements.
 
-Action taken: `final/indexes/requirements_audit.md` and `final/indexes/status.md` have been rewritten in a conservative gap-tracking form. They now distinguish structural coverage from completed research depth, identify missing Proposal Template sections, and record weak/quarantined proposals honestly. After the later CPU completion, `core-rl-scale-invariant-extended-33723554` was upgraded from running status to completed evidence.
+Action taken: `final/indexes/requirements_audit.md` and `final/indexes/status.md` have been rewritten in a conservative gap-tracking form. They now distinguish structural coverage from completed research depth and record weak/quarantined proposals honestly. After later CPU completions, Scale-Invariant, Reward Sensitivity, Output Fairness, and Dyna Drift were upgraded from running/status records to completed evidence.
 
 Main critique: even after the indexes were corrected, the formal reports themselves still lacked explicit Proposal Template answers, independent research scope, evidence level, experiment-design rationale, and per-proposal critique records.
 
-Action taken: all 16 English reports and all 16 Chinese reports now include the required structural sections. Strong proposals were framed as strong with remaining experiments; weak proposals were explicitly marked as supporting, negative, dropped, or quarantined. The structural audit is recorded in `final/indexes/report_section_audit.md`.
+Action taken: all 17 English reports and all 17 Chinese reports now include the required structural sections. Strong proposals were framed as strong with remaining experiments; weak proposals were explicitly marked as supporting, negative, dropped, or quarantined. The structural audit is recorded in `final/indexes/report_section_audit.md`.
+
+### Parallel Independence And Overclaiming Audit
+
+Main critique: a read-only parallel audit found no high-impact cross-report dependency, but it did find several remaining overclaiming risks. `GVF Predictive State` claimed that the learned GVF failed to carry cue information even though that report lacks a direct cue-decodability probe. `Nonstationary Bandit` used "confirms" language despite five seeds and wide uncertainty. `Reward-Centered Sarsa` and `Scale-Invariant Continuing Control` used "necessary" language that sounded broader than the tested access-control grids. `Predictive State Plasticity` still mentioned limited-budget replacement and feature-wise plasticity often enough that they could be mistaken for current evidence rather than future work.
+
+Action taken: the relevant English and Chinese reports were revised. `GVF Predictive State` now states that the recurrent GVF does not become usable control state, while direct cue information remains unmeasured in that pilot. `Nonstationary Bandit` now uses "suggests" and "sanity-check observation" language. `Reward-Centered Sarsa` and `Scale-Invariant Continuing Control` now restrict their strongest wording to the tested access-control variants and combinations. `Predictive State Plasticity` now states that limited-budget replacement, generated traces, and feature-wise step-size adaptation are future-work mechanisms and not evidence for the current fixed predictive-state gate.
 
 ## Current Open Items
 
 - Deepen the newly added Proposal Template/evidence/reviewer sections where they change scientific decisions; the first structural pass is complete, but not every report is paper-perfect.
-- Continue the Output-Controlled TD follow-up after the completed fairness audit: add a more principled true-online TD(lambda) output-control derivation, max-stable-alpha analysis, and a no-reset feature-scale switch experiment.
+- Continue the Output-Controlled TD follow-up after the completed fairness audit and max-stable-alpha frontier: add a more principled true-online TD(lambda) output-control derivation and a no-reset feature-scale switch experiment.
 - Continue the Scale-Invariant follow-up after the completed fixed-condition grid: add gradual unit drift, recovery AUC, and policy-distance probes.
-- Add beta/gamma and midstream reward-origin tests for `reward_centered_sarsa` if the standalone paper is selected as a final topic.
-- Add gradual/stochastic drift environments for Dyna aging before making general claims beyond abrupt changing gridworlds.
+- Continue Reward-Centered beyond the completed beta/gamma/no-reset switch and early recovery score with matched-seed recovery analysis, policy-distance probes, and natural reward drift.
+- Continue Dyna aging beyond the completed abrupt/gradual/stochastic drift sweep and reward/staleness frontier with repeated changes and true per-backup planning-utility logging.
 - Add true-online TD(lambda) max-stable-alpha audit before treating that baseline as a strong negative comparison.
-- Add cue-decodability and downstream-control ablations before attempting a positive GVF predictive-state claim.
+- Continue Useful Predictive Knowledge beyond the completed feature-budget gate with oracle-prediction scaling, GVF-output normalization, prediction-to-policy coupling, downstream-control ablations, and then plasticity stages before attempting a positive GVF predictive-state claim.
 
 ## Verification After This Revision
 
 - Markdown image-link check passed for all files under `final/`.
 - Report-image check passed for `final/reports/**/report*.md` with zero missing images after this repair pass.
-- All 16 English `report.pdf` files were regenerated, with `missing_images=0` in the PDF export output.
+- All 17 English `report.pdf` files were regenerated after the latest edits, with `missing_images=0` in `final/indexes/english_report_pdf_manifest.json`.
 - `python -m compileall experiments/alberta_core_rl` completed without errors.
 - Generated `__pycache__` directories were not fully cleaned: two directories under `experiments/alberta_core_rl/` are owned by `nobody:nogroup`, and normal-user cleanup fails with permission denied.
 - Python source files remain under the 500-line guidance after splitting report plotting utilities; `envs.py` is the largest at 474 lines.

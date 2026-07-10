@@ -92,18 +92,26 @@ scale conditions 本身不是现实 sensor model，而是 invariance tests。uni
 
 ## Results
 
+这些 heatmaps 应读作 stability atlas，而不是 leaderboard。判断哪些 cells 有效，应先看 divergence panels。在 RMSE 和 output-change panels 中，已经 diverged 的 cell 即使有颜色，也可能只是 clipped value 或最后可用 logged value，不能当作有意义的 final performance。空白或 `n/a` cell 表示该聚合值未定义，常见原因是这个 condition 没有 non-diverged stable tail，或该算法 variant 没有包含在对应 sweep 中。
+
 ![按 algorithm、scale 和 alpha 分面展示的 tail RMSE stability atlas。](figures/report_log_rmse_heatmap_panels.png)
 
 ![按 algorithm、scale 和 alpha 分面展示的 seed-level divergence-rate atlas。](figures/report_divergence_heatmap_panels.png)
 
 ![按 algorithm、scale 和 alpha 分面展示的 tail output-change atlas。](figures/report_prediction_change_heatmap_panels.png)
 
-| Algorithm | Lambda | Seed-conditions diverged | Non-diverged final RMSE mean | Interpretation |
-|---|---:|---:|---:|---|
-| fixed TD | 0.0 | `141/400` (`35.2%`) | `0.551` | easy scales 下可用，但对 feature scale 极其敏感。 |
-| normalized TD | 0.0 | `0/400` (`0.0%`) | `0.461` | 所有测试 scale 和 alpha 下都稳定。 |
-| trace-normalized TD(lambda) | 0.8 | `0/400` (`0.0%`) | `0.497` | 带 traces 时，如果 normalize trace direction，也能保持稳定。 |
-| true-online TD(lambda), raw alpha | 0.8 | `141/400` (`35.2%`) | `0.382` | 在 surviving easy conditions 上 RMSE 低，但很多 high-scale conditions 发散。 |
+下面的 max-stable-alpha frontier 把 primary sweep 压缩成审稿人最先会问的问题：对每个 algorithm 和 feature scale，alpha 最大可以到多少而不出现任何 seed-level divergence？在 primary grid 中，normalized TD 和 trace-normalized TD(lambda) 在所有 scale 上都稳定到最大测试 alpha `0.3`。fixed TD 和 raw-alpha true-online TD(lambda) 在 `hundred` scale 下没有 fully stable cell，在 `uneven` scale 下最大稳定 alpha 缩到 `0.03`。
+
+![Primary sweep 中按 algorithm 和 feature scale 展示的 max-stable-alpha frontier。](stability_frontier/report_primary_max_stable_alpha_frontier.png)
+
+下面的 compact table 使用 artifact 中的 seed-tail summaries，并只在 condition-level stable cells 中选择 best RMSE：stable cell 指某个 algorithm、scale 和 alpha 组合下没有任何 seed 发散。这样可以避免用已经出现 seed-level failure 的 condition 中幸存 seeds 来给算法排名。
+
+| Algorithm | Stable region | Best stable tail RMSE (log10; cell) | Divergence count/risk | Prediction-change behavior | Interpretation |
+|---|---|---:|---|---|---|
+| fixed TD | `12/20` cells：全部 `one`；`ten` 到 alpha `0.1`；`uneven` 到 `0.03`；`lognormal` 到 `0.1`；没有稳定的 `hundred` cell。 | `0.184` (`-0.736`; `ten`, alpha `0.1`) | `141/400` (`35.2%`)；`hundred`、`ten` alpha `0.3`、`uneven` alpha `0.1/0.3` 全面失败；`lognormal` alpha `0.3` 有小风险。 | stable-cell tail change mean `0.010`，max `0.103`；diverged cells 不属于有效 output-change comparison。 | raw alpha 在 easy units 下能学，但稳定性强依赖 feature scale。 |
+| normalized TD | `20/20` cells：所有测试 scale 和 alpha。 | `0.264` (`-0.578`; `uneven`, alpha `0.3`) | `0/400` (`0.0%`)；没有观测到 seed-level divergence。 | stable-cell tail change mean `9.51e-4`，max `0.003`。 | feature normalization 把 alpha grid 变成稳定的 output-change range。 |
+| trace-normalized TD(lambda) | `20/20` cells：所有测试 scale 和 alpha。 | `0.388` (`-0.412`; `lognormal`, alpha `0.3`) | `0/400` (`0.0%`)；没有观测到 seed-level divergence。 | stable-cell tail change mean `2.78e-4`，max `0.002`。 | normalize eligibility-trace direction 后，lambda `0.8` 下仍保持稳定。 |
+| true-online TD(lambda), raw alpha | `12/20` cells：stable region 与 fixed TD 相同。 | `0.149` (`-0.826`; `ten`, alpha `0.03`) | `141/400` (`35.2%`)；失败的 scale/alpha cells 与 fixed TD 相同。 | stable-cell tail change mean `0.002`，max `0.006`；失败来自 raw alpha 遇到 high feature scale。 | 稳定时表现强，但这个 raw-alpha baseline 不是 true-online TD(lambda) 的公平最终排名。 |
 
 Fixed TD 在 scale `hundred` 的所有 alpha 下所有 seeds 都发散，在 scale `ten` 的 alpha `0.3` 下发散，在 scale `uneven` 的 alpha `0.1` 和 `0.3` 下发散。它在 `lognormal` alpha `0.3` 下也有小但真实的 divergence rate。
 
@@ -119,19 +127,25 @@ Extended result path：`experiments/alberta_core_rl/results/output_controlled_td
 
 CPU task：`core-rl-output-fairness-extended-rerun-29576456`，已在 2026-07-09 17:41 HKT 成功完成。
 
+Fairness-audit panels 也按同一规则阅读。Normalized true-online variant 只在这里出现，所以 primary sweep 中缺失该 variant 是设计空缺，不是负面结果。对 RMSE 和 output-change 来说，divergence 或 `n/a` cells 应理解为不在有效比较区域内；真正的 failure risk 由 divergence panel 和下面的表直接给出。
+
 ![Fairness-audit tail RMSE panels by scale, algorithm, and alpha.](fairness_figures/report_log_rmse_heatmap_panels.png)
 
 ![Fairness-audit seed-level divergence panels by scale, algorithm, and alpha.](fairness_figures/report_divergence_heatmap_panels.png)
 
 ![Fairness-audit output-change panels by scale, algorithm, and alpha.](fairness_figures/report_prediction_change_heatmap_panels.png)
 
-| Algorithm | Lambda | Fairness-audit seed-conditions diverged | Main interpretation |
-|---|---:|---:|---|
-| fixed TD | 0.0 | `81/300` (`27.0%`) | 大 uniform feature scale 和 high-alpha uneven/ten-scale settings 下失败。 |
-| normalized TD | 0.0 | `0/300` (`0.0%`) | 本 prediction audit 的所有测试 scales 和 alphas 下稳定。 |
-| trace-normalized TD(lambda) | 0.8 | `0/300` (`0.0%`) | trace-normalized update direction 在更宽网格下仍稳定。 |
-| true-online TD(lambda), raw alpha | 0.8 | `81/300` (`27.0%`) | 在 feature-scale stress 下与 fixed TD 的 seed-level failure count 相同。 |
-| true-online TD(lambda), normalized audit | 0.8 | `34/300` (`11.3%`) | 移除了 uniform-scale failures，但仍在 lognormal feature scaling 下失败，因此 naive normalization 不是完整 true-online answer。 |
+Fairness-audit frontier 补充了两个关键细节。第一，更宽 alpha grid 为 fixed TD 和 raw-alpha true-online TD(lambda) 在 uniform `hundred` scale 下找到了非常小的稳定 alpha `0.001`，说明 raw-alpha methods 可以通过 scale-specific tuning 被救回来。第二，naive normalized true-online audit variant 在 `one`、`ten`、`hundred` 和 `uneven` 上都稳定到 `0.3`，但在 `lognormal` 下没有 fully stable alpha。这是报告保持 bounded conclusion 的最清楚图形证据：output control 对 true-online traces 有帮助，但 heterogeneous feature scaling 仍需要更 principled 的推导。
+
+![Fairness audit 中按 algorithm 和 feature scale 展示的 max-stable-alpha frontier。](stability_frontier/report_fairness_max_stable_alpha_frontier.png)
+
+| Algorithm | Stable region | Best stable tail RMSE (log10; cell) | Divergence count/risk | Prediction-change behavior | Interpretation |
+|---|---|---:|---|---|---|
+| fixed TD | `21/30` cells：全部 `one`；`ten` 到 alpha `0.1`；`hundred` 只有 alpha `0.001`；`uneven` 到 `0.03`；`lognormal` 到 `0.1`。 | `0.173` (`-0.763`; `hundred`, alpha `0.001`) | `81/300` (`27.0%`)；high-alpha 和 large-scale failures 仍存在。 | stable-cell tail change mean `0.003`，max `0.027`；unstable cells 不是有效 RMSE comparison。 | 更宽 alpha grid 找到了很小的 `hundred` safe step，但 raw alpha 仍然 scale-fragile。 |
+| normalized TD | `30/30` cells：所有测试 scale 和 alpha。 | `0.253` (`-0.596`; `uneven`, alpha `0.3`) | `0/300` (`0.0%`)；没有观测到 seed-level divergence。 | stable-cell tail change mean `6.62e-4`，max `0.004`。 | 普通 normalized update 在更宽 audit grid 上仍稳定。 |
+| trace-normalized TD(lambda) | `30/30` cells：所有测试 scale 和 alpha。 | `0.389` (`-0.411`; `lognormal`, alpha `0.3`) | `0/300` (`0.0%`)；没有观测到 seed-level divergence。 | stable-cell tail change mean `1.90e-4`，max `0.001`。 | trace normalization 给出最保守的 output changes 和最宽的 trace stable region。 |
+| true-online TD(lambda), raw alpha | `21/30` cells：stable region 与 fixed TD 相同。 | `0.134` (`-0.874`; `ten`, alpha `0.03`) | `81/300` (`27.0%`)；seed-level failure count 与 fixed TD 相同。 | stable-cell tail change mean `0.002`，max `0.007`。 | stable-cell RMSE 很好，但不能消除 raw-alpha fairness problem。 |
+| true-online TD(lambda), normalized audit | `24/30` cells：所有非 `lognormal` cells；没有 fully stable 的 `lognormal` alpha。 | `0.135` (`-0.868`; `hundred`, alpha `0.3`) | `34/300` (`11.3%`)；所有 failures 都在 `lognormal`，不同 alpha 下从 `1/10` 到 `10/10` seeds。 | stable-cell tail change mean `0.001`，max `0.005`。 | simple normalization 修复 uniform-scale failure，但没有解决 heterogeneous lognormal trace-correction interaction。 |
 
 ## Analysis
 
@@ -145,7 +159,7 @@ Heatmaps 支持核心机制：当 feature scale 改变时，fixed alpha 不是�
 
 Feature scaling 是 synthetic 的。这适合做 invariance test，但真实 sensor streams 可能有 drifting scale、changing relevance 和 partial observability。最重要的下一步是做 no-reset feature-scale switch。
 
-Divergence 现在使用 seed-level event rate，比 logged-row average 更可解释；但 final RMSE 仍然是最后 logged point，而不是 area-under-learning-curve。未来分析应同时报告 stability 和 learning speed。
+Divergence 现在使用 seed-level event rate，比 logged-row average 更可解释；但 RMSE 仍然是接近 run 末端的 summary，而不是 area-under-learning-curve。未来分析应同时报告 stability 和 learning speed。
 
 ## Reviewer Critique And Revisions
 
@@ -216,4 +230,10 @@ PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconf
   --kind output-td \
   --result-dir experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended \
   --figure-dir final/reports/proposals/output_controlled_td/fairness_figures
+
+PYTHONNOUSERSITE=1 PYTHONPYCACHEPREFIX=/tmp/core-rl-pycache MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
+  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/analyze_output_stability_frontier.py \
+  --primary-result-dir experiments/alberta_core_rl/results/output_controlled_td/20260709T051934Z_extended \
+  --fairness-result-dir experiments/alberta_core_rl/results/output_controlled_td_fairness_audit/20260709T085746Z_extended \
+  --out-dir final/reports/proposals/output_controlled_td/stability_frontier
 ```

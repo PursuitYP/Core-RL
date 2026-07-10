@@ -20,7 +20,12 @@ from alberta_core_rl.report_figures_heatmaps import (
     plot_reward_centered_sensitivity,
     plot_unit_switching,
 )
-from alberta_core_rl.report_figures_predictive import plot_predictive_state, plot_useful_predictive_knowledge
+from alberta_core_rl.report_figures_predictive import (
+    plot_gvf_question_design,
+    plot_predictive_state,
+    plot_useful_predictive_knowledge_budget,
+    plot_useful_predictive_knowledge,
+)
 
 
 def main() -> None:
@@ -35,7 +40,9 @@ def main() -> None:
             "dyna-drift",
             "dyna-budget",
             "predictive-state",
+            "gvf-question-design",
             "useful-predictive-knowledge",
+            "useful-predictive-knowledge-budget",
             "output-td",
             "reward-centered",
             "reward-sensitivity",
@@ -57,8 +64,12 @@ def main() -> None:
         outputs = plot_dyna_budget(result_dir, figure_dir)
     elif args.kind == "predictive-state":
         outputs = plot_predictive_state(result_dir, figure_dir)
+    elif args.kind == "gvf-question-design":
+        outputs = plot_gvf_question_design(result_dir, figure_dir)
     elif args.kind == "useful-predictive-knowledge":
         outputs = plot_useful_predictive_knowledge(result_dir, figure_dir)
+    elif args.kind == "useful-predictive-knowledge-budget":
+        outputs = plot_useful_predictive_knowledge_budget(result_dir, figure_dir)
     elif args.kind == "output-td":
         outputs = plot_output_td(result_dir, figure_dir)
     elif args.kind == "reward-centered":

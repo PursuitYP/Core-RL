@@ -1,0 +1,14 @@
+{
+  "source_result_dir": "experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended",
+  "early_limit_steps": 1000.0,
+  "seed_rows": 3150,
+  "condition_rows": 315,
+  "compact_rows": 9,
+  "outputs": [
+    "reward_recovery_seed_summary.csv",
+    "reward_recovery_condition_summary.csv",
+    "reward_recovery_compact_best_by_family.csv",
+    "report_reward_recovery_auc_best_by_family.png",
+    "report_reward_recovery_accept_best_by_family.png"
+  ]
+}

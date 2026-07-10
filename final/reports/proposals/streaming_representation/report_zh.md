@@ -8,6 +8,20 @@
 
 这个结果有用，因为它说明 auxiliary loss 不会自动成为 useful prediction。Auxiliary target 必须与 agent 要回答的 value 或 control question 相关。因此，这个 proposal 是独立 negative result 和 redesign target，而不是反对 auxiliary learning 或 GVFs 的一般证据。
 
+## Evidence Summary / 证据摘要
+
+本报告是一个 negative representation diagnostic。它问的是一个窄但重要的问题：一个方便定义的 auxiliary target 是否改善真正重要的 downstream value prediction？当前 stream 中答案是否定的。这个负结果有价值，因为它阻止一个常见 overclaim：auxiliary prediction 可以 learnable，但仍然不一定对 agent 的 value question 有用。
+
+| 项目 | 当前证据 |
+|---|---|
+| RL question | 在没有 replay 或 deep networks 的 streaming linear setting 中，auxiliary next-feature prediction objective 是否能改善 online value prediction？ |
+| Testbed | 包含 feature-relevance switch 的 nonstationary sensor stream；learner 在线观察 features，不能回放过去 transitions。 |
+| Compared learners | Value-only normalized TD 与带 auxiliary next-feature prediction head 的 normalized TD。 |
+| Seeds and horizon | 五个 seeds，每个 learner `5000` online steps。 |
+| Primary metric | Downstream value predictor 的 seed-tail absolute TD error；auxiliary MSE 和 weight norm 是诊断指标。 |
+| Headline result | Phase 1 中，auxiliary next-feature prediction 的 absolute TD error 为 `0.5298 +/- 0.0243`，value-only TD 为 `0.5301 +/- 0.0240`；auxiliary MSE 很低（`0.0413 +/- 0.0002`），但没有带来 value-error gain。 |
+| Conclusion boundary | 这是当前 auxiliary target 的 negative result；不是反对 auxiliary learning 或 GVFs 的一般证据。更强版本需要 task-relevant auxiliary questions 和 ablations。 |
+
 ## 1. Proposal Template Answers / 提案模板回答
 
 Focused RL question：在没有 replay 或 deep networks 的 streaming linear setting 中，auxiliary next-feature prediction objective 是否能改善 online value prediction？

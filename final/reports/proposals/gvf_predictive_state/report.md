@@ -4,7 +4,21 @@ Status: independent negative-result proposal and redesign target.
 
 ## Abstract
 
-This proposal tests whether learned General Value Function predictions can serve as useful agent state under partial observability. In a long aliased T-maze, the agent sees a cue at the start, loses direct access to it in the corridor, and must remember it at the junction. The current main pilot compares raw observation, short history, trace memory, recurrent GVF features, and oracle memory. Trace memory and oracle memory solve the task, while the current recurrent GVF design remains near chance. This is a valuable negative result: it does not refute GVFs, but it shows that the current GVF question/state design fails to carry the hidden cue information required for control.
+This proposal tests whether learned General Value Function predictions can serve as useful agent state under partial observability. In a long aliased T-maze, the agent sees a cue at the start, loses direct access to it in the corridor, and must remember it at the junction. The current main pilot compares raw observation, short history, trace memory, recurrent GVF features, and oracle memory. Trace memory and oracle memory solve the task, while the current recurrent GVF design remains near chance. This is a valuable negative result: it does not refute GVFs, but it shows that the current GVF question/state design does not become usable control state. This pilot does not include a direct cue-decodability probe, so it should not claim that the GVF contains no weak cue information.
+
+## Evidence Summary
+
+This report is a negative useful-state pilot. Its job is not to decide whether GVFs can ever construct state; it asks whether this recurrent GVF design becomes useful state in one clean partial-observability control task. The answer is no under the current evidence. Trace and oracle memory show that the task is solvable with small non-deep features, while the recurrent GVF condition remains near chance on the decision that matters.
+
+| Item | Current evidence |
+|---|---|
+| RL question | Can a learned GVF feature become usable control state in a partially observable T-maze where the useful state must preserve an early cue? |
+| Testbed | Long aliased T-maze with start cue, cue-free corridor, delayed junction action, and online linear Sarsa control. |
+| Compared state constructions | Raw observation, short history, trace memory, recurrent GVF features, and oracle cue memory. |
+| Seeds and horizon | Five seeds, `5000` online steps, maze length `12`. |
+| Primary metric | Seed-tail trial accuracy at the cue-dependent junction decision; reward and GVF TD error are diagnostics. |
+| Headline result | Trace memory reaches trial accuracy `0.944 +/- 0.018` and oracle reaches `0.939 +/- 0.027`, while recurrent GVF reaches `0.502 +/- 0.023`, similar to raw observation `0.512 +/- 0.038` and short history `0.492 +/- 0.043`. |
+| Conclusion boundary | Current recurrent GVF features are not usable control state in this pilot. Direct cue-decodability is not measured here, so stronger information-content claims require new probes. |
 
 
 ## Standalone Study Summary
@@ -33,7 +47,7 @@ The scope is intentionally limited because the result is negative. It should not
 
 Evidence level: negative pilot/redesign target. The result is convincing enough to show that the current recurrent-GVF pilot should not be submitted as a positive GVF-state result. It remains limited by five seeds and one maze length.
 
-The central failure mechanism is clear: cheap trace memory solves the task, while the current recurrent GVF does not. Any stronger claim about predictive state should require larger runs and direct cue-decodability evidence.
+The central control failure is clear: cheap trace memory solves the task, while the current recurrent GVF does not improve junction decisions over chance. Any stronger claim about predictive state should require larger runs and direct cue-decodability evidence.
 
 ## Research Motivation
 
@@ -43,7 +57,7 @@ The goal of this proposal is therefore not to make a decorative auxiliary predic
 
 ## Research Question
 
-Can learned GVF predictions supply missing cue information in a partially observable T-maze?
+Can learned GVF predictions become usable control state in a partially observable T-maze where the useful state must preserve an early cue?
 
 More specifically:
 
@@ -126,9 +140,9 @@ The current design is a pilot because it tests one maze length and one GVF desig
 
 Trace memory and oracle memory solve the task, with seed-aware tail trial accuracy about `0.944 +/- 0.018` and `0.939 +/- 0.027`. This establishes that the task is learnable with small non-deep state augmentation.
 
-Raw observation, short history, and recurrent GVF remain near chance: about `0.512`, `0.492`, and `0.502`. The current GVF state therefore does not carry the cue information needed by the control decision.
+Raw observation, short history, and recurrent GVF remain near chance: about `0.512`, `0.492`, and `0.502`. The current GVF state therefore does not become usable control state for the junction decision.
 
-The trajectory figure supports this interpretation. The learned GVF signal does not show a clean cue-dependent trace that persists to the junction in the way the hand-coded trace does.
+The trajectory figure supports a cautious interpretation. The learned GVF signal does not show a clean cue-dependent trace that persists to the junction in the way the hand-coded trace does, but the report does not yet include a direct linear cue probe. The safe conclusion is therefore about control usability, not the complete absence of cue information.
 
 ## Analysis
 
@@ -138,7 +152,7 @@ This is not a failed experiment; it is a useful negative result. It separates th
 - The control algorithm might be broken.
 - The current GVF question/state design might be insufficient.
 
-The trace and oracle baselines rule out the first possibility. The remaining conclusion is that the GVF feature, as designed, is not the right predictive state. That is exactly the kind of boundary condition a serious GVF proposal should expose.
+The trace and oracle baselines rule out the first possibility. The remaining conclusion is that the GVF feature, as designed, is not a usable predictive state for this control problem. That is exactly the kind of boundary condition a serious GVF proposal should expose.
 
 ## Threats To Validity
 
@@ -180,7 +194,7 @@ Reviewer audit matrix:
 
 ## Conclusion
 
-The current GVF Predictive State proposal is an independent negative result. It shows that the task is solvable by cheap memory but not by the current learned GVF feature. The next iteration should not merely tune hyperparameters; it should redesign the GVF questions so that the learned prediction is demonstrably tied to the hidden cue and useful for the junction decision.
+The current GVF Predictive State proposal is an independent negative result. It shows that the task is solvable by cheap memory but not solved by the current learned GVF feature. The next iteration should not merely tune hyperparameters; it should add cue-decodability probes and redesign the GVF questions so that any learned prediction is demonstrably tied to the hidden cue and useful for the junction decision.
 
 ## Reproduction
 

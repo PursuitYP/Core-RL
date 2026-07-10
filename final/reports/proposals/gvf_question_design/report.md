@@ -113,7 +113,13 @@ Current measurements:
 - prediction value;
 - weight norm.
 
-Primary figure:
+Primary summary figure:
+
+![Tail absolute TD error heatmap by cumulant and discount.](figures/report_gvf_question_tail_td_error_heatmap.png)
+
+This heatmap is deliberately labeled as a learnability diagnostic only. It shows that bias questions can be learned almost perfectly, while cue and junction questions have larger TD errors. The figure does not prove usefulness; it motivates the next cue-decodability and control-ablation probes.
+
+Secondary learning-curve diagnostic:
 
 ![GVF TD error by cumulant and discount.](../../../../experiments/alberta_core_rl/results/gvf_question_design/20260708T160958Z_main/figures/abs_td_error_by_cumulant-gamma_curve.png)
 

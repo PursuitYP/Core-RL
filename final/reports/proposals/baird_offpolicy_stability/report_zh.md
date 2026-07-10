@@ -8,6 +8,20 @@
 
 当前 pilot 在三个 step size 上比较 semi-gradient off-policy TD 和 TDC-style correction。Semi-gradient TD 出现严重 weight-norm growth。TDC-style learner 在较小 step size 下保持稳定，但在最大测试 step size 下也失败。因此本文贡献是一个受限 warning：off-policy predictions 在被当作 agent knowledge 之前，需要显式 stability checks。
 
+## Evidence Summary / 证据摘要
+
+本报告应被阅读为 stability diagnostic，而不是 performance proposal。整个实验被设计成 true value 为零；因此 weights 或 value estimates 增长是 update instability 的直接证据，而不是 reward maximization 失败。当前证据规模小，但问题明确：一个 continual agent 可能用来学习 background knowledge 的 off-policy prediction machinery，即使只使用 linear features 且没有 neural network，也可能失败。
+
+| 项目 | 当前证据 |
+|---|---|
+| RL question | Baird-style counterexample 对从 ordinary experience 中学习的 off-policy linear value prediction 提供什么 stability warning？ |
+| Testbed | Seven-state Baird-style off-policy prediction，包含 zero reward、behavior-target mismatch、linear features 和 online bootstrapping。 |
+| Compared learners | Semi-gradient off-policy TD 与 TDC-style correction，alpha 为 `0.005`、`0.01` 和 `0.02`。 |
+| Seeds and horizon | 五个 seeds，每个 condition `5000` online steps。 |
+| Primary metric | Seed-tail weight norm；divergence flag 和 TD error 是辅助诊断。 |
+| Headline result | Semi-gradient TD 的 weight norm 从 alpha `0.005` 下的 `1.12e4 +/- 2.18e3` 增长到 alpha `0.02` 下的 `3.57e7 +/- 3.62e6`；TDC-style correction 在 alpha `0.005/0.01` 时接近 `8.79`，但在 alpha `0.02` 时也失败，weight norm 为 `2.07e7 +/- 6.91e6`。 |
+| Conclusion boundary | 可作为 off-policy stability warning；还不是 canonical Baird replication，不是 control result，也不是 TDC-style correction 解决所有 off-policy prediction 的证据。 |
+
 ## Claim 边界
 
 本文只提出一个受限 claim：在当前 Baird-style implementation 中，普通 semi-gradient off-policy TD 出现严重 weight growth；TDC-style correction 扩大但没有消除 stable step-size region。

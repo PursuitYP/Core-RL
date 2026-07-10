@@ -113,7 +113,13 @@ Hidden control-relevant variable 是早先出现、并应决定 junction action 
 - prediction value；
 - weight norm。
 
-主图：
+主 summary figure：
+
+![Tail absolute TD error heatmap by cumulant and discount.](figures/report_gvf_question_tail_td_error_heatmap.png)
+
+这张 heatmap 被明确标为 learnability diagnostic only。它显示 bias questions 几乎可以被完美学习，而 cue 和 junction questions 的 TD error 更大。该图不证明 usefulness；它的作用是说明为什么下一步必须加入 cue-decodability 和 control-ablation probes。
+
+辅助 learning-curve diagnostic：
 
 ![GVF TD error by cumulant and discount.](../../../../experiments/alberta_core_rl/results/gvf_question_design/20260708T160958Z_main/figures/abs_td_error_by_cumulant-gamma_curve.png)
 

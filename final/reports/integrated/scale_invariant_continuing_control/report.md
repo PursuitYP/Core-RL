@@ -31,7 +31,7 @@ The report does not claim that unit invariance is solved in general. Its current
 
 Evidence level: strong independent evidence. The completed fixed-condition extended sweep demonstrates the interaction between reward centering and update normalization across 375 condition groups and 7500 seed-conditions. The completed 20-seed unit-switching run is stronger for continual-learning relevance because it changes units inside the same stream without resetting weights. Together these experiments support the stability part of the proposal while preserving the harder recovery caveat.
 
-The current claim should be deliberately narrow: combined centering/normalization is necessary for stable unit changes, and it prevents severe numerical instability under no-reset switches, but it does not fully solve recovery after abrupt feature-scale changes. A mature final paper would add gradual scale drift, beta sensitivity, recovery AUC, and policy-distance probes.
+The current claim should be deliberately narrow: combined centering/normalization is the only tested family that stabilizes both reward-origin and feature-scale nuisance dimensions in the access-control grid, and it prevents severe numerical instability under no-reset switches, but it does not fully solve recovery after abrupt feature-scale changes. A mature final paper would add gradual scale drift, beta sensitivity, recovery AUC, and policy-distance probes.
 
 ## Paper-Style Contribution And Claim Boundaries
 
@@ -135,7 +135,9 @@ The extended run crosses reward shifts `-8, -4, 0, 4, 8`, feature scales `one`, 
 - Normalized reward-centered Sarsa has `0/1500` divergent seed-conditions and the highest mean tail unshifted reward (`2.556`), with condition-level reward range `2.493-2.609`.
 - Normalized differential Sarsa also has `0/1500` divergent seed-conditions and a very similar mean tail unshifted reward (`2.554`), with condition-level reward range `2.486-2.603`.
 
-The important pattern is interaction-specific: each single mechanism fails outside its own invariance dimension, while the combined mechanisms compose in the completed extended grid.
+The important pattern is interaction-specific: each single mechanism fails outside its own invariance dimension, while the combined mechanisms compose in the completed extended grid. Table 1 is the fixed-condition headline; the later figures are supporting diagnostics rather than the primary claim.
+
+**Table 1. Fixed-condition headline evidence from `20260709T063128Z_extended`.**
 
 | Algorithm | Mean tail unshifted reward | Reward range across conditions | Seed-conditions diverged | Median tail Q norm | Interpretation |
 |---|---:|---:|---:|---:|---|
@@ -149,7 +151,20 @@ A stricter no-reset unit-switching experiment was then added:
 
 `experiments/alberta_core_rl/results/unit_switching_continuing_control/20260709T024834Z_extended`
 
-This run uses seeds `0-19`, `20000` online steps, reward-origin and feature-scale switches halfway through the stream, and alpha values `0.01`, `0.03`, and `0.1`. It changes the interpretation in an important way. Fixed discounted Sarsa can become numerically unstable after a feature-scale or joint reward/scale switch, with post-switch Q norms reaching about `1e8` and nonzero divergence in the early post-change window. Normalized reward-centered and normalized differential variants avoid divergence, which supports the core stability claim. However, they do not fully solve recovery after the harsh `hundred`-scale switch: late unshifted reward for normalized-centered and normalized-differential variants often falls to about `1.9-2.0` under feature-scale or joint-scale switches, even though reward-shift-only and lognormal-scale switches recover much better. The stronger conclusion is therefore not "unit invariance is solved"; it is that combined centering/normalization is necessary for stability, but no-reset recovery under abrupt feature-unit changes remains an open design problem.
+This run uses seeds `0-19`, `20000` online steps, reward-origin and feature-scale switches halfway through the stream, and alpha values `0.01`, `0.03`, and `0.1`. It changes the interpretation in an important way. Fixed discounted Sarsa can become numerically unstable after a feature-scale or joint reward/scale switch, with post-switch Q norms reaching about `1e8` and nonzero divergence in the early post-change window. Normalized reward-centered and normalized differential variants avoid divergence, which supports the core stability claim. However, they do not fully solve recovery after the harsh `hundred`-scale switch: late unshifted reward for normalized-centered and normalized-differential variants often falls to about `1.9-2.0` under feature-scale or joint-scale switches, even though reward-shift-only and lognormal-scale switches recover much better. The stronger conclusion is therefore not "unit invariance is solved"; it is that the combined variants are the only tested family that stabilizes both nuisance dimensions, while no-reset recovery under abrupt feature-unit changes remains an open design problem.
+
+Table 2 makes the no-reset evidence primary. Entries average the three alpha values over 20 seeds. `late reward` is mean tail `avg_unshifted_reward` in the `post_late` window; `Q` is mean tail Q norm; `div` is the mean tail divergence rate. For discounted Sarsa under `feature_scale_only` and `joint_reward_scale`, the condition summary has no `post_late` rows, so the table reports the early post-switch instability instead.
+
+**Table 2. No-reset unit-switch headline evidence from `20260709T024834Z_extended`.**
+
+| Switch type | Discounted Sarsa | Normalized reward-centered Sarsa | Normalized differential Sarsa | Main read |
+|---|---|---|---|---|
+| `reward_shift_only` | late reward `2.212`, Q `694`, div `0` | late reward `2.544`, Q `25`, div `0` | late reward `2.544`, Q `25`, div `0` | Reward-origin changes recover; centering also keeps the value scale small. |
+| `feature_scale_only` (`hundred`) | no late row; early Q `1.5e8`, div `0.23` | late reward `1.897`, Q `16`, div `0` | late reward `1.879`, Q `15.5`, div `0` | Combined methods stabilize numerics, but abrupt feature-unit recovery is poor. |
+| `joint_reward_scale` (`hundred`) | no late row; early Q `1.3e8`, div `0.23` | late reward `1.907`, Q `15.9`, div `0` | late reward `1.888`, Q `15.8`, div `0` | The joint abrupt switch repeats the unresolved recovery failure. |
+| `joint_reward_lognormal` | late reward `2.316`, Q `102`, div `0` | late reward `2.541`, Q `62.8`, div `0` | late reward `2.537`, Q `62.0`, div `0` | Milder irregular rescaling recovers much better. |
+
+Normalized Sarsa is the important intermediate control: it also survives abrupt scale switches, but it has lower fixed-condition reward and much larger Q norms than the combined variants. The evidence therefore supports combined centering/normalization as a stability improvement, while the abrupt no-reset recovery problem remains unsolved.
 
 Unit-switching summary figures:
 
@@ -169,7 +184,7 @@ Fixed-condition extended figures below use seed-tail condition summaries with 95
 
 ## Analysis
 
-The main insight is that reward-origin correction and feature-scale correction address different parts of the TD learning loop. Reward centering removes the constant component of the return that is irrelevant for average-reward control, but it does not prevent a large feature vector from producing an oversized parameter update. Output normalization controls the update direction's scale, but it does not remove the nuisance value offset created by shifted rewards. The fixed-condition pilot shows that the two mechanisms can compose: when both arbitrary units are stressed, the combined variants remain much more stable than either single correction.
+The main insight is that reward-origin correction and feature-scale correction address different parts of the TD learning loop. Reward centering removes the constant component of the return that is irrelevant for average-reward control, but it does not prevent a large feature vector from producing an oversized parameter update. Output normalization controls the update direction's scale, but it does not remove the nuisance value offset created by shifted rewards. The completed fixed-condition extended sweep shows that the two mechanisms can compose: when both arbitrary units are stressed, the combined variants remain much more stable than either single correction.
 
 The no-reset unit-switching result is the more important continual-learning test because it removes the hidden retuning assumption of fixed-condition sweeps. A stable method must continue from its current weights after the measurement convention changes. The result is mixed in a useful way: combined variants avoid the catastrophic Q-norm blow-up of fixed discounted Sarsa, but abrupt `hundred`-scale feature switches still reduce late unshifted reward. The open problem is therefore not whether unit correction matters; it is how an online control learner should recalibrate after a large unit change without replay, reset, or a special calibration phase.
 
@@ -179,7 +194,7 @@ Strict reviewer challenge: "You are just combining two tricks." Response: the sc
 
 Strict reviewer challenge: "Access-control is still small." Response: small is acceptable for Core RL if the manipulation is sharp and the diagnostics expose mechanism. The added unit-switching experiment now tests a harder no-reset adaptation case, and its mixed result prevents the report from overstating the fixed-condition pilot.
 
-Per-proposal audit matrix:
+Reviewer Audit Matrix:
 
 | Reviewer angle | Critique | Action taken | Remaining risk |
 |---|---|---|---|
@@ -195,7 +210,7 @@ The current evidence is stronger than the first pilot but still not a finished e
 
 ## Conclusion
 
-This proposal remains a strong independent Core-RL candidate because it has a clear invariance question, an interpretable continuing-control environment, and a nontrivial interaction: reward centering and output normalization solve different failure modes and compose in the completed fixed-condition extended grid. The stricter unit-switching extension prevents the conclusion from becoming too strong. Combined variants prevent the catastrophic numerical instability seen in fixed discounted Sarsa, but abrupt no-reset feature-scale changes can still reduce long-run unshifted reward. The current claim is therefore: centering plus normalization is necessary for stable unit changes, but recovery after abrupt feature-unit changes is still an open Core RL problem. The next step is gradual feature-scale drift, recovery AUC, and policy-distance probes, not another claim that unit invariance is solved.
+This proposal remains a strong independent Core-RL candidate because it has a clear invariance question, an interpretable continuing-control environment, and a nontrivial interaction: reward centering and output normalization solve different failure modes and compose in the completed fixed-condition extended grid. The stricter unit-switching extension prevents the conclusion from becoming too strong. Combined variants prevent the catastrophic numerical instability seen in fixed discounted Sarsa, but abrupt no-reset feature-scale changes can still reduce long-run unshifted reward. The current claim is therefore: centering plus normalization is the only tested combination that stabilizes both unit dimensions in this access-control grid, but recovery after abrupt feature-unit changes is still an open Core RL problem. The next step is gradual feature-scale drift, recovery AUC, and policy-distance probes, not another claim that unit invariance is solved.
 
 ## Reproduction
 

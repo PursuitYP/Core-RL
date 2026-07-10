@@ -24,6 +24,7 @@ from .studies.planning_offpolicy import (
     proposal_continual_dyna_model_aging_drift,
     proposal_dyna_planning_budget,
 )
+from .studies.predictive_budget import proposal_useful_predictive_knowledge_budget
 from .studies.prediction_scale import proposal_output_controlled_td, proposal_output_controlled_td_fairness
 from .studies.predictive_state import (
     proposal_predictive_state_plasticity,
@@ -54,6 +55,7 @@ RUNNERS: dict[str, Callable[[list[int], str, int], tuple[list[dict], dict]]] = {
     "unit_switching_continuing_control": proposal_unit_switching_control,
     "useful_gvfs_state": proposal_useful_gvfs_state,
     "useful_predictive_knowledge": proposal_useful_predictive_knowledge,
+    "useful_predictive_knowledge_budget": proposal_useful_predictive_knowledge_budget,
     "predictive_state_plasticity": proposal_predictive_state_plasticity,
     "generate_test_features": proposal_generate_test,
     "options_reusable_subtasks": proposal_options,

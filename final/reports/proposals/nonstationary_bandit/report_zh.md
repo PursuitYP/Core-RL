@@ -4,9 +4,23 @@
 
 ## 摘要
 
-本研究把 drifting multi-armed bandit 作为 continual adaptation 的最小测试。聚焦问题是：一个基础 online learner 在没有 replay 的情况下，是否还能保持足够 plasticity 来跟踪变化中的 action values。实验确认了预期现象：reward distribution 改变后，constant-alpha action-value estimates 比 sample averages 更能适应。
+本研究把 drifting multi-armed bandit 作为 continual adaptation 的最小测试。聚焦问题是：一个基础 online learner 在没有 replay 的情况下，是否还能保持足够 plasticity 来跟踪变化中的 action values。这个 pilot 与预期现象一致：reward distribution 改变后，constant-alpha action-value estimates 比 sample averages 更能适应。
 
 这个结果是有效的独立 study，其范围刻意保持狭窄。它回答了一个窄 plasticity question，并检查了 experiment pipeline、绘图和解释语言。它的限制同样重要：该任务没有 state、没有 temporal credit assignment、没有 bootstrapped value functions、没有 learned model、没有 planning，也没有 options。因此它应作为 bounded plasticity result 来推动更丰富的 Core RL settings，而不是单独作为完整 Core RL project。
+
+## Evidence Summary / 证据摘要
+
+本报告是一个刻意保持很小的 continual adaptation sanity check。它有用，是因为它隔离了 reward drift 下 vanishing effective step size 与 persistent plasticity 的差异；但它不足以支撑最终 Core RL submission。下面的证据摘要用于让读者在进入细节前先看到完整 scope 和 limitation。
+
+| 项目 | 当前证据 |
+|---|---|
+| RL question | 在 nonstationary reward stream 中，哪种基础 online bandit update 能在 best action 改变后保持 plasticity？ |
+| Testbed | Drifting multi-armed bandit，具有 stochastic rewards，并在 stream 后半段发生 reward-distribution shift。 |
+| Compared learners | Sample-average action values、constant-alpha action values、gradient bandit without baseline、gradient bandit with reward baseline。 |
+| Seeds and horizon | 五个 seeds，每个 learner `5000` online interaction steps。 |
+| Primary metric | Seed-tail best-action rate；reward 和 cumulative regret 是辅助指标。 |
+| Headline result | Constant-alpha action values 的 best-action rate 为 `0.306 +/- 0.270`，reward 为 `5.952 +/- 0.546`，cumulative regret 为 `2838 +/- 1020`；sample averages 的 best-action rate 为 `0.009 +/- 0.003`，reward 为 `5.040 +/- 0.394`，cumulative regret 为 `4321 +/- 1560`。 |
+| Conclusion boundary | 提示了一个最小 plasticity phenomenon；但太浅，不能作为最终 Core RL claim，因为它只有五个 seeds，并且缺少 state、bootstrapping、function approximation、planning、GVFs 和 temporal abstraction。 |
 
 ## 1. Proposal Template Answers / 提案模板回答
 
@@ -54,7 +68,7 @@ Main run：
 
 两个 gradient bandit variants 在这次 run 中位于二者之间：no-baseline variant 的 seed-tail mean best-action rate 约为 `0.176`，baseline variant 约为 `0.155`。Seed-tail summary 的 cumulative regret 也支持 constant-alpha learning，constant alpha 约为 `2838`，sample averaging 约为 `4321`。
 
-由于只有五个 seeds，且部分 learners 的 confidence intervals 很宽，证据有噪声。但定性模式足以支持 diagnostic claim：persistent step sizes 有助于在该 nonstationary bandit stream 中保持 adaptation。
+由于只有五个 seeds，且部分 learners 的 confidence intervals 很宽，证据有噪声。定性模式足以作为 sanity-check observation，但不足以作为强 empirical claim：persistent step sizes 在该 nonstationary bandit stream 中似乎更能保持 adaptation。
 
 ## 5. Analysis / 分析
 
@@ -81,7 +95,7 @@ Main run：
 
 ## 8. Conclusion / 结论
 
-这个 proposal 是独立且结论受限的 plasticity study：它确认在 drifting bandit 中，constant step sizes 比 sample averages 更能保持 plasticity，但不建立 submission-grade Core RL result。它最合适的用途是记录一个最小 adaptation phenomenon，并推动带 state、value functions 或 continuing control 的更丰富重设计。
+这个 proposal 是独立且结论受限的 plasticity study：它提示在这个 drifting bandit 中，constant step sizes 比 sample averages 更能保持 plasticity，但不建立 submission-grade Core RL result。它最合适的用途是记录一个最小 adaptation sanity check，并推动带 state、value functions 或 continuing control 的更丰富重设计。
 
 ## 9. Reproduction / 复现
 

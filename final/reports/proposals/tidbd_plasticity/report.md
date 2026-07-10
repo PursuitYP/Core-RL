@@ -8,6 +8,20 @@ This proposal studies per-feature step-size adaptation as a possible mechanism f
 
 The current pilot supports only the mechanism part of that story. TIDBD-lite shows interpretable feature-wise alpha dynamics after the switch, but normalized TD has slightly lower late prediction error. The proposal is therefore a mechanism diagnostic, not a performance victory. Its value is to separate "the learner changes its internal learning rates in a sensible way" from "the learner improves the prediction objective."
 
+## Evidence Summary
+
+This report is a mechanism study for adaptive step sizes. It does not claim that the simplified TIDBD-lite learner is already a better predictor. Instead, it separates two questions that are often blurred in continual-learning discussions: does the learner move feature-wise step sizes in a sensible direction, and does that movement improve the downstream TD prediction objective? The current evidence answers the first question partly yes and the second question no.
+
+| Item | Current evidence |
+|---|---|
+| RL question | Can per-feature step-size adaptation track changing feature relevance in online TD prediction? |
+| Testbed | Nonstationary sensor prediction stream with old-relevant, new-relevant, and distractor feature groups; relevance switches halfway through the stream. |
+| Compared learners | Fixed-alpha TD (`0.01`, `0.03`, `0.1`), normalized TD, and simplified TIDBD-lite. |
+| Seeds and horizon | Five seeds, `5000` online steps per learner. |
+| Primary metric | Post-change absolute TD error, with group-wise alpha trajectories as mechanism diagnostics. |
+| Headline result | TIDBD-lite raises new-feature alpha from about `0.0068` before the switch to about `0.0093` late after the switch, while distractor alpha stays near `0.0068`; however, normalized TD has lower late post-change absolute TD error (`0.4419 +/- 0.0085`) than TIDBD-lite (`0.4493 +/- 0.0119`). |
+| Conclusion boundary | Evidence supports visible adaptive-step-size dynamics, not a performance advantage. Stronger claims require canonical TIDBD/AutoStep, repeated switches, recovery AUC, and alpha-utility correlation. |
+
 ## Claim Boundary
 
 The report makes one bounded claim:

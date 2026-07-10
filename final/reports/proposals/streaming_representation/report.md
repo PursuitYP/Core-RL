@@ -8,6 +8,20 @@ This study tests a common representation-learning intuition in a small streaming
 
 The result is useful because it shows that an auxiliary loss is not automatically a useful prediction. The auxiliary target must be relevant to the value or control question the agent is trying to answer. This proposal is therefore an independent negative result and redesign target, not evidence against auxiliary learning or GVFs in general.
 
+## Evidence Summary
+
+This report is a negative representation diagnostic. It asks a narrow but important question: does a convenient auxiliary target improve the downstream value prediction that actually matters? The answer in the current stream is no. That negative answer is useful because it prevents a common overclaim: an auxiliary prediction can be learnable without being useful for the agent's value question.
+
+| Item | Current evidence |
+|---|---|
+| RL question | Does an auxiliary next-feature prediction objective improve online value prediction in a streaming linear setting without replay or deep networks? |
+| Testbed | Nonstationary sensor stream with a feature-relevance switch; the learner observes features online and cannot revisit past transitions. |
+| Compared learners | Value-only normalized TD versus normalized TD with an auxiliary next-feature prediction head. |
+| Seeds and horizon | Five seeds, `5000` online steps per learner. |
+| Primary metric | Seed-tail absolute TD error for the downstream value predictor; auxiliary MSE and weight norm are diagnostics. |
+| Headline result | In phase 1, auxiliary next-feature prediction has absolute TD error `0.5298 +/- 0.0243`, while value-only TD has `0.5301 +/- 0.0240`; auxiliary MSE is low (`0.0413 +/- 0.0002`) but does not produce a value-error gain. |
+| Conclusion boundary | Negative result for this auxiliary target; not evidence against auxiliary learning or GVFs generally. A stronger version needs task-relevant auxiliary questions and ablations. |
+
 ## 1. Proposal Template Answers
 
 Focused RL question: Does an auxiliary next-feature prediction objective improve online value prediction in a streaming linear setting without replay or deep networks?

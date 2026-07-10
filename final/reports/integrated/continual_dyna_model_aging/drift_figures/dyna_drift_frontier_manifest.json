@@ -1,0 +1,11 @@
+{
+  "source_result_dir": "experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended",
+  "candidate_rows": 90,
+  "realistic_rows": 81,
+  "frontier_rows": 21,
+  "outputs": [
+    "dyna_drift_postlate_candidates.csv",
+    "dyna_drift_reward_stale_frontier.csv",
+    "report_drift_reward_stale_frontier.png"
+  ]
+}

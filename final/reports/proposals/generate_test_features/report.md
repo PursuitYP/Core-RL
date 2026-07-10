@@ -6,6 +6,20 @@ Status: independent negative/redesign proposal. The current experiment is not po
 
 Continual agents need representations that can change while learning online. This proposal studies a minimal version of that problem: a prediction agent has a small budget of temporal trace features, the reward delay changes during the stream, and the agent must decide which traces to keep or replace. The intended hypothesis was that utility-based generate-and-test replacement would recover useful timescales faster than fixed trace banks or random replacement. The pilot does not support that hypothesis. Generate-and-test often moves active trace timescales closer to the new delay, but it does not reduce prediction error relative to fixed or random baselines. The result is therefore a negative redesign result: the experiment identifies a real Core RL question, but the current utility proxy is not yet aligned with downstream prediction improvement.
 
+## Evidence Summary
+
+This report is a negative generate-and-test pilot. It keeps two kinds of evidence separate: structural feature movement and downstream prediction error. The current utility rule can change the feature set, but the downstream error metric does not improve. That distinction is the main research value of the report, because a continual agent should select features for their contribution to prediction or control, not for looking plausible.
+
+| Item | Current evidence |
+|---|---|
+| RL question | Under a fixed trace-feature budget, can utility-based generate-and-test replacement preserve or recover useful temporal traces after the reward delay changes? |
+| Testbed | Streaming trace-conditioning prediction stream with a cue, delayed reward, and midstream delay switch from `10` to `20`. |
+| Compared feature strategies | Fixed tight trace bank, oracle-style trace bank, random replacement, and utility-based generate-and-test replacement. |
+| Seeds and horizon | Five seeds, `5000` online steps, feature budget `4`. |
+| Primary metric | Post-late absolute prediction error after the delay switch; replacement count and trace timescale movement are diagnostics. |
+| Headline result | Post-late absolute error is `0.0496 +/- 0.0004` for random replacement, `0.0512 +/- 0.0000` for fixed tight traces, `0.0518 +/- 0.0004` for generate-and-test, and `0.0545` for the current oracle-style bank. Generate-and-test changes features but does not improve the behavioral metric. |
+| Conclusion boundary | Negative redesign result for this utility rule and testbed. It does not refute generate-and-test generally, but it blocks a positive feature-learning claim until a validation stream and loss-aligned utility rule are added. |
+
 ## Study Claim And Evidence Level
 
 This is a standalone representation-learning proposal. Its claim is deliberately limited:

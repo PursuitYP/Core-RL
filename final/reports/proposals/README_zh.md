@@ -2,7 +2,7 @@
 
 每个子目录包含英文 `report.md` 和中文 `report_zh.md`。这些 proposal 都有独立研究问题，但证据强度不同：Reward-Centered Sarsa 与 Output-Controlled TD 是主线候选；Dyna Planning Budget 是独立 planning 诊断；GVF、generate-and-test、TIDBD、options、bandit、streaming representation 等方向目前包含负结果、独立机制诊断或需要 redesign 的材料。
 
-不要把所有 proposal 等同为 submission-grade 正结果。当前项目更重视诚实解释：强 proposal 要突出机制与证据；弱 proposal 要说明为什么弱、失败暴露了什么 Core-RL 问题、下一步如何升级。
+不要把所有 proposal 等同为 submission-grade 正结果。当前项目更重视诚实解释：强 proposal 要突出机制与证据；弱 proposal 要说明为什么弱、失败暴露了什么 Core-RL 问题、下一步如何升级。除了本目录十三个普通 proposal，`../integrated/` 还包含四个更大的独立 Core-RL 课题：Scale-Invariant Continuing Control、Continual Dyna Model Aging、Predictive State Plasticity 和 Useful Predictive Knowledge。它们不是普通 proposal 的简单拼接，也不替代这里的十三个目录，而是各自有独立研究问题、实验流程和报告的更综合候选。
 
 ## 当前 Proposal 表
 
@@ -23,3 +23,7 @@
 | Streaming Representation | dropped auxiliary-prediction diagnostic | `experiments/alberta_core_rl/results/streaming_representation/20260708T160958Z_main` | `streaming_representation/report.md` / `report_zh.md` |
 
 最终审阅时，优先读 `final/indexes/status_zh.md`、`final/indexes/results_zh.md` 和每个 proposal 的 `report_zh.md`。`final/archive/` 只保留早期碎片和审计记录，不作为当前结论来源。
+
+## 更大独立 Proposal 入口
+
+`../integrated/` 下目前共有四个更大独立 proposal。Scale-Invariant Continuing Control 和 Continual Dyna Model Aging 的完成度最高，分别对应 continuing-control invariance 和 continual planning/model freshness。Predictive State Plasticity 与 Useful Predictive Knowledge 更偏 representation/GVF 方向，已经有 staged evidence，但仍需要严格阅读各自报告中的限制、负结果和后续实验边界。最终选择题目时，不应把普通目录中的机制诊断和 integrated 目录中的大课题重复计数；例如某些 GVF/T-maze 诊断材料应作为 supporting evidence，而不是和更大的 predictive-knowledge 课题同时当作独立最终提交。

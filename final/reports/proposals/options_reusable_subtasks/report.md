@@ -6,6 +6,20 @@ Status: independent bounded negative-result study. This proposal asks whether do
 
 Options are often motivated as temporally extended actions that can make exploration, planning, and transfer easier. This study tests that idea in a deliberately small Four Rooms navigation task using hand-coded doorway options. The core methodological rule is real environment-step accounting: an option may compress several primitive moves into one high-level decision, but it still consumes the same interaction steps. In the current changing-goal pilot, primitive control slightly outperforms both short and long doorway-option controllers when reward is measured per real environment step. Options are selected and sometimes reach their local doorway targets, but their commitment cost is not repaid by better goal recovery or better final reward. The result is therefore a bounded negative pilot rather than evidence for reusable-subtask transfer.
 
+## Evidence Summary
+
+This report is an options accounting study. It does not ask whether options can ever help; it asks whether these hand-coded doorway options help when measured by real environment steps rather than by compressed high-level decisions. The current evidence says they do not. That finding is still useful because it identifies the exact gate a positive options project must pass: fixed-goal validation and explicit SMDP duration accounting before any transfer claim.
+
+| Item | Current evidence |
+|---|---|
+| RL question | Do hand-coded doorway options provide reusable subtasks in Four Rooms when performance and learning are evaluated with real environment-step and SMDP duration accounting? |
+| Testbed | Larger Four Rooms navigation with primitive movement, doorway options, and alternating goals. |
+| Compared controllers | Primitive actions only; primitive actions plus short doorway options; primitive actions plus long doorway options. |
+| Seeds and horizon | Five seeds, `5000` real environment steps per controller. |
+| Primary metric | Seed-tail reward per real environment step; option usage, duration, and success are diagnostics. |
+| Headline result | Primitive control has reward per environment step `-0.00919 +/- 0.00040`; short options have `-0.00935 +/- 0.00122`; long options have `-0.00995 +/- 0.000004`. Short and long options are used (`0.222` and `0.176` of decisions), but usage does not convert into better reward. |
+| Conclusion boundary | Bounded negative result for the current option definitions and changing-goal setting; transfer claim remains quarantined until fixed-goal sanity and SMDP backup audits pass. |
+
 ## Proposal Template Answers
 
 Focused RL question: Do hand-coded doorway options provide reusable subtasks in Four Rooms when performance and learning are evaluated with real environment-step and SMDP duration accounting?

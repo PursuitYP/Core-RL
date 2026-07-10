@@ -6,6 +6,20 @@
 
 Continual agent 需要能在在线学习中改变的 representation。本 proposal 研究这个问题的最小形式：prediction agent 只有很小的 temporal trace feature budget，reward delay 在 stream 中改变，agent 必须决定保留或替换哪些 traces。原始假设是 utility-based generate-and-test replacement 会比 fixed trace banks 或 random replacement 更快恢复有用 timescales。Pilot 不支持这个假设。Generate-and-test 经常把 active trace timescales 移向新的 delay，但没有相对于 fixed 或 random baselines 降低 prediction error。因此它是一个 negative redesign result：研究问题是有效的 Core RL 问题，但当前 utility proxy 还没有和 downstream prediction improvement 对齐。
 
+## Evidence Summary / 证据摘要
+
+本报告是 negative generate-and-test pilot。它把两类证据分开：structural feature movement 和 downstream prediction error。当前 utility rule 可以改变 feature set，但 downstream error metric 没有改善。这个区分是本报告最主要的研究价值，因为 continual agent 应根据 feature 对 prediction 或 control 的贡献来选择 features，而不是因为 feature 看起来 plausible。
+
+| 项目 | 当前证据 |
+|---|---|
+| RL question | 在固定 trace-feature budget 下，utility-based generate-and-test replacement 能否在 reward delay 改变后保留或恢复有用 temporal traces？ |
+| Testbed | Streaming trace-conditioning prediction stream，包含 cue、delayed reward，以及从 `10` 到 `20` 的 midstream delay switch。 |
+| Compared feature strategies | Fixed tight trace bank、oracle-style trace bank、random replacement 和 utility-based generate-and-test replacement。 |
+| Seeds and horizon | 五个 seeds，`5000` online steps，feature budget `4`。 |
+| Primary metric | Delay switch 后的 post-late absolute prediction error；replacement count 和 trace timescale movement 是诊断指标。 |
+| Headline result | Post-late absolute error：random replacement 为 `0.0496 +/- 0.0004`，fixed tight traces 为 `0.0512 +/- 0.0000`，generate-and-test 为 `0.0518 +/- 0.0004`，当前 oracle-style bank 为 `0.0545`。Generate-and-test 会改变 features，但没有改善 behavioral metric。 |
+| Conclusion boundary | 这是当前 utility rule 和 testbed 的 negative redesign result。它不否定 generate-and-test 一般方法，但在加入 validation stream 和 loss-aligned utility rule 前，不能提出正向 feature-learning claim。 |
+
 ## 研究主张与证据等级
 
 这是独立 representation-learning proposal。它的主张必须保持窄：

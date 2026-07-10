@@ -25,7 +25,7 @@ Compute need and fallback: The extended first-gate run is complete. If no furthe
 
 ## Independent Research Scope
 
-This proposal is an independent representation and partial-observability study. The current scope is fixed predictive state under T-maze partial observability. Limited-budget feature replacement, generated traces, and feature-wise step-size adaptation are later stages inside the same research program, gated on whether a useful predictive feature can first be demonstrated. The present claim does not require those later mechanisms to succeed.
+This proposal is an independent representation and partial-observability study. The current scope is fixed predictive state under T-maze partial observability. Limited-budget feature replacement, generated traces, and feature-wise step-size adaptation are future-work mechanisms, gated on whether a useful predictive feature can first be demonstrated. The present negative claim does not depend on those later mechanisms and should be evaluated on the fixed predictive-state evidence alone.
 
 The proposal explicitly does not claim that GVFs fail in general. It claims that the current cue-GVF and recurrent-GVF constructions do not carry or expose the cue strongly enough for downstream linear control in this setting. This boundary is important because it turns a negative result into a design constraint rather than a broad dismissal of predictive knowledge.
 
@@ -33,7 +33,7 @@ The proposal explicitly does not claim that GVFs fail in general. It claims that
 
 Evidence level: high-value negative gate with 20-seed extended evidence. The completed run covers maze lengths `8`, `12`, `20`, and `30`, five representation modes, and 20000 online steps per condition. The evidence is strong enough to say that the current learned GVF features do not become useful state in this T-maze.
 
-The evidence is not a positive plasticity result. It now includes a cue-decodability probe, but it still does not include oracle-prediction control, GVF output normalization, feature ablations, phase switches, limited-budget feature replacement, or a fully specified feature-wise step-size adaptation baseline. Those missing experiments are not minor details; they are the necessary next gates for turning the negative result into a stronger research program.
+The evidence is not a positive plasticity result. It now includes a cue-decodability probe, but it still does not include oracle-prediction control, GVF output normalization, feature ablations, phase switches, limited-budget feature replacement, or a fully specified feature-wise step-size adaptation baseline. Those missing experiments are future work, not hidden support for the current claim.
 
 ## Paper-Style Contribution And Claim Boundaries
 
@@ -84,8 +84,8 @@ Learning variants:
 
 - Fixed feature set with ordinary TD/Sarsa.
 - Fixed feature set with normalized updates.
-- Planned limited-budget feature replacement based on downstream TD-error contribution.
-- Planned feature-wise step-size adaptation, treated as exploratory and only worth running after the fixed useful-GVF gate is understood.
+- Future-work limited-budget feature replacement based on downstream TD-error contribution.
+- Future-work feature-wise step-size adaptation, treated as exploratory and only worth running after the fixed useful-GVF gate is understood.
 
 ## Experimental Design
 
@@ -126,7 +126,7 @@ The current extended run is a gate rather than a full program. Maze length tests
 
 ## Expected Results And Failure Modes
 
-Expected positive pattern: oracle memory and fixed trace memory should define upper bounds. Naive GVFs may fail unless their questions align with hidden cue information. Later replacement mechanisms should help only if utility is tied to downstream control; later feature-wise plasticity should reveal whether useful predictive features remain learnable after a phase switch.
+Expected positive pattern: oracle memory and fixed trace memory should define upper bounds. Naive GVFs may fail unless their questions align with hidden cue information. Future replacement mechanisms should help only if utility is tied to downstream control; future feature-wise plasticity should be tested only after a fixed predictive feature becomes control-useful.
 
 Failure modes:
 
@@ -175,11 +175,11 @@ The central interpretation is that information content and control usefulness ar
 
 ## Reviewer Critique And Revisions
 
-Strict reviewer challenge: "The GVF result is negative, so why continue?" Response: the negative result is exactly the design signal. It says current GVF questions do not carry the cue; the next experiment must measure cue information and downstream usefulness directly.
+Strict reviewer challenge: "The GVF result is negative, so why continue?" Response: the negative result is exactly the design signal. It says current GVF questions carry at most weak cue information and do not expose it as usable control state; the next experiment must measure cue information and downstream usefulness directly.
 
-Strict reviewer challenge: "This is too broad." Response: the proposal should be run in layers: first fixed useful GVF questions, then limited-budget selection, then step-size plasticity. The combined variant is not promoted until earlier layers pass.
+Strict reviewer challenge: "This is too broad." Response: the current report is only the fixed predictive-state gate. Limited-budget selection and step-size plasticity remain future work and are not evidence for the present claim.
 
-Per-proposal audit matrix:
+Reviewer Audit Matrix:
 
 | Reviewer angle | Critique | Action taken | Remaining risk |
 |---|---|---|---|

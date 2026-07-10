@@ -6,6 +6,20 @@
 
 Options 常被用来说明 temporally extended actions 可以改善 exploration、planning 和 transfer。本研究在一个有意保持小型的 Four Rooms navigation task 中，用 hand-coded doorway options 测试这个想法。核心方法规则是真实 environment-step accounting：option 可能把多个 primitive moves 压缩成一个 high-level decision，但它仍然消耗同样的 interaction steps。在当前 changing-goal pilot 中，如果按 reward per real environment step 衡量，primitive control 略优于 short 和 long doorway-option controllers。Options 会被选择，也有时能到达局部 doorway target，但它们的 commitment cost 没有换来更好的 goal recovery 或 final reward。因此当前结果是 bounded negative pilot，而不是 reusable-subtask transfer 的证据。
 
+## Evidence Summary / 证据摘要
+
+本报告是一个 options accounting study。它不问 options 是否永远不会有用，而是问这些 hand-coded doorway options 在按真实 environment steps 而不是压缩后的 high-level decisions 衡量时是否有用。当前证据显示它们没有改善主指标。这个发现仍然有用，因为它指出了一个正向 options project 必须先通过的 gate：fixed-goal validation 和显式 SMDP duration accounting，然后才能提出 transfer claim。
+
+| 项目 | 当前证据 |
+|---|---|
+| RL question | 在 Four Rooms 中，如果 performance 和 learning 都按真实 environment-step 和 SMDP duration accounting 评价，hand-coded doorway options 是否提供 reusable subtasks？ |
+| Testbed | Larger Four Rooms navigation，包含 primitive movement、doorway options 和 alternating goals。 |
+| Compared controllers | 只用 primitive actions；primitive actions 加 short doorway options；primitive actions 加 long doorway options。 |
+| Seeds and horizon | 五个 seeds，每个 controller `5000` real environment steps。 |
+| Primary metric | Seed-tail reward per real environment step；option usage、duration 和 success 是诊断指标。 |
+| Headline result | Primitive control 的 reward per environment step 为 `-0.00919 +/- 0.00040`；short options 为 `-0.00935 +/- 0.00122`；long options 为 `-0.00995 +/- 0.000004`。Short 和 long options 确实被使用（decision 中占 `0.222` 和 `0.176`），但 usage 没有转化为更好的 reward。 |
+| Conclusion boundary | 当前 option definitions 和 changing-goal setting 下是 bounded negative result；transfer claim 在 fixed-goal sanity 和 SMDP backup audits 通过前继续 quarantine。 |
+
 ## Proposal Template Answers / 提案模板回答
 
 Focused RL question：在 Four Rooms 中，如果 performance 和 learning 都按真实 environment-step 和 SMDP duration accounting 评价，hand-coded doorway options 是否提供 reusable subtasks？

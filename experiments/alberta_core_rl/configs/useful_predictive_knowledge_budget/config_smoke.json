@@ -1,0 +1,7 @@
+{
+  "proposal": "useful_predictive_knowledge_budget",
+  "suite": "smoke",
+  "seeds": [0, 1],
+  "steps": 800,
+  "notes": "Smoke run for the useful-predictive-knowledge feature-budget gate."
+}

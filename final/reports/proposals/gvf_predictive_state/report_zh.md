@@ -4,7 +4,21 @@
 
 ## 摘要
 
-本 proposal 检验 General Value Function predictions 是否能在 partial observability 下成为有用 agent state。T-maze 任务中，agent 在起点看到左右 cue，之后进入 aliased corridor，直到 junction 才需要根据早期 cue 选择动作。当前 main pilot 比较 raw observation、short history、trace memory、recurrent GVF features 和 oracle memory。Trace memory 与 oracle memory 能解决任务，而当前 recurrent GVF design 仍接近 chance。这个结果不说明 GVF 一般无用；它说明当前 GVF question/state design 没有携带 control 所需的 hidden cue 信息。
+本 proposal 检验 General Value Function predictions 是否能在 partial observability 下成为有用 agent state。T-maze 任务中，agent 在起点看到左右 cue，之后进入 aliased corridor，直到 junction 才需要根据早期 cue 选择动作。当前 main pilot 比较 raw observation、short history、trace memory、recurrent GVF features 和 oracle memory。Trace memory 与 oracle memory 能解决任务，而当前 recurrent GVF design 仍接近 chance。这个结果不说明 GVF 一般无用；它说明当前 GVF question/state design 没有成为可用 control state。本 pilot 还没有 direct cue-decodability probe，因此不能声称 GVF 完全没有弱 cue 信息。
+
+## Evidence Summary / 证据摘要
+
+本报告是 negative useful-state pilot。它不是判断 GVFs 是否永远不能构造 state，而是问当前 recurrent GVF design 在一个干净的 partial-observability control task 中是否成为 useful state。当前证据的答案是否定的。Trace 和 oracle memory 说明任务可由小型非深度 features 解决；recurrent GVF condition 在真正重要的 decision 上仍接近 chance。
+
+| 项目 | 当前证据 |
+|---|---|
+| RL question | Learned GVF feature 能否在 partially observable T-maze 中成为可用 control state，而 useful state 必须保留早期 cue？ |
+| Testbed | Long aliased T-maze，包含 start cue、cue-free corridor、delayed junction action 和 online linear Sarsa control。 |
+| Compared state constructions | Raw observation、short history、trace memory、recurrent GVF features 和 oracle cue memory。 |
+| Seeds and horizon | 五个 seeds，`5000` online steps，maze length `12`。 |
+| Primary metric | Cue-dependent junction decision 的 seed-tail trial accuracy；reward 和 GVF TD error 是诊断指标。 |
+| Headline result | Trace memory 的 trial accuracy 为 `0.944 +/- 0.018`，oracle 为 `0.939 +/- 0.027`；recurrent GVF 为 `0.502 +/- 0.023`，接近 raw observation `0.512 +/- 0.038` 和 short history `0.492 +/- 0.043`。 |
+| Conclusion boundary | 当前 recurrent GVF features 在这个 pilot 中不是 usable control state。本报告没有测 direct cue-decodability，因此更强 information-content claim 需要新 probe。 |
 
 ## Proposal Template Answers / 提案模板回答
 
@@ -28,7 +42,7 @@ Compute need / fallback：当前 result 是 five-seed pilot。诚实 fallback �
 
 证据等级：negative pilot / redesign target。这个结果足以说明当前 recurrent-GVF pilot 不应被提交为 positive GVF-state result。它仍受限于 five seeds 和一个 maze length。
 
-核心 failure mechanism 很清楚：cheap trace memory 能解任务，而当前 recurrent GVF 不能。任何更强的 predictive-state claim 都需要更大规模 runs 和直接 cue-decodability evidence。
+核心 control failure 很清楚：cheap trace memory 能解任务，而当前 recurrent GVF 不能把 junction decisions 提升到 chance 以上。任何更强的 predictive-state claim 都需要更大规模 runs 和直接 cue-decodability evidence。
 
 ## 研究动机
 
@@ -38,7 +52,7 @@ Compute need / fallback：当前 result 是 five-seed pilot。诚实 fallback �
 
 ## 研究问题
 
-主问题：learned GVF predictions 能否在 partially observable T-maze 中提供缺失的 cue information，从而改善 trial-end control accuracy？
+主问题：learned GVF predictions 能否在 partially observable T-maze 中成为可用 control state，而这个 state 必须保留早期 cue？
 
 更具体地说，加入 recurrent GVF feature 是否能明显优于 raw observation 和 short history，并接近 cheap trace-memory baseline？Trace baseline 被故意设置得强而简单，因为如果一个非深度手写 trace 能解决任务，而 GVF 不能接近它，就不能把当前 GVF 设计包装成正结果。
 
@@ -76,11 +90,11 @@ T-maze 构造了一个最小但有意义的 partial-observability problem。Raw 
 
 Trace memory 与 oracle memory 能解决任务，seed-aware tail trial accuracy 分别约为 `0.944 +/- 0.018` 和 `0.939 +/- 0.027`。这说明在项目限制下，任务并不是不可解；小型非深度记忆足以提供所需 state augmentation。
 
-Raw observation、short history 和 recurrent GVF 仍接近 chance，约为 `0.512`、`0.492` 和 `0.502`。当前 GVF state 因此没有携带 junction decision 所需的 cue information。Trajectory plot 也支持这个解释：learned GVF signal 没有像 hand-coded trace 那样形成清晰且持续到 junction 的 cue-dependent trace。
+Raw observation、short history 和 recurrent GVF 仍接近 chance，约为 `0.512`、`0.492` 和 `0.502`。当前 GVF state 因此没有成为 junction decision 可用的 control state。Trajectory plot 支持谨慎解释：learned GVF signal 没有像 hand-coded trace 那样形成清晰且持续到 junction 的 cue-dependent trace；但本报告还没有 direct linear cue probe，所以安全结论是 control usability 失败，而不是 cue information 完全不存在。
 
 ## 分析
 
-这个负结果有价值，因为它排除了几个模糊解释。第一，任务不是无法被小 agent 解决，因为 trace/oracle 成功；第二，control learner 不是完全坏掉，因为在合适 state 下它能学；第三，失败集中指向当前 GVF question/state design 不足。
+这个负结果有价值，因为它排除了几个模糊解释。第一，任务不是无法被小 agent 解决，因为 trace/oracle 成功；第二，control learner 不是完全坏掉，因为在合适 state 下它能学；第三，失败集中指向当前 GVF question/state design 没有成为可用 predictive state。
 
 这也给 GVF 研究提出了更严格标准：不是所有 prediction 都值得进入 agent state。一个 useful GVF 应该同时满足至少三个条件：它预测的问题与 hidden variable 或未来 decision 有关；它的 output scale 和 dynamics 能被 control learner 使用；它在 downstream control 上接近或超过简单 memory baseline。
 
@@ -108,7 +122,7 @@ Strict baseline reviewer 会指出：如果 trace memory 这么便宜，GVF 必�
 
 ## 结论
 
-GVF Predictive State 是一个独立负结果。它说明当前 T-maze 任务可由 cheap memory 解决，但当前 learned GVF feature 不能解决。下一轮不应只调超参数，而应重新设计 GVF questions，使 learned prediction 明确携带 hidden cue，并在 junction decision 上产生可测的控制收益。
+GVF Predictive State 是一个独立负结果。它说明当前 T-maze 任务可由 cheap memory 解决，但当前 learned GVF feature 不能解决。下一轮不应只调超参数，而应加入 cue-decodability probes，并重新设计 GVF questions，使 learned prediction 明确关联 hidden cue，并在 junction decision 上产生可测的控制收益。
 
 ## 复现
 

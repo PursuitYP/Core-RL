@@ -24,11 +24,11 @@ This distinction is deliberate. The project requirement asked for independent pr
 
 ## Evidence Tiers
 
-Main independent candidates: Reward-Centered Sarsa and Output-Controlled TD have the cleanest standalone question, implementation, baseline comparison, current result, and direct Alberta Plan connection.
+Main independent candidates: Reward-Centered Sarsa and Output-Controlled TD have the cleanest standalone question, implementation, baseline comparison, current result, and direct Alberta Plan connection among the ordinary proposal folders.
 
 Conditional or upgradeable candidates: Dyna Planning Budget, GVF Predictive State, Generate-and-Test, TIDBD, Baird, Options, GVF Question Design, On-policy Stability Atlas, Centered TD Diagnostics, Streaming Representation, and Nonstationary Bandit each document an independent question, but some are currently negative, diagnostic, or too narrow to submit unchanged. Their reports should be read as honest research records, not as equally strong final proposals.
 
-Larger independent candidates: Scale-Invariant Continuing Control and Continual Dyna Model Aging currently look stronger than most weak single proposals because they combine several Core RL pressures into one coherent research question. Predictive State Plasticity is important but still high-risk because current evidence is a first-gate negative result.
+Larger independent candidates: Scale-Invariant Continuing Control, Continual Dyna Model Aging, Predictive State Plasticity, and Useful Predictive Knowledge live in `../integrated/`. Scale-Invariant and Continual Dyna currently have the strongest completed evidence. Predictive State Plasticity and Useful Predictive Knowledge are important representation-focused directions with staged evidence and stricter remaining claim boundaries.
 
 ## File Contract
 
@@ -42,10 +42,11 @@ Weak proposals remain included only when they have an honest negative or dropped
 
 ## Additional Large Independent Proposals
 
-Three larger independent Core RL proposals live in `../integrated/`:
+Four larger independent Core RL proposals live in `../integrated/`:
 
 - Scale-Invariant Continuing Control.
 - Continual Dyna Model Aging.
 - Predictive State Plasticity.
+- Useful Predictive Knowledge.
 
 These are additional independent research topics with their own standalone reports. They do not replace the 13 canonical proposal folders.

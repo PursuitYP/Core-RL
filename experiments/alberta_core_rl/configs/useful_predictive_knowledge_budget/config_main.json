@@ -1,0 +1,7 @@
+{
+  "proposal": "useful_predictive_knowledge_budget",
+  "suite": "main",
+  "seeds": [0, 1, 2, 3, 4, 5, 6, 7],
+  "steps": 8000,
+  "notes": "Gate-3 run: two-feature state budget for raw, trace, oracle, fixed GVF pairs, low-TD-error selection, and oracle-decoding selection."
+}

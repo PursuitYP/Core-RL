@@ -4,9 +4,23 @@ Status: independent limited-scope plasticity study. The result is useful and rep
 
 ## Abstract
 
-This study evaluates a drifting multi-armed bandit as the smallest possible test of continual adaptation. The focused question is whether an elementary online learner can keep enough plasticity to track changing action values without replay. The experiment confirms the expected pattern: constant-alpha action-value estimates adapt better than sample averages after the reward distribution changes.
+This study evaluates a drifting multi-armed bandit as the smallest possible test of continual adaptation. The focused question is whether an elementary online learner can keep enough plasticity to track changing action values without replay. The pilot is consistent with the expected pattern: constant-alpha action-value estimates adapt better than sample averages after the reward distribution changes.
 
 The result is a valid independent study with a deliberately narrow scope. It answers a small plasticity question and checks the experiment pipeline, plotting, and interpretation language. Its limitation is equally important: the task has no state, no temporal credit assignment, no bootstrapped value functions, no learned model, no planning, and no options. It should therefore be used as a bounded plasticity result that motivates richer Core RL settings, not as a full Core RL project by itself.
+
+## Evidence Summary
+
+This report is a deliberately small sanity check for continual adaptation. It is useful because it isolates the difference between vanishing effective step sizes and persistent plasticity under reward drift, but it is not deep enough to carry a final Core RL submission. The evidence summary below is included so the reader can see the full scope and limitation before reading the detailed sections.
+
+| Item | Current evidence |
+|---|---|
+| RL question | In a nonstationary reward stream, which elementary online bandit update preserves plasticity after the best action changes? |
+| Testbed | Drifting multi-armed bandit with stochastic rewards and a reward-distribution shift in the second half of the stream. |
+| Compared learners | Sample-average action values, constant-alpha action values, gradient bandit without baseline, and gradient bandit with reward baseline. |
+| Seeds and horizon | Five seeds, `5000` online interaction steps per learner. |
+| Primary metric | Seed-tail best-action rate; reward and cumulative regret are supporting metrics. |
+| Headline result | Constant-alpha action values reach best-action rate `0.306 +/- 0.270`, reward `5.952 +/- 0.546`, and cumulative regret `2838 +/- 1020`; sample averages reach best-action rate `0.009 +/- 0.003`, reward `5.040 +/- 0.394`, and cumulative regret `4321 +/- 1560`. |
+| Conclusion boundary | Suggests a minimal plasticity phenomenon; too shallow for a final Core RL claim because it has only five seeds and lacks state, bootstrapping, function approximation, planning, GVFs, and temporal abstraction. |
 
 ## 1. Proposal Template Answers
 
@@ -54,7 +68,7 @@ The observed ordering matches the hypothesis. Constant-alpha action values are s
 
 The gradient bandit variants fall between those two in this run: the no-baseline variant has seed-tail mean best-action rate about `0.176`, and the baseline variant about `0.155`. Cumulative regret also favors constant-alpha learning in the seed-tail summary, with about `2838` for constant alpha versus about `4321` for sample averaging.
 
-The evidence is noisy because there are only five seeds, and the confidence intervals for some learners are wide. Still, the qualitative pattern is enough for the diagnostic claim: persistent step sizes help preserve adaptation in this nonstationary bandit stream.
+The evidence is noisy because there are only five seeds, and the confidence intervals for some learners are wide. The qualitative pattern is enough for a sanity-check observation, not a strong empirical claim: persistent step sizes appear to preserve adaptation better in this nonstationary bandit stream.
 
 ## 5. Analysis
 
@@ -81,7 +95,7 @@ This mechanism is relevant to persistent adaptation, step-size adaptation, rewar
 
 ## 8. Conclusion
 
-This proposal is an independent bounded plasticity study: it confirms that constant step sizes preserve plasticity better than sample averages in a drifting bandit, but it does not establish a submission-grade Core RL result. Its best use is to document a minimal adaptation phenomenon and to motivate a richer redesign with state, value functions, or continuing control.
+This proposal is an independent bounded plasticity study: it suggests that constant step sizes preserve plasticity better than sample averages in this drifting bandit, but it does not establish a submission-grade Core RL result. Its best use is to document a minimal adaptation sanity check and to motivate a richer redesign with state, value functions, or continuing control.
 
 ## 9. Reproduction
 

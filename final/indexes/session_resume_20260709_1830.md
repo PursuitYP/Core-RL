@@ -4,6 +4,8 @@ Timestamp: 2026-07-09 18:30 HKT
 
 This file records the current state before pausing the session. Use it as the first file to read after resuming work. The project is not complete; this note preserves exactly what was finished, what is running, and what should happen next.
 
+Post-resume resolution note: this file is a historical pause snapshot. The subsequent continuation completed the Useful Predictive Knowledge main run, the Reward-Centered sensitivity sweep, and the Dyna drift sweep; current evidence/status should be read from `final/indexes/status.md`, `final/indexes/results.md`, and `final/indexes/reproduction.md`.
+
 ## Current User Priority
 
 The active task is the large revision requested by the user: every proposal must remain an independent academic-style study, reports must be clearer and more paper-like, figures must be readable, requirements 2 and 3 in `final/indexes/revise_plan_20260709.md` and `final/indexes/revise_plan_20260709_zh.md` must be genuinely addressed, and the work should keep iterating instead of stopping after superficial edits.
@@ -63,31 +65,13 @@ The active task is the large revision requested by the user: every proposal must
    - `experiments/alberta_core_rl/scripts/plot_report_figures.py`: 77 lines
    - `experiments/alberta_core_rl/proposals.py`: 251 lines
 
-## Running Or Pending Work
+## Historical Running Work And Current Resolution
 
-1. Local main run for `useful_predictive_knowledge` is still running in the current Codex exec session.
-   - Session id: `86697`
-   - Command:
+1. `useful_predictive_knowledge` main run completed after resume. Current evidence path: `experiments/alberta_core_rl/results/useful_predictive_knowledge/20260709T102402Z_main`.
 
-```bash
-PYTHONNOUSERSITE=1 MPLCONFIGDIR=/mnt/shared-storage-user/yupeng/Core-RL/.mplconfig \
-  /data/yupeng/conda_envs/core-rl/bin/python experiments/alberta_core_rl/scripts/run_experiment.py \
-  --config experiments/alberta_core_rl/configs/useful_predictive_knowledge/config_main.json
-```
+2. CPU job `core-rl-reward-sensitivity-extended-rerun-28457861` produced standard artifacts after resume. Current evidence path: `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended`.
 
-   - Important caveat: this local exec session may not survive if the user exits the outer interactive session. If no new `*_main` result directory appears under `experiments/alberta_core_rl/results/useful_predictive_knowledge/`, rerun the command above or submit it to `cpu_task` after resuming.
-
-2. CPU job `core-rl-reward-sensitivity-extended-rerun-28457861` was still running when checked at 2026-07-09 18:15 HKT.
-   - Namespace: `ailab-safethm`
-   - Node: `lg-cmc-h-cpu-0057.host.h.pjlab.org.cn`
-   - Current pending result dir: `experiments/alberta_core_rl/results/reward_centered_sarsa_sensitivity/20260709T085747Z_extended`
-   - The directory had no standard artifacts at the last check, so it is not evidence yet.
-
-3. CPU job `core-rl-dyna-drift-extended-rerun-30016335` was still running when checked at 2026-07-09 18:16 HKT.
-   - Namespace: `ailab-safethm`
-   - Node: `lg-cmc-h-cpu-0061.host.h.pjlab.org.cn`
-   - Current pending result dir: `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended`
-   - The directory had no standard artifacts at the last check, so it is not evidence yet.
+3. CPU job `core-rl-dyna-drift-extended-rerun-30016335` produced standard artifacts after resume. Current evidence path: `experiments/alberta_core_rl/results/continual_dyna_model_aging_drift/20260709T085809Z_extended`.
 
 4. `__pycache__` cleanup remains blocked by file ownership.
    - Remaining directories:

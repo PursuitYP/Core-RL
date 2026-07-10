@@ -8,6 +8,20 @@ This study examines a narrow failure mode for continual predictive agents: off-p
 
 The pilot compares semi-gradient off-policy TD with a TDC-style correction across three step sizes. Semi-gradient TD shows severe weight-norm growth. The TDC-style learner remains stable at smaller tested step sizes but also fails at the largest tested step size. The contribution is therefore a bounded warning: off-policy predictions need explicit stability checks before they are treated as agent knowledge.
 
+## Evidence Summary
+
+This report should be read as a stability diagnostic, not as a performance proposal. The entire experiment is designed so that the correct value is zero; therefore, growing weights or value estimates are direct evidence of update instability rather than poor reward maximization. The evidence is intentionally small but pointed: it asks whether the off-policy prediction machinery that a continual agent might use for background knowledge can fail even with linear features and no neural network.
+
+| Item | Current evidence |
+|---|---|
+| RL question | What stability warning does a Baird-style counterexample provide for off-policy linear value prediction learned from ordinary experience? |
+| Testbed | Seven-state Baird-style off-policy prediction with zero reward, behavior-target mismatch, linear features, and online bootstrapping. |
+| Compared learners | Semi-gradient off-policy TD versus TDC-style correction at alpha `0.005`, `0.01`, and `0.02`. |
+| Seeds and horizon | Five seeds, `5000` online steps per condition. |
+| Primary metric | Seed-tail weight norm, with divergence flag and TD error as supporting diagnostics. |
+| Headline result | Semi-gradient TD weight norm grows from `1.12e4 +/- 2.18e3` at alpha `0.005` to `3.57e7 +/- 3.62e6` at alpha `0.02`; TDC-style correction stays near `8.79` at alpha `0.005/0.01` but also fails at alpha `0.02` with weight norm `2.07e7 +/- 6.91e6`. |
+| Conclusion boundary | Useful as an off-policy stability warning; not yet a canonical Baird replication, not a control result, and not evidence that TDC-style correction solves all off-policy prediction. |
+
 ## Claim Boundary
 
 The report makes one bounded claim: in the current Baird-style implementation, ordinary semi-gradient off-policy TD exhibits severe weight growth, and a TDC-style correction enlarges but does not eliminate the stable step-size region.

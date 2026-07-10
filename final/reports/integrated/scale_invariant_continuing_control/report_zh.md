@@ -34,7 +34,7 @@ Compute need / fallback：main pilot、fixed-condition 20-seed extended sweep �
 
 证据等级：强独立证据。完成的 fixed-condition extended sweep 覆盖 375 个 condition groups 和 7500 个 seed-conditions，展示 reward centering 与 update normalization 的 interaction。完成的 20-seed unit-switching run 对 continual-learning relevance 更强，因为它在同一 stream 中改变 units，不重置 weights。这两个实验共同支持 stability 部分的 claim，同时保留更困难的 recovery caveat。
 
-当前 claim 必须收紧：combined centering/normalization 在当前测试 variants 和 access-control 设置中对 stable unit changes 是必要的，并且能在 no-reset switches 下避免严重数值不稳定；但它没有完全解决 abrupt feature-scale changes 后的 reward recovery。成熟最终论文还需要 gradual scale drift、beta sensitivity、recovery AUC 和 policy-distance probes。
+当前 claim 必须收紧：combined centering/normalization 是当前 access-control grid 中唯一能同时稳定 reward-origin 和 feature-scale 两个 nuisance dimensions 的测试方法族，并且能在 no-reset switches 下避免严重数值不稳定；但它没有完全解决 abrupt feature-scale changes 后的 reward recovery。成熟最终论文还需要 gradual scale drift、beta sensitivity、recovery AUC 和 policy-distance probes。
 
 ## 论文式贡献与 Claim 边界
 
@@ -86,7 +86,9 @@ no-reset unit-switching extension 用来避免 fixed-condition sweep 隐含的 r
 
 ## 结果
 
-fixed-condition extended sweep 显示两个机制是互补的：discounted Sarsa 和 reward-centered Sarsa 各自有 `500/1500` seed-conditions 发散，失败集中在 scale `hundred` 和高 alpha 的 scale `ten`；normalized Sarsa 有 `0/1500` divergent seed-conditions，说明 feature-scale stability 明显改善，但 mean tail unshifted reward 只有 `1.965`，仍有 reward-origin sensitivity；normalized reward-centered Sarsa 和 normalized differential Sarsa 在当前 sweep 中最稳，分别达到 mean tail unshifted reward `2.556` 和 `2.554`，并且都是 `0/1500` divergent seed-conditions。
+fixed-condition extended sweep 显示两个机制是互补的：discounted Sarsa 和 reward-centered Sarsa 各自有 `500/1500` seed-conditions 发散，失败集中在 scale `hundred` 和高 alpha 的 scale `ten`；normalized Sarsa 有 `0/1500` divergent seed-conditions，说明 feature-scale stability 明显改善，但 mean tail unshifted reward 只有 `1.965`，仍有 reward-origin sensitivity；normalized reward-centered Sarsa 和 normalized differential Sarsa 在当前 sweep 中最稳，分别达到 mean tail unshifted reward `2.556` 和 `2.554`，并且都是 `0/1500` divergent seed-conditions。下面两个表是 headline evidence；后面的 heatmaps/figures 是诊断展示，不是主要结论本身。
+
+**表 1. fixed-condition headline evidence from `20260709T063128Z_extended`.**
 
 | Algorithm | Mean tail unshifted reward | Reward range across conditions | Seed-conditions diverged | Median tail Q norm | Interpretation |
 |---|---:|---:|---:|---:|---|
@@ -96,13 +98,22 @@ fixed-condition extended sweep 显示两个机制是互补的：discounted Sarsa
 | normalized reward-centered Sarsa | `2.556` | `2.493-2.609` | `0/1500` | `24.6` | 本 sweep 中 stability 和 reward 的最佳组合。 |
 | normalized differential Sarsa | `2.554` | `2.486-2.603` | `0/1500` | `24.4` | average-reward objective 下有非常接近的 robust pattern。 |
 
-![Tail unshifted reward by algorithm, reward shift, and feature scale.](figures/report_avg_unshifted_reward_by_scale.png)
+unit-switching extension 让结论更严格也更诚实。Fixed discounted Sarsa 在 feature-scale-only 或 joint_reward_scale switch 后可能出现巨大 Q norm，早期 post-change window 中 Q norm 可到约 `1e8` 并有非零 divergence。Normalized reward-centered 和 normalized differential variants 避免了 catastrophic divergence，支持核心 stability claim。但它们没有完全解决 abrupt `hundred`-scale no-reset recovery：在 feature-scale 或 joint-scale switch 后，late unshifted reward 经常降到约 `1.9-2.0`。相比之下，reward_shift_only 和 lognormal-scale switch 更容易恢复。更准确的结论是：combined centering/normalization improves stability，但 abrupt no-reset recovery remains unsolved。
 
-![Tail Q norm by algorithm, reward shift, and feature scale.](figures/report_q_norm_by_scale.png)
+表 2 汇总 no-reset evidence。数值对 `0.01, 0.03, 0.1` 三个 alpha 和 20 seeds 取平均。`late reward` 是 `post_late` window 的 mean tail `avg_unshifted_reward`；`Q` 是 mean tail Q norm；`div` 是 mean tail divergence rate。对于 discounted Sarsa 的 `feature_scale_only` 和 `joint_reward_scale`，condition summary 中没有 `post_late` rows，因此表中报告 early post-switch instability。
 
-![Tail output-change magnitude by algorithm, reward shift, and feature scale.](figures/report_prediction_change_by_scale.png)
+**表 2. No-reset unit-switch headline evidence from `20260709T024834Z_extended`.**
 
-unit-switching extension 让结论更严格也更诚实。Fixed discounted Sarsa 在 feature-scale-only 或 joint_reward_scale switch 后可能出现巨大 Q norm，早期 post-change window 中 Q norm 可到约 `1e8` 并有非零 divergence。Normalized reward-centered 和 normalized differential variants 避免了 catastrophic divergence，支持核心 stability claim。但它们没有完全解决 abrupt `hundred`-scale no-reset recovery：在 feature-scale 或 joint-scale switch 后，late unshifted reward 经常降到约 `1.9-2.0`。相比之下，reward_shift_only 和 lognormal-scale switch 更容易恢复。
+| Switch type | Discounted Sarsa | Normalized reward-centered Sarsa | Normalized differential Sarsa | Main read |
+|---|---|---|---|---|
+| `reward_shift_only` | late reward `2.212`, Q `694`, div `0` | late reward `2.544`, Q `25`, div `0` | late reward `2.544`, Q `25`, div `0` | reward-origin switch 可以恢复；centering 同时压低 value scale。 |
+| `feature_scale_only` (`hundred`) | 无 late row；early Q `1.5e8`, div `0.23` | late reward `1.897`, Q `16`, div `0` | late reward `1.879`, Q `15.5`, div `0` | 组合方法数值稳定，但 abrupt feature-unit recovery 仍差。 |
+| `joint_reward_scale` (`hundred`) | 无 late row；early Q `1.3e8`, div `0.23` | late reward `1.907`, Q `15.9`, div `0` | late reward `1.888`, Q `15.8`, div `0` | joint abrupt switch 重复同一个 unresolved recovery failure。 |
+| `joint_reward_lognormal` | late reward `2.316`, Q `102`, div `0` | late reward `2.541`, Q `62.8`, div `0` | late reward `2.537`, Q `62.0`, div `0` | 较温和的不规则 rescaling 恢复明显更好。 |
+
+Normalized Sarsa 是重要中间对照：它也能在 abrupt scale switch 下保持零 divergence，但 fixed-condition reward 更低、Q norm 更大。因此证据支持 combined centering/normalization 改善稳定性，不支持 no-reset abrupt recovery 已解决。
+
+诊断图：
 
 ![No-reset unit switches 后的 post-late reward。](figures/report_unit_switch_reward_heatmap.png)
 
@@ -110,15 +121,21 @@ unit-switching extension 让结论更严格也更诚实。Fixed discounted Sarsa
 
 ![No-reset unit switches 后的 post-late divergence。](figures/report_unit_switch_divergence_heatmap.png)
 
+![Tail unshifted reward by algorithm, reward shift, and feature scale.](figures/report_avg_unshifted_reward_by_scale.png)
+
+![Tail Q norm by algorithm, reward shift, and feature scale.](figures/report_q_norm_by_scale.png)
+
+![Tail output-change magnitude by algorithm, reward shift, and feature scale.](figures/report_prediction_change_by_scale.png)
+
 ## 分析
 
-最重要的 insight 不是“组合方法分数最高”，而是两个单独机制的失败边界不同。Reward centering 主要移除 reward-origin nuisance component，但不能控制 feature norm 变大导致的 update explosion。Normalization 主要控制 feature-scale sensitivity，但如果 reward baseline 产生巨大 value offset，它仍然不能保证 behavior invariance。组合机制在 fixed-condition pilot 中表现最好，说明两个 correction 方向可以组合。
+最重要的 insight 不是“组合方法分数最高”，而是两个单独机制的失败边界不同。Reward centering 主要移除 reward-origin nuisance component，但不能控制 feature norm 变大导致的 update explosion。Normalization 主要控制 feature-scale sensitivity，但如果 reward baseline 产生巨大 value offset，它仍然不能保证 behavior invariance。组合机制在 completed fixed-condition extended sweep 中表现最好，说明两个 correction 方向可以组合。
 
 unit-switching 进一步说明，稳定性和恢复性是两个层次。组合方法能避免 fixed discounted Sarsa 的灾难性发散，但 abrupt feature-scale switch 会让已学 value weights 与新 feature units 不匹配，导致 long-run reward 降低。这个结果很有研究价值，因为它把下一步问题从“是否需要 centering/normalization”推进到“如何在 no-reset unit change 后快速重新校准 internal values”。
 
 ## 局限
 
-当前证据比初版 pilot 强，但仍不是完成版 empirical paper。Access-control queue 是有意义的 continuing-control testbed，但仍是 compact synthetic task。feature-scale manipulation 是人为设计的 invariance test，不代表真实 sensor drift 一定如此。unit-switching 使用 abrupt switch，比 gradual drift 更激烈；下一步应加入 gradual feature-scale drift、reward baseline beta sensitivity 和全状态 policy-distance probes。full fixed-condition 20-seed grid 也还没有完成。
+当前证据比初版 pilot 强，但仍不是完成版 empirical paper。Access-control queue 是有意义的 continuing-control testbed，但仍是 compact synthetic task。feature-scale manipulation 是人为设计的 invariance test，不代表真实 sensor drift 一定如此。unit-switching 使用 abrupt switch，比 gradual drift 更激烈；下一步应加入 gradual feature-scale drift、reward baseline beta sensitivity、recovery AUC 和全状态 policy-distance probes。
 
 ## 审稿式批评与回应
 
