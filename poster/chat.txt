@@ -1,0 +1,114 @@
+我们周末或者下周一要不要整理出来一份初步结果讨论一下？
+我觉得需要，要不周日下午或者周一课后？
+下午几点？
+或者明天？
+@所有人
+你们结果咋样了？
+要不明天吧，我下午不在电脑前，或者你们先开也行
+那行，那就明天下午
+我整理一份类似于论文的报告和简单已读的html出来看看
+你看看你们有没有感兴趣的结果
+这两份结果我没太仔细看，你们可以大致看看（）
+家人们我后面这周人在国外，是线上参加课程。时差原因可能回复不及时，你们先讨论着
+下午有无讨论
+蹲个今天录音
+都可以，这是我目前的部分，还在整理
+反正线上开会吧
+要不下午4点？
+@李明珠 你那边时差啥情况？
+你这周会回来吗？
+我这边晚8h
+没事你们线下讨论优先吧，先不用考虑我
+不好意思，今天没时间诶
+要不我们明天比如下午或者晚上
+[捂脸]
+我明晚没时间
+@宋欣薇 要不然你看看我发出来的文档，反正结果都在里面了，有什么不确定的直接问我？
+ok
+你可以先看看，结合一下你那边做的，看看有没有下一步推进的想法
+哎早知道我午睡就不醒了（笑
+[捂脸]
+html其实是做的pdf的交互化展示，其实内容都在pdf里
+话说有必要安排讨论吗，也可以是明早讨论也行🤔
+你们怎么想
+@宋欣薇 是不是还有今天后半场的录音
+？我从来不录音
+记错了
+[破涕为笑]
+@所有人 我们明天上午还是下午讨论？
+其实我觉得上午也行，不过要是不方便就下午
+下午可以不
+飞书群助教发了 poster 提交消息
+原来今晚十二点是 ddl 哇
+啊这
+那要不下午两点?
+留点时间调整修改一下
+1
+2
+看了你们两个分别做的
+感觉都还挺好哈哈哈
+那没时间了
+要不然我们下午交流一下就整理起来当最终结果交上去吧
+本来要是还有时间还可以补一些融合实验的
+这是大群里发的 poster template
+开个腾讯会议？
+#腾讯会议：888-691-718
+@余鹏 我们讨论下poster怎么做吧
+我马上来嗷，等我五分钟左右
+okk
+我也来啦
+接下要不是你们帮忙梳理一下论文脉络，然后我开始做 poster
+
+标题 动机 方法 实验图表 结论
+或者你们有其他想法么
+research problem: 探索怎样的representation对policy learning有效，怎样得到这样的representation
+
+motivation: big world hypothesis, 需要表征学习辅助policy learning，但不是所有的sub-task得到的representation都有效
+
+method：
+- yuqi 通过一些集合特征设计representation
+- yuqi 为了增强representation的表现力，增加非线性适配器
+- xinwei 组合多个gvf，迭代生成gvf
+我群里打字吧
+感觉脉络可以，但需要再细化一点
+环境：t-maze，ringworld，two_loop，hidden_velocity
+研究得到有效representation的motivation之一：有些representation保留了信息，但是policy不能有效利用，可附实验图
+big world hypothesis蕴含的假设：raw observation 在这些 POMDP 环境里通常不足以支撑稳定有效的policy；某些 predictive tasks 能提升 hidden-state decodability
+辛苦你们帮忙继续梳理一下嗷，我负责做 poster
+就按照xinwei的思路来就行，我负责提供材料
+okk
+后面要是有不清楚的再找我
+result：
+- decodable representation 也不一定带来 control gain
+- 非线性适配器在部分场景中能提升利用效率
+-多个互补 GVF 组成的 bank 通常比单个 GVF 更有效。
+- 在 non-stationary setting 下，自适应 GVF bank 比固定组合更有潜力。
+我们 poster/paper title 叫什么诶
+草拟一下
+不知道我没啥英文品味（头大）
+我也来了
+有什么我能做的吗
+🙌🏻
+你那边现在几点？
+八点
+早上
+哦哦
+好早
+没事，但是我们今晚有个ddl，你看看余鹏那边有没有需要你帮忙的
+行
+没有的话你也可以和xinwei那边聊聊，看看论文那边有没有什么需要帮忙的
+okok.杂活都可以群里直接戳我
+recap：yuqi 和 xinwei 分别做了一点我们选定 topic 的分析和实验，下午讨论了一些怎么做 poster，现在我们在梳理脉络，然后我开始下午做 poster ppt
+明珠你后面可以帮忙整合一下我们的材料，编纂一个minipaper
+好，你们的材料会发在哪里？飞书还是微信
+微信
+已经在发了
+minipaper的话应该是23号交，还有时间
+好大
+好滴
+要不火速上传个 github
+我发的压缩包里面资料应该是全的，但是可能有部分内容是重复的，有的是代码有的是latex原稿有的是编译好的paper还有一份关于我的github仓库让gpt草拟的使用指南
+东西应该都在里面了，如果有不全或者缺失的可以call我
+Exploring Useful Predictive Representations for Streaming RL under Partial Observability
+[强]
+助教群里发的 example poster

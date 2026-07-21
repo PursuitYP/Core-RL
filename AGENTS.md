@@ -33,6 +33,7 @@ Use repository resources in this order:
 - Supplemental Alberta Plan notes: `resources/class-on-files/alberta_plan_rl_conversation.md`; `AlbertaPlan.pdf` remains canonical when sources differ.
 - Slides/logistics: `resources/class-on-files/RL_Course_Project.pptx`, `resources/class-on-files/2026强化学习暑期学校后续事宜通知（英文版）.pdf`.
 - Class materials: `resources/class-materials/`; another `AlbertaPlan.pdf` copy is in `resources/class-materials/class02-bitter-lesson,-big-world,-six-steps/`.
+- 2026 RL Summer School shared materials: `resources/26_RLSS_Lecture_Talk_Notes/` mirrors the Feishu folder hierarchy with directory-name spaces normalized to underscores, and includes course PDFs/notebooks plus exported DOCX/PPTX copies of the native Research Seminar files.
 - Implementation references: `resources/Hands-on-RL/` and `resources/spinningup/` contain RL-related resources, code, and reference implementations for building experiments.
 - General coding/workflow reference: `resources/andrej-karpathy-skills/` may guide agent behavior and exposition style, but it is not a canonical RL/course source.
 - Conda environment configuration files live in `conda-env-configs/`; this directory is not an RL environment/testbed collection.

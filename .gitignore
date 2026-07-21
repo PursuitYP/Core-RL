@@ -13,6 +13,9 @@ experiments/alberta_core_rl/results/
 # Large/imported course and reference resources
 resources/
 
+# Large poster archive; GitHub rejects normal Git blobs over 100 MB.
+poster/**/streaming-rl-feature-geometry.tar
+
 # Local scratch files
 .pytest_cache/
 .ruff_cache/
