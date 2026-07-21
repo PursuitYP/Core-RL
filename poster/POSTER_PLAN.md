@@ -35,6 +35,8 @@
 - Rebalance the second-column result narrative specifically: the RQ1 answer must not crowd its table, while the RQ3 answer must not float too far below its evidence; review the complete RQ1/RQ2/RQ3 column after correcting both local cases.
 - Expand each RQ answer only with meaningful interpretation so that all three occupy two well-filled lines—never a short orphan line and never a third line.
 - Conduct another independent full-page review and improve the poster as a complete composition, explicitly including the upper institutional color band and lower blue-purple gradient as well as content logic, spacing, alignment, readability, and visual balance.
+- Narrow the first column of the RQ3 bank table; verify whether RQ1 and RQ3 should use the original supplied figures directly, confirm whether RQ2 already does, and improve the RQ1/RQ3 summaries when the source figures are not poster-suitable.
+- Further shrink the first and second RQ3 columns and make the two inter-column gaps exactly equal rather than stretching all columns continuously across the table.
 
 ## 2. Locked poster specification
 
@@ -542,4 +544,80 @@ A compact readout map then closes the experiment-design loop: decoding diagnoses
 - Final PDF: one 60 × 90 cm page with embedded fonts, correct title/author metadata, approximately 845 extracted words, and none of the four excluded contextual values.
 - Independent isolated LibreOffice exports are pixel-identical at both 144 dpi and 96 dpi (absolute pixel error = 0).
 - Source templates remain unchanged at `7c3e921f…` and `9e528c40…`.
-- Final artifact hashes: PPTX `25a119b14b040dc5ed4099b810747ade8bf8b810a75d30a881e7891b7be9f57d`; PDF `820ff88d64b12f7d0d54dd131ca8c778682a5fe53366250545ac3dd60dbf2879`; preview `e851f6ac5033721a371b3f90ccc0b95951e9bbf56f884a00d2f760d9175b2dba`.
+- Revision 8 artifact hashes: PPTX `25a119b14b040dc5ed4099b810747ade8bf8b810a75d30a881e7891b7be9f57d`; PDF `820ff88d64b12f7d0d54dd131ca8c778682a5fe53366250545ac3dd60dbf2879`; preview `e851f6ac5033721a371b3f90ccc0b95951e9bbf56f884a00d2f760d9175b2dba`.
+
+## 21. Revision 9 — Source-figure provenance and RQ table refinement
+
+### Additional user requirements
+
+- Reduce the unnecessary width of the first column in the RQ3 bank table.
+- Determine whether RQ1 and RQ3 can directly use charts from the supplied experiment materials.
+- Confirm whether the RQ2 chart comes from the supplied materials.
+- If the original RQ1/RQ3 charts are unsuitable at poster scale, continue improving the poster-native summaries instead of forcing them onto the page.
+
+### Figure provenance and selection decision
+
+- **RQ2 uses the original supplied figure directly.** `build_poster.py` reads `02_integrated_paper/figures/fig02_stage_b1_trace_only_rescue.png` from the integrated-findings archive and embeds it without redrawing. The source PNG and `ppt/media/image2.png` share the exact SHA-256 `859737f3aadc3e02e3c6453c75930bad3a10985d31c3f93ccdaa034344cfe0ff`.
+- **RQ1 remains a source-faithful poster table.** The closest source figures (`fig01_final_performance_by_environment.png`, `fig02_task_matched_vs_generic.png`, and `fig01_stage_a_paired_seed_effects.png`) contain four panels, multiple independent scales, and either 10 rotated condition labels per environment or dense paired-seed clouds. At the available RQ1 height, direct embedding would make labels and uncertainty unreadable and would visually imply cross-environment comparability that the paper explicitly rejects.
+- **RQ3 remains a source-faithful combined table.** `bank_ablation_decodability.png` and `bank_ablation_postswitch.png` split the two key metrics into separate 1692 × 864 bar charts and use code-level labels such as `bank_k3_no_diversity`. Two directly embedded panels would consume substantially more height while making the k=4 “more decodable, worse control” comparison harder to perform. The combined table retains the exact `main.tex` values and places both readouts on the same row.
+- The decision is therefore not “tables instead of evidence”: RQ1/RQ3 use selected values copied from the supplied figures/tables, while RQ2 preserves the original paired-seed visualization where the within-seed geometry is itself the evidence.
+
+### Implemented table refinements
+
+- Renamed the RQ1 result column from generic “Selected result” to **“Within-task evidence”**, reinforcing that accuracy and reward are interpreted only within each environment.
+- Made every RQ1 evidence cell bold navy, so the three counterexamples can be scanned before reading their diagnostic implications.
+- Reduced the RQ3 first-column width from **5.85 in to 4.50 in**; all labels still fit on one line.
+- Allocated the remaining width evenly to the two quantitative readouts: approximately **3.78 in for cue decodability** and **3.78 in for post-switch control**. This makes the two measures visually coequal and shortens the eye movement required for the k=3/k=4 comparison.
+
+## 22. Revision 9 QA log
+
+### Round 30 — Source-figure suitability review
+
+- Inspected the original RQ1 four-panel performance, task-matched-prior, and paired-adapter figures at native resolution.
+- Inspected the original RQ3 post-switch, decodability, method-comparison, and decodability-versus-adaptation figures at native resolution.
+- Chose direct embedding only for RQ2 because it remains legible, exactly matches the controlled intervention, and communicates paired-seed behavior that a summary table would lose.
+
+### Round 31 — Table-scale and full-page review
+
+- Inspected dedicated 144-dpi RQ1 and RQ3 crops, the full right column, an A4-scale overview, and a grayscale full page.
+- Confirmed that “Within-task evidence” fits on one line, every RQ1 value remains legible, all RQ3 variant names remain on one line, and the equal numeric columns stay aligned.
+- Confirmed that the stronger RQ1 evidence column and narrower RQ3 label column do not compete with the central RQ2 figure.
+
+### Round 32 — Final freeze
+
+- Final package remains one 59.9987 × 89.9971 cm slide with 142 objects, 111 non-empty text objects, and two embedded media files.
+- Final geometry remains zero out-of-bounds objects, zero text-to-text overlaps, zero rule/text crossings, zero external relationships, and a valid PPTX archive.
+- Final PDF remains one 60 × 90 cm page with embedded fonts, correct metadata, approximately 845 extracted words, and none of the four excluded contextual values.
+- Independent isolated LibreOffice exports are pixel-identical at both 144 dpi and 96 dpi (absolute pixel error = 0).
+- Source templates remain unchanged at `7c3e921f…` and `9e528c40…`.
+- Revision 9 artifact hashes: PPTX `a543946765d43e276b295816d56b28ba751c2e50ca140345485e86dbb43b4f94`; PDF `face2eaf874b4df5f64c73b3063c7d0e551868914081551aa2399beff6f6dc2f`; preview `7497f30633317a1e0b5ce9926df761274a5613e7ae442acee37e7b6213e0474a`.
+
+## 23. Revision 10 — Content-sized RQ3 columns with equal gutters
+
+### Additional user requirement
+
+- Shrink the RQ3 first column further, shrink the second column as well, and make the spacing between adjacent columns equal.
+
+### Implemented geometry
+
+- Replaced the prior contiguous `4.50 / 3.78 / 3.78 in` allocation with content-sized widths of **3.40 in / 3.10 in / 3.55 in**.
+- The 12.06 in table width leaves 2.01 in after those content columns; it is divided into two exactly equal **1.005 in gutters**.
+- Column starts are computed from the widths and shared gutter rather than hard-coded independently, so future width changes cannot silently produce unequal spacing.
+- The first column remains left-aligned; both quantitative columns remain centered. Header and body padding remain identical across all three columns.
+
+## 24. Revision 10 QA log
+
+### Round 33 — Column-fit review
+
+- Inspected a dedicated 144-dpi RQ3 crop after the change.
+- Confirmed that `k=3, no diversity`, `Cue decodability`, and `Post-switch control` all remain on one line.
+- Confirmed that both highlighted rows span the full table, the values remain vertically aligned, and the wider equal gutters improve rather than fragment the k=3/k=4 comparison.
+
+### Round 34 — Final freeze
+
+- Final package remains one 59.9987 × 89.9971 cm slide with 142 objects and 111 non-empty text objects.
+- Final geometry remains zero out-of-bounds objects, zero text-to-text overlaps, zero rule/text crossings, and zero external relationships.
+- Final PDF remains one 60 × 90 cm page with approximately 845 extracted words.
+- Independent isolated LibreOffice exports are pixel-identical at both 144 dpi and 96 dpi (absolute pixel error = 0).
+- Source templates remain unchanged at `7c3e921f…` and `9e528c40…`.
+- Final artifact hashes: PPTX `b1d0c75d6341eeab1f5565f1e8e6fa7f5abd661860a11528ed3ad24cc30e572c`; PDF `3f8384559681d5ca4a5f627d1a222fe50f6b1af0f31f472964832f81d0fb8f2f`; preview `b99cd05f3ba66425e6d33e49f00d0f0bbaa923ff2bd2856f6d8448a052823da0`.

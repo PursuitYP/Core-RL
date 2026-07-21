@@ -495,7 +495,7 @@ def add_bank_mechanism(slide, x: float, y: float, w: float) -> None:
 
 def add_geometry_result_table(slide, x: float, y: float, w: float) -> None:
     columns = [2.05, 3.35, w - 5.40]
-    headers = ["Environment", "Selected result", "What it rules out"]
+    headers = ["Environment", "Within-task evidence", "What it rules out"]
     starts = [x, x + columns[0], x + columns[0] + columns[1]]
     add_rect(slide, x, y, w, 0.40, fill=SOFT, line=SOFT, line_width=0)
     for start, width, header in zip(starts, columns, headers):
@@ -542,17 +542,23 @@ def add_geometry_result_table(slide, x: float, y: float, w: float) -> None:
                 row_h - 0.08,
                 value,
                 14.0,
-                INK,
-                index == 1 and start == starts[1],
+                NAVY if start == starts[1] else INK,
+                start == starts[1],
                 valign=MSO_ANCHOR.MIDDLE,
                 line_spacing=0.92,
             )
 
 
 def add_bank_table(slide, x: float, y: float, w: float) -> None:
-    columns = [5.85, 2.75, w - 8.60]
+    # Size columns to their contents and use equal gutters instead of stretching labels.
+    columns = [3.40, 3.10, 3.55]
+    column_gap = (w - sum(columns)) / 2
     headers = ["Bank variant", "Cue decodability", "Post-switch control"]
-    starts = [x, x + columns[0], x + columns[0] + columns[1]]
+    starts = [
+        x,
+        x + columns[0] + column_gap,
+        x + columns[0] + column_gap + columns[1] + column_gap,
+    ]
     add_rect(slide, x, y, w, 0.40, fill=SOFT, line=SOFT, line_width=0)
     for start, width, header in zip(starts, columns, headers):
         add_text(
